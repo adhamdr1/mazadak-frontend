@@ -1,0 +1,914 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type RatingBreakdown {
+  oneStar: Int!
+  twoStar: Int!
+  threeStar: Int!
+  fourStar: Int!
+  fiveStar: Int!
+}
+
+type UserRatingStats {
+  averageRating: Float!
+  totalReviews: Int!
+  asSellerAverageRating: Float!
+  asSellerTotalReviews: Int!
+  asBuyerAverageRating: Float!
+  asBuyerTotalReviews: Int!
+  breakdown: RatingBreakdown!
+}
+
+type Address {
+  city: String!
+  street: String!
+}
+
+type User {
+  _id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  authProvider: AuthProvider!
+  googleId: String
+  role: UserRole!
+  phoneNumber: String!
+  dateOfBirth: DateTime!
+  address: Address!
+  isEmailVerified: Boolean!
+  isBanned: Boolean!
+  ratingStats: UserRatingStats
+  deletedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type UsersPage {
+  items: [User!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+"""Sanitized public profile projection for a user"""
+type PublicProfile {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  city: String
+  memberSince: DateTime!
+  ratingStats: UserRatingStats
+  activeAuctionsCount: Int!
+  completedAuctionsCount: Int!
+}
+
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
+type RegisterResponse {
+  success: Boolean!
+  message: String!
+}
+
+type Wallet {
+  _id: ID!
+  userId: ID!
+  balance: String!
+  heldBalance: String!
+  availableBalance: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Transaction {
+  _id: ID!
+  walletId: ID!
+  type: TransactionType!
+  amount: String!
+  currency: String!
+  status: TransactionStatus!
+  referenceId: String
+  idempotencyKey: String
+  gatewayPaymentIntentId: String
+  gatewayTransactionId: String
+  gatewayProvider: String
+  referenceType: TransactionReferenceType
+  expiresAt: DateTime
+  hasChild: Boolean!
+  walletCredited: Boolean!
+  createdAt: DateTime!
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  HOLD
+  RELEASE
+  CAPTURE
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELLED
+  EXPIRED
+}
+
+enum TransactionReferenceType {
+  AUCTION
+  TRANSACTION
+  ESCROW
+  DISPUTE
+}
+
+type TransactionsPage {
+  items: [Transaction!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type WalletsPage {
+  items: [Wallet!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type InAppNotification {
+  _id: ID!
+  userId: ID!
+  type: InAppNotificationType!
+  title: String!
+  body: String!
+  isRead: Boolean!
+  referenceId: String
+  referenceType: NotificationReferenceType
+  createdAt: DateTime!
+}
+
+enum InAppNotificationType {
+  OUTBID
+  AUCTION_WON
+  AUCTION_ENDED_SELLER
+  DEPOSIT_SUCCESSFUL
+  WITHDRAWAL_COMPLETED
+  AUCTION_STARTED
+  WELCOME
+  NEW_BID
+  AUCTION_CANCELLED
+  AUCTION_CANCELLED_BY_ADMIN
+  NEW_CHAT_MESSAGE
+  REVIEW_RECEIVED
+  REVIEW_REPLIED
+  AUTO_BID_PLACED
+  AUTO_BID_EXHAUSTED
+  ESCROW_CREATED
+  ESCROW_RELEASED
+  ESCROW_REFUNDED
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  DISPUTE_CANCELLED
+}
+
+enum NotificationReferenceType {
+  AUCTION
+  TRANSACTION
+  WALLET
+  REVIEW
+  ESCROW
+  DISPUTE
+}
+
+type InAppNotificationsPage {
+  items: [InAppNotification!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type Auction {
+  _id: ID!
+  sellerId: ID!
+  title: String!
+  description: String!
+  images: [String!]!
+  category: AuctionCategory!
+  startingPrice: String!
+  minimumBidIncrement: String!
+  currentPrice: String!
+  status: AuctionStatus!
+  startTime: DateTime!
+  endTime: DateTime!
+  winnerId: ID
+  isFinalized: Boolean!
+  adminActionReason: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum AuctionCategory {
+  ELECTRONICS
+  FASHION
+  JEWELRY
+  WATCHES
+  ANTIQUES
+  ART
+  COLLECTIBLES
+  BOOKS
+  FURNITURE
+  HOME_APPLIANCES
+  CARS
+  MOTORCYCLES
+  REAL_ESTATE
+  SPORTS
+  TOYS
+  OTHER
+}
+
+enum AuctionStatus {
+  PENDING
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+type AuctionsPage {
+  items: [Auction!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type AuctionStatusChangedPayload {
+  auction: Auction!
+}
+
+type Bid {
+  _id: ID!
+  auctionId: ID!
+  bidderId: ID!
+  amount: String!
+  status: BidStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum BidStatus {
+  WINNING
+  OUTBID
+}
+
+type UploadImageResponse {
+  """Public URL of the uploaded image"""
+  url: String!
+}
+
+type UploadSignatureResponse {
+  signature: String!
+  timestamp: Float!
+  apiKey: String!
+  cloudName: String!
+  folder: String!
+}
+
+type AutoBid {
+  _id: ID!
+  auctionId: ID!
+  userId: ID!
+  maxAmount: String!
+  status: AutoBidStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The status of an auto-bid configuration (ACTIVE, EXHAUSTED, CANCELLED)"""
+enum AutoBidStatus {
+  ACTIVE
+  EXHAUSTED
+  CANCELLED
+}
+
+type BidsPage {
+  items: [Bid!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type AutoBidsPage {
+  items: [AutoBid!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type BidAddedPayload {
+  bid: Bid!
+  currentPrice: Float!
+  leadingBidderId: ID!
+  bidCount: Int!
+}
+
+type Escrow {
+  _id: ID!
+  auctionId: ID!
+  buyerId: ID!
+  sellerId: ID!
+  amount: String!
+  currency: String!
+  status: EscrowStatus!
+  inspectionPeriodEndsAt: DateTime!
+  releasedAt: DateTime
+  refundedAt: DateTime
+  disputeId: ID
+  releaseReason: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Lifecycle status of an escrow hold"""
+enum EscrowStatus {
+  HELD
+  RELEASED
+  REFUNDED
+  DISPUTED
+}
+
+type Dispute {
+  _id: ID!
+  escrowId: ID!
+  auctionId: ID!
+  openedById: ID!
+  againstUserId: ID!
+  reason: DisputeReason!
+  description: String!
+  evidenceUrls: [String!]!
+  status: DisputeStatus!
+  adminId: ID
+  adminDecision: DisputeResolution
+  adminNotes: String
+  resolvedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reason for opening a dispute against an escrow transaction"""
+enum DisputeReason {
+  ITEM_NOT_RECEIVED
+  ITEM_DAMAGED
+  ITEM_MISMATCH
+  COUNTERFEIT_ITEM
+  OTHER
+}
+
+"""Lifecycle status of an escrow dispute"""
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_BUYER_REFUNDED
+  RESOLVED_SELLER_PAID
+  CANCELLED
+}
+
+"""Admin resolution decision for an escrow dispute"""
+enum DisputeResolution {
+  REFUND_BUYER
+  PAY_SELLER
+}
+
+type DisputesPage {
+  items: [Dispute!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type EscrowsPage {
+  items: [Escrow!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type AdminUserDetails {
+  user: User!
+  wallet: Wallet
+  recentAuctions: AuctionsPage
+  recentTransactions: TransactionsPage
+}
+
+type DashboardStats {
+  totalUsers: Int!
+  verifiedUsers: Int!
+  activeAuctions: Int!
+  completedAuctions: Int!
+  cancelledAuctions: Int!
+  totalWalletBalance: Float!
+  todaysRevenue: Float!
+  totalTransactions: Int!
+}
+
+type ChatReaction {
+  emoji: String!
+  userId: ID!
+}
+
+type ChatMessage {
+  _id: ID!
+  clientMessageId: String!
+  auctionId: ID!
+  senderId: ID!
+  type: ChatMessageType!
+  content: String
+  mediaUrls: [String!]
+  reactions: [ChatReaction!]!
+  isEdited: Boolean!
+  isDeleted: Boolean!
+  senderName: String!
+  createdAt: DateTime!
+}
+
+enum ChatMessageType {
+  TEXT
+  IMAGE
+}
+
+type ChatReadState {
+  _id: ID!
+  auctionId: ID!
+  userId: ID!
+  lastReadMessageId: ID
+  lastReadAt: DateTime
+}
+
+type ChatMessagesConnection {
+  items: [ChatMessage!]!
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type ChatReadStateUpdatedPayload {
+  auctionId: ID!
+  userId: ID!
+  lastReadMessageId: ID
+  lastReadAt: DateTime
+}
+
+type ReviewCriteria {
+  itemAccuracy: Int
+  communication: Int
+  packaging: Int
+  smoothExperience: Int
+}
+
+type Review {
+  _id: ID!
+  auctionId: ID!
+  reviewerId: ID!
+  reviewedUserId: ID!
+  type: ReviewType!
+  status: ReviewStatus!
+  overallRating: Float!
+  criteria: ReviewCriteria
+  comment: String
+  reply: String
+  repliedAt: DateTime
+  publishedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reviewer: PublicProfile
+  reviewedUser: PublicProfile
+  auction: Auction
+}
+
+"""
+Type of review submitted (buyer reviewing seller or seller reviewing buyer)
+"""
+enum ReviewType {
+  BUYER_TO_SELLER
+  SELLER_TO_BUYER
+}
+
+"""Publication and moderation status of a review"""
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  HIDDEN
+}
+
+type ReviewsPage {
+  items: [Review!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+"""Indicates whether the current user is eligible to review an auction"""
+type CanReviewAuctionResponse {
+  canReview: Boolean!
+  reason: String
+}
+
+type Query {
+  publicProfile(userId: ID!): PublicProfile!
+  me: User!
+  findUser(input: FindUserInput!): User!
+  users(input: PaginationInput!, filter: UsersFilterInput): UsersPage!
+  wallets(input: PaginationInput!): WalletsPage!
+  adminGetWallet(userId: String!): Wallet!
+  myWallet: Wallet!
+  myTransactions(input: PaginationInput, filter: TransactionsFilterInput): TransactionsPage!
+  transactions(input: PaginationInput, filter: TransactionsFilterInput): TransactionsPage!
+  myNotifications(input: PaginationInput!): InAppNotificationsPage!
+  unreadNotificationsCount: Int!
+  auctions(input: PaginationInput!, filter: AuctionsFilterInput): AuctionsPage!
+  adminAuctions(input: PaginationInput!, filter: AuctionsFilterInput): AuctionsPage!
+  auction(id: ID!): Auction!
+  myAuctions(input: PaginationInput!, filter: AuctionsFilterInput): AuctionsPage!
+  myWonAuctions(input: PaginationInput!, filter: AuctionsFilterInput): AuctionsPage!
+  userAuctions(userId: ID!, input: PaginationInput, filter: AuctionsFilterInput): AuctionsPage!
+  generateUploadSignature(folder: String): UploadSignatureResponse!
+  auctionBids(auctionId: String!, input: PaginationInput!, filter: BidsFilterInput): BidsPage!
+  adminBids(input: PaginationInput!, filter: BidsFilterInput): BidsPage!
+  myBids(input: PaginationInput!, filter: BidsFilterInput): BidsPage!
+  myAutoBid(auctionId: ID!): AutoBid
+  myAutoBids(input: PaginationInput!, status: AutoBidStatus): AutoBidsPage!
+  escrowByAuction(auctionId: ID!): Escrow
+  escrow(id: ID!): Escrow!
+  myEscrows(input: PaginationInput, filter: EscrowFilterInput): EscrowsPage!
+  allEscrows(input: PaginationInput, filter: EscrowFilterInput): EscrowsPage!
+  dispute(id: ID!): Dispute!
+  disputeByAuction(auctionId: ID!): Dispute
+  myDisputes(input: PaginationInput, filter: DisputeFilterInput): DisputesPage!
+  allDisputes(input: PaginationInput, filter: DisputeFilterInput): DisputesPage!
+  adminGetUsers(input: PaginationInput!, filter: UsersFilterInput): UsersPage!
+  adminGetUserDetails(userId: ID!): AdminUserDetails!
+  adminGetAuctions(input: PaginationInput!, filter: AuctionsFilterInput): AuctionsPage!
+  adminGetTransactions(input: PaginationInput!, filter: TransactionsFilterInput): TransactionsPage!
+  adminGetDashboardStats: DashboardStats!
+  chatMessages(auctionId: ID!, limit: Float! = 20, cursor: String): ChatMessagesConnection!
+  chatReadState(auctionId: ID!): ChatReadState
+  userReviews(userId: ID!, input: PaginationInput, filter: ReviewsFilterInput, sort: ReviewsSortInput): ReviewsPage!
+  myWrittenReviews(input: PaginationInput): ReviewsPage!
+  userRatingStats(userId: ID!): UserRatingStats!
+  canReviewAuction(auctionId: ID!): CanReviewAuctionResponse!
+  review(id: ID!): Review!
+  adminAuctionReviews(auctionId: ID!): [Review!]!
+}
+
+input FindUserInput {
+  id: String!
+}
+
+input PaginationInput {
+  page: Int! = 1
+  limit: Int! = 10
+}
+
+input UsersFilterInput {
+  search: String
+  sort: UsersSortInput
+}
+
+input UsersSortInput {
+  field: UsersSortField! = CREATED_AT
+  order: SortOrder! = DESC
+}
+
+"""Fields by which users can be sorted"""
+enum UsersSortField {
+  CREATED_AT
+  FIRST_NAME
+  LAST_NAME
+}
+
+"""Sorting order (Ascending or Descending)"""
+enum SortOrder {
+  ASC
+  DESC
+}
+
+input TransactionsFilterInput {
+  search: String
+  type: TransactionType
+  status: TransactionStatus
+  startDate: DateTime
+  endDate: DateTime
+  expiresAtBefore: DateTime
+  hasChild: Boolean
+  sort: TransactionsSortInput
+}
+
+input TransactionsSortInput {
+  field: TransactionsSortField! = CREATED_AT
+  order: SortOrder! = DESC
+}
+
+"""Fields by which transactions can be sorted"""
+enum TransactionsSortField {
+  CREATED_AT
+  AMOUNT
+}
+
+input AuctionsFilterInput {
+  category: AuctionCategory
+  status: AuctionStatus
+  search: String
+  sort: AuctionsSortInput
+}
+
+input AuctionsSortInput {
+  field: AuctionsSortField! = CREATED_AT
+  order: SortOrder! = DESC
+}
+
+"""Fields by which auctions can be sorted"""
+enum AuctionsSortField {
+  CREATED_AT
+  START_TIME
+  END_TIME
+  CURRENT_PRICE
+  TITLE
+}
+
+input BidsFilterInput {
+  status: BidStatus
+  sort: BidsSortInput
+}
+
+input BidsSortInput {
+  field: BidsSortField! = CREATED_AT
+  order: SortOrder! = DESC
+}
+
+"""Fields by which bids can be sorted"""
+enum BidsSortField {
+  CREATED_AT
+  AMOUNT
+}
+
+input EscrowFilterInput {
+  status: EscrowStatus
+  userId: String
+  buyerId: String
+  sellerId: String
+  auctionId: String
+}
+
+input DisputeFilterInput {
+  status: DisputeStatus
+  userId: String
+  openedById: String
+  againstUserId: String
+  auctionId: String
+}
+
+input ReviewsFilterInput {
+  type: ReviewType
+  minRating: Int
+}
+
+input ReviewsSortInput {
+  field: ReviewsSortField! = CREATED_AT
+  order: SortOrder! = DESC
+}
+
+"""Available sorting fields for reviews listing"""
+enum ReviewsSortField {
+  CREATED_AT
+  RATING
+}
+
+type Mutation {
+  register(registerInput: RegisterInput!): RegisterResponse!
+  login(loginInput: LoginInput!): AuthResponse!
+  googleRegister(googleRegisterInput: GoogleRegisterInput!): AuthResponse!
+  googleLogin(googleLoginInput: GoogleLoginInput!): AuthResponse!
+  confirmEmail(token: String!): Boolean!
+  resendConfirmationEmail(email: String!): Boolean!
+  requestReactivation(email: String!): Boolean!
+  confirmReactivation(token: String!): Boolean!
+  refreshToken(refreshToken: String!): AuthResponse!
+  logout(refreshToken: String!): Boolean!
+  logoutAll: Boolean!
+  forgotPassword(input: ForgotPasswordInput!): Boolean!
+  resetPassword(input: ResetPasswordInput!): Boolean!
+  updatePassword(input: UpdatePasswordInput!): Boolean!
+  updateProfile(input: UpdateUserInput!): User!
+  deleteAccount: Boolean!
+  adminUpdateUser(targetUser: FindUserInput!, input: UpdateUserInput!): User!
+  adminDeleteUser(targetUser: FindUserInput!): Boolean!
+  withdraw(input: WithdrawInput!): Wallet!
+  markNotificationAsRead(notificationId: ID!): InAppNotification!
+  markAllNotificationsAsRead: Boolean!
+  createAuction(input: CreateAuctionInput!): Auction!
+  updateAuction(id: ID!, input: UpdateAuctionInput!): Auction!
+  cancelAuction(id: ID!): Boolean!
+  uploadImage(input: UploadImageInput!): UploadImageResponse!
+  deleteImage(url: String!): Boolean!
+  placeBid(input: PlaceBidInput!): Bid!
+  setAutoBid(input: SetAutoBidInput!): AutoBid!
+  cancelAutoBid(input: CancelAutoBidInput!): Boolean!
+  confirmDelivery(escrowId: ID!): Escrow!
+  releaseEscrow(escrowId: ID!, reason: String): Escrow!
+  refundEscrow(escrowId: ID!, reason: String): Escrow!
+  openDispute(input: CreateDisputeInput!): Dispute!
+  cancelDispute(disputeId: ID!): Dispute!
+  updateDisputeStatus(input: UpdateDisputeStatusInput!): Dispute!
+  resolveDispute(input: ResolveDisputeInput!): Dispute!
+  adminToggleUserBan(userId: ID!): User!
+  adminCancelAuction(auctionId: ID!, reason: String!): Boolean!
+  sendMessage(input: CreateChatMessageInput!): ChatMessage!
+  editMessage(messageId: ID!, newContent: String!): ChatMessage!
+  deleteMessage(messageId: ID!): ChatMessage!
+  reactToMessage(messageId: ID!, emoji: String): ChatMessage!
+  markChatAsRead(auctionId: ID!, lastReadMessageId: ID!): Boolean!
+  createReview(input: CreateReviewInput!): Review!
+  replyToReview(input: ReplyReviewInput!): Review!
+  hideReview(reviewId: ID!): Review!
+  unhideReview(reviewId: ID!): Review!
+}
+
+input RegisterInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  phoneNumber: String!
+  dateOfBirth: DateTime!
+  address: AddressInput!
+}
+
+input AddressInput {
+  city: String!
+  street: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input GoogleRegisterInput {
+  token: String!
+  firstName: String!
+  lastName: String!
+  phoneNumber: String!
+  dateOfBirth: DateTime!
+  address: AddressInput!
+}
+
+input GoogleLoginInput {
+  token: String!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+input ResetPasswordInput {
+  email: String!
+  token: String!
+  password: String!
+}
+
+input UpdatePasswordInput {
+  oldPassword: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  email: String
+  phoneNumber: String
+  dateOfBirth: DateTime
+  address: AddressInput
+}
+
+input WithdrawInput {
+  amount: Float!
+}
+
+input CreateAuctionInput {
+  title: String!
+  description: String!
+  category: AuctionCategory!
+  startingPrice: Float!
+  minimumBidIncrement: Float!
+  images: [String!]!
+  startTime: DateTime!
+  endTime: DateTime!
+}
+
+input UpdateAuctionInput {
+  title: String
+  description: String
+  category: AuctionCategory
+  images: [String!]
+  startTime: DateTime
+  endTime: DateTime
+}
+
+input UploadImageInput {
+  """Base64 encoded image string"""
+  base64Data: String!
+
+  """Optional folder name to store the image in"""
+  folder: String
+}
+
+input PlaceBidInput {
+  auctionId: ID!
+  amount: Float!
+}
+
+input SetAutoBidInput {
+  """The ID of the auction to configure auto-bidding for"""
+  auctionId: ID!
+
+  """The maximum ceiling amount the user is willing to bid"""
+  maxAmount: Float!
+}
+
+input CancelAutoBidInput {
+  """The ID of the auction to cancel auto-bidding for"""
+  auctionId: ID!
+}
+
+input CreateDisputeInput {
+  auctionId: String!
+  reason: DisputeReason!
+  description: String!
+  evidenceUrls: [String!] = []
+}
+
+input UpdateDisputeStatusInput {
+  disputeId: String!
+  status: DisputeStatus!
+}
+
+input ResolveDisputeInput {
+  disputeId: String!
+  decision: DisputeResolution!
+  adminNotes: String
+}
+
+input CreateChatMessageInput {
+  auctionId: ID!
+  content: String
+  type: ChatMessageType
+  mediaUrls: [String!]
+  clientMessageId: String!
+}
+
+input CreateReviewInput {
+  auctionId: String!
+  overallRating: Int!
+  criteria: ReviewCriteriaInput
+  comment: String
+}
+
+input ReviewCriteriaInput {
+  itemAccuracy: Int
+  communication: Int
+  packaging: Int
+  smoothExperience: Int
+}
+
+input ReplyReviewInput {
+  reviewId: String!
+  reply: String!
+}
+
+type Subscription {
+  notificationAdded: InAppNotification!
+  auctionStatusChanged(auctionId: ID!): AuctionStatusChangedPayload!
+  bidAdded(auctionId: ID!): BidAddedPayload!
+  messageSent(auctionId: ID!): ChatMessage!
+  messageUpdated(auctionId: ID!): ChatMessage!
+  chatReadStatusUpdated(auctionId: ID!): ChatReadStateUpdatedPayload!
+}
