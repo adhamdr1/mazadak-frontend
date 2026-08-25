@@ -1,0 +1,15 @@
+import { z } from 'zod';
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, 'validation.emailRequired')
+    .email('validation.emailInvalid'),
+  password: z
+    .string()
+    .min(1, 'validation.passwordRequired'),
+  rememberMe: z.boolean().optional(),
+});
+
+export type LoginSchema = z.infer<typeof loginSchema>;

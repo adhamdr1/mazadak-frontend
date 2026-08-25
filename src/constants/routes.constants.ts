@@ -3,11 +3,19 @@ export const ROUTES = {
   // Auth
   LOGIN: '/login',
   REGISTER: '/register',
+  GOOGLE_REGISTER: '/register/google',
   VERIFY_EMAIL: '/verify-email',
+  CONFIRM_EMAIL: '/auth/confirm-email',
+  CONFIRM_EMAIL_ALT: '/confirm-email',
   VERIFY_NOTICE: '/verify-notice',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
+  RESET_PASSWORD_ALT: '/auth/reset-password',
   REACTIVATE: '/reactivate',
+  CONFIRM_REACTIVATION: '/auth/confirm-reactivation',
+  CONFIRM_REACTIVATION_ALT: '/confirm-reactivation',
+  UPDATE_PASSWORD: '/update-password',
+  UNAUTHORIZED: '/unauthorized',
 
   // Auctions
   AUCTIONS: '/auctions',

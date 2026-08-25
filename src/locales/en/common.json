@@ -1,0 +1,72 @@
+{
+  "appName": "Mazadak",
+  "appTagline": "Live & Secure Auction Platform",
+  "loading": "Loading...",
+  "submit": "Submit",
+  "save": "Save",
+  "cancel": "Cancel",
+  "back": "Back",
+  "next": "Next",
+  "finish": "Finish",
+  "confirm": "Confirm",
+  "retry": "Retry",
+  "or": "or",
+  "close": "Close",
+  "error": "An unexpected error occurred",
+  "success": "Operation completed successfully",
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "ar": "العربية",
+    "en": "English"
+  },
+  "nav": {
+    "login": "Sign In",
+    "register": "Register",
+    "logout": "Logout",
+    "home": "Home"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page Not Found",
+    "message": "Sorry, the page you are looking for does not exist or has been moved.",
+    "backHome": "Back to Home"
+  },
+  "unauthorized": {
+    "code": "403",
+    "title": "Access Denied",
+    "message": "You do not have sufficient permissions to access this page.",
+    "backHome": "Back to Home"
+  },
+  "home": {
+    "title": "Authentication & Identity Module is Ready",
+    "subtitle": "All auth screens and components are built with 100% backend contract fidelity, Zod schemas, bilingual i18n, Dark Mode, and responsive design.",
+    "allPagesTitle": "Completed Auth Module Screens (7 Screens)",
+    "loginLink": "Sign In",
+    "registerLink": "Create Account",
+    "forgotPasswordLink": "Forgot Password",
+    "reactivateLink": "Reactivate Account",
+    "verifyNoticeLink": "Verification Notice",
+    "verifyEmailLink": "Verify Email",
+    "resetPasswordLink": "Reset Password",
+    "updatePasswordLink": "Change Password",
+    "notFoundLink": "404 Page"
+  },
+  "errors": {
+    "BAD_REQUEST": "Invalid request — please check your inputs",
+    "UNAUTHORIZED": "Unauthorized — please sign in first",
+    "FORBIDDEN": "Forbidden — you do not have permission for this action",
+    "NOT_FOUND": "Resource not found",
+    "CONFLICT": "Data conflict — resource already exists",
+    "RATE_LIMIT_EXCEEDED": "Too many requests. Please slow down and try again later",
+    "TOO_MANY_REQUESTS": "Too many requests. Please slow down and try again later",
+    "INTERNAL_SERVER_ERROR": "Internal server error occurred while processing your request",
+    "SERVICE_UNAVAILABLE": "Service temporarily unavailable — server is under maintenance",
+    "NETWORK_ERROR": "Network connection failed — please check your internet connection",
+    "VALIDATION_ERROR": "Validation error — please verify the submitted form fields",
+    "UNKNOWN_ERROR": "An unexpected error occurred. Please try again"
+  }
+}

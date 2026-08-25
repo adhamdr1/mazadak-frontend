@@ -11,7 +11,17 @@ export default defineConfig({
     },
   },
   server: {
-    port: 4000,
-    open: true,
+    port: 5173,
+    proxy: {
+      '/graphql': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        ws: true,
+      },
+      '/payments': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
   },
 });
