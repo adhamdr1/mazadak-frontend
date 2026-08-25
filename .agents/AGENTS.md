@@ -1,4 +1,4 @@
-﻿# قواعد العمل — مشروع مزادك Frontend
+# قواعد العمل — مشروع مزادك Frontend
 ## (Mazadak Frontend — Rules of Engagement)
 
 > هذا الملف يُقرأ قبل بدء أي Feature أو Module جديد.
@@ -25,6 +25,7 @@ Icons:          Lucide React
 **مراجع الـ Backend المتاحة في المشروع:**
 - 📜 ملف الـ GraphQL Schema الكامل: .agents/schema.gql
 - 📑 مرجع العقود والأخطاء والـ REST: .agents/BACKEND_CONTRACT.md
+- 📐 دليل إعداد خطط التنفيذ والأنماط المعمارية: .agents/IMPLEMENTATION_PLAN_PATTERN.md
 
 **نقاط الدخول (Entry Points):**
 - POST http://localhost:3000/graphql → كل الـ Mutations & Queries
