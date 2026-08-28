@@ -125,7 +125,7 @@ export const DateOfBirthPicker: React.FC<DateOfBirthPickerProps> = ({
             {label}
           </span>
           <span className="text-[11px] text-slate-400 font-mono">
-            {isRTL ? 'يوم / شهر / سنة' : 'DD / MM / YYYY'}
+            {t('register.dobFormatPlaceholder')}
           </span>
         </label>
       )}
@@ -152,7 +152,7 @@ export const DateOfBirthPicker: React.FC<DateOfBirthPickerProps> = ({
           type="button"
           onClick={openNativeCalendar}
           tabIndex={-1}
-          aria-label={t('register.openCalendar', { defaultValue: 'Open calendar' })}
+          aria-label={t('register.openCalendar')}
           className={cn(
             'absolute inset-y-0 flex items-center justify-center w-10 text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors cursor-pointer',
             isRTL ? 'left-0' : 'right-0'
@@ -175,7 +175,7 @@ export const DateOfBirthPicker: React.FC<DateOfBirthPickerProps> = ({
 
       {error && (
         <p className="text-xs text-red-500 dark:text-red-400 mt-0.5 flex items-center gap-1 font-medium animate-fadeIn">
-          {t(error, { defaultValue: error })}
+          {i18n.exists(error) ? t(error) : error}
         </p>
       )}
     </div>

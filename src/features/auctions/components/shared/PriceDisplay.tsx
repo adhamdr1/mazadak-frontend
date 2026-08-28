@@ -18,9 +18,10 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
   variant = 'accent',
   className,
 }) => {
-  const { t } = useTranslation('auctions');
+  const { t, i18n } = useTranslation('auctions');
+  const isRTL = i18n.language?.startsWith('ar');
 
-  const formattedAmount = formatPrice(amount);
+  const formattedAmount = formatPrice(amount, isRTL);
   const currencySymbol = t('currency.symbol');
 
   const sizeStyles = {
@@ -60,11 +61,9 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
           {label}
         </span>
       )}
-      <div className={cn('inline-flex items-baseline gap-1.5 leading-none', variantStyles[variant])}>
-        <span dir="ltr" className={cn('tracking-tight font-mono font-bold', sizeStyles[size].amount)}>
-          {formattedAmount}
-        </span>
-        <span className={cn('opacity-90 select-none font-semibold text-xs', sizeStyles[size].currency)}>
+      <div className={cn('inline-flex items-baseline gap-1 font-mono tracking-tight select-none', variantStyles[variant])}>
+        <span className={sizeStyles[size].amount}>{formattedAmount}</span>
+        <span className={cn('font-sans font-semibold text-slate-500 dark:text-slate-400', sizeStyles[size].currency)}>
           {currencySymbol}
         </span>
       </div>

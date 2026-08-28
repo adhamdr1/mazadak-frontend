@@ -14,6 +14,7 @@
   "close": "إغلاق",
   "error": "حدث خطأ غير متوقع",
   "success": "تمت العملية بنجاح",
+  "switchToLanguage": "تحويل الي انجليزي",
   "theme": {
     "light": "فاتح",
     "dark": "داكن",
@@ -31,6 +32,7 @@
     "auctions": "المزادات"
   },
   "rightsReserved": "جميع الحقوق محفوظة.",
+  "footerCopyright": "منصة مزادك. جميع الحقوق محفوظة.",
   "notFound": {
     "code": "404",
     "title": "الصفحة غير موجودة",

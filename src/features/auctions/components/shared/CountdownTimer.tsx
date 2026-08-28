@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Flame, Hourglass, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { toLocalizedDigits } from '@/utils/formatters';
 import type { AuctionStatus } from '../../types/auctions.types';
 
 export interface CountdownTimerProps {
@@ -59,20 +60,18 @@ function calculateTimeRemaining(target: Date): TimeRemaining {
 
 /**
  * Formats day string according to strict Arabic linguistic rules
- * - 1 day: "يوم"
- * - 2 days: "يومان"
- * - 3 to 10 days: "X أيام"
- * - 11+ days: "X يوم"
  */
-function formatDaysRemaining(days: number, isRTL: boolean): string {
+function formatDaysRemaining(
+  days: number,
+  t: (key: string, options?: Record<string, unknown>) => string,
+  isRTL: boolean
+): string {
   if (days <= 0) return '';
-  if (!isRTL) {
-    return days === 1 ? '1d' : `${days}d`;
-  }
-  if (days === 1) return 'يوم';
-  if (days === 2) return 'يومان';
-  if (days >= 3 && days <= 10) return `${days} أيام`;
-  return `${days} يوم`;
+  const countStr = isRTL ? toLocalizedDigits(days, true) : days;
+  if (days === 1) return t('countdown.oneDay');
+  if (days === 2) return t('countdown.twoDays');
+  if (days >= 3 && days <= 10) return t('countdown.fewDays', { count: countStr });
+  return t('countdown.manyDays', { count: countStr });
 }
 
 export const CountdownTimer: React.FC<CountdownTimerProps> = ({
@@ -86,6 +85,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
 }) => {
   const { t, i18n } = useTranslation('auctions');
   const isRTL = i18n.language?.startsWith('ar');
+
   const target = useMemo(() => new Date(targetDate), [targetDate]);
   const [time, setTime] = useState<TimeRemaining>(() => calculateTimeRemaining(target));
 
@@ -104,25 +104,31 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   }, [target, onEnd]);
 
   const sizeStyles = {
-    sm: 'text-[11px] px-2.5 py-1 gap-1.5',
-    md: 'text-xs px-3 py-1.5 gap-2',
-    lg: 'text-sm sm:text-base px-4 py-2 gap-2.5 font-bold',
+    sm: 'text-[11px] px-2.5 py-1 gap-1.5 font-bold',
+    md: 'text-xs px-3 py-1.5 gap-2 font-bold',
+    lg: 'text-sm sm:text-base px-4 py-2 gap-2.5 font-extrabold',
   };
 
   const iconSizes = {
-    sm: 'w-3 h-3',
-    md: 'w-3.5 h-3.5',
-    lg: 'w-4 h-4',
+    sm: 'w-3.5 h-3.5',
+    md: 'w-4 h-4',
+    lg: 'w-4.5 h-4.5',
   };
 
-  // Ended State: Uses CheckCircle2 icon (No clock icon!)
+  // Ended State: High-contrast Slate with strong grey border & text
   if (status === 'ENDED' || status === 'CANCELLED' || time.isExpired) {
+    const endedStyles =
+      variant === 'pill'
+        ? 'bg-white/95 text-slate-700 border-slate-300 dark:bg-slate-900/95 dark:text-slate-300 dark:border-slate-600 shadow-md backdrop-blur-md'
+        : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700 shadow-sm';
+
     return (
       <div
         className={cn(
-          'inline-flex items-center gap-1.5 font-bold rounded-full select-none backdrop-blur-md shadow-sm border transition-colors',
-          'bg-white/95 text-slate-700 border-slate-200 dark:bg-slate-900/95 dark:text-slate-300 dark:border-slate-700/80',
+          'inline-flex items-center gap-1.5 font-bold rounded-full select-none border transition-colors',
+          endedStyles,
           sizeStyles[size],
+          variant === 'banner' && 'w-full justify-center rounded-2xl py-3 text-base',
           className
         )}
       >
@@ -132,49 +138,57 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
     );
   }
 
-  const pad = (n: number) => n.toString().padStart(2, '0');
+  const pad = (num: number) => {
+    const padded = String(num).padStart(2, '0');
+    return isRTL ? toLocalizedDigits(padded, true) : padded;
+  };
 
-  // Distinct visual themes for Starts Soon (PENDING) vs Active (ACTIVE) vs Urgent
+  // State-Driven Unified Color Configurations
   const getThemeStyles = () => {
+    const isPill = variant === 'pill';
+
+    // 1. Starts Soon (PENDING) - Amber Border & Amber Text
+    if (status === 'PENDING') {
+      return {
+        container: isPill
+          ? 'bg-white/95 text-amber-900 border-amber-400 dark:bg-slate-900/95 dark:text-amber-300 dark:border-amber-500 shadow-md backdrop-blur-md'
+          : 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/40 dark:border-amber-500/40 shadow-sm',
+        icon: <Hourglass className={cn(iconSizes[size], 'text-amber-500 dark:text-amber-400 shrink-0')} />,
+        label: isPill
+          ? 'text-amber-900 dark:text-amber-300 font-bold'
+          : 'text-amber-700 dark:text-amber-300 font-bold',
+      };
+    }
+
+    // 2. Urgent State (< 1 min) - High-contrast Pulsing Flame
     if (time.isUrgent) {
       return {
-        container: 'bg-red-600 text-white border-red-500 shadow-md shadow-red-500/20 animate-pulse',
+        container:
+          'bg-red-600 text-white border-red-500 shadow-md shadow-red-500/25 animate-pulse',
         icon: <Flame className={cn(iconSizes[size], 'text-white animate-bounce shrink-0')} />,
         label: 'text-white font-bold',
       };
     }
-    if (time.isNearEnd) {
-      return {
-        container: 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-500/20',
-        icon: <Clock className={cn(iconSizes[size], 'text-white shrink-0')} />,
-        label: 'text-white font-bold',
-      };
-    }
-    // Starts Soon (PENDING) - Distinct Warm Amber Theme with Hourglass
-    if (status === 'PENDING') {
-      return {
-        container:
-          'bg-amber-50/95 text-amber-900 border-amber-300/90 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-500/40 shadow-sm',
-        icon: <Hourglass className={cn(iconSizes[size], 'text-amber-600 dark:text-amber-400 shrink-0')} />,
-        label: 'text-amber-800 dark:text-amber-300 font-bold',
-      };
-    }
-    // Live Active (ACTIVE) - Crisp Theme with Emerald Clock
+
+    // 3. Live Active (ACTIVE) - Green Border & Green Text
     return {
-      container:
-        'bg-white/95 text-slate-900 border-slate-200/90 dark:bg-slate-900/95 dark:text-white dark:border-slate-700/80 shadow-sm',
-      icon: <Clock className={cn(iconSizes[size], 'text-emerald-500 dark:text-emerald-400 shrink-0')} />,
-      label: 'text-slate-600 dark:text-slate-300 font-semibold',
+      container: isPill
+        ? 'bg-white/95 text-emerald-800 border-emerald-400 dark:bg-slate-900/95 dark:text-emerald-300 dark:border-emerald-500 shadow-md backdrop-blur-md'
+        : 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/40 dark:border-emerald-500/40 shadow-sm',
+      icon: <Clock className={cn(iconSizes[size], 'text-emerald-600 dark:text-emerald-400 shrink-0')} />,
+      label: isPill
+        ? 'text-emerald-800 dark:text-emerald-300 font-bold'
+        : 'text-emerald-800 dark:text-emerald-300 font-bold',
     };
   };
 
   const theme = getThemeStyles();
-  const daysFormatted = formatDaysRemaining(time.days, isRTL);
+  const daysFormatted = formatDaysRemaining(time.days, t, isRTL);
 
   return (
     <div
       className={cn(
-        'inline-flex items-center select-none backdrop-blur-md rounded-full border shadow-sm transition-colors',
+        'inline-flex items-center select-none rounded-full border transition-colors',
         sizeStyles[size],
         theme.container,
         variant === 'banner' && 'w-full justify-center rounded-2xl py-3 text-base',
@@ -191,8 +205,8 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         )}
       </div>
 
-      {/* Clearly Separated Digits Block with Bullet separator */}
-      <div dir="ltr" className="inline-flex items-center gap-1.5 font-mono font-bold tracking-tight text-xs leading-none">
+      {/* Clearly Separated Digits Block */}
+      <div className="inline-flex items-center gap-1.5 font-mono font-bold tracking-tight text-xs leading-none">
         {time.days > 0 && (
           <>
             <span className="font-sans font-bold text-[11px]">
@@ -201,7 +215,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
             <span className="opacity-40 font-normal select-none">•</span>
           </>
         )}
-        <span>
+        <span dir="ltr">
           {pad(time.hours)}:{pad(time.minutes)}:{pad(time.seconds)}
         </span>
       </div>

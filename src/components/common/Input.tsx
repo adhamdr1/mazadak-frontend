@@ -29,7 +29,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const { t } = useTranslation('auth');
+    const { t, i18n } = useTranslation('auth');
     const [showPassword, setShowPassword] = useState(false);
     const inputId = id || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
     const isPasswordType = type === 'password';
@@ -92,7 +92,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         {error ? (
           <p className="text-xs text-red-500 dark:text-red-400 mt-0.5 flex items-center gap-1 font-medium animate-fadeIn">
-            {t(error, { defaultValue: error })}
+            {i18n.exists(error) ? t(error) : error}
           </p>
         ) : helperText ? (
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{helperText}</p>

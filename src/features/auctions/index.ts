@@ -7,9 +7,11 @@ export { MOCK_AUCTIONS } from './services/auctions.mock';
 
 // Export Hooks
 export { useAuctions } from './hooks/useAuctions';
+export { useAuctionDetail, AUCTION_QUERY_KEYS } from './hooks/useAuctionDetail';
 
 // Export Pages
 export { AuctionListPage } from './pages/AuctionListPage';
+export { AuctionDetailPage } from './pages/AuctionDetailPage';
 
 // Export Shared Components
 export { AuctionCard, type AuctionCardProps } from './components/shared/AuctionCard';
@@ -25,3 +27,12 @@ export { AuctionFilterBar, type AuctionFilterBarProps } from './components/brows
 export { AuctionSortDropdown, type AuctionSortDropdownProps } from './components/browse/AuctionSortDropdown';
 export { AuctionGrid, type AuctionGridProps } from './components/browse/AuctionGrid';
 export { AuctionEmptyState, type AuctionEmptyStateProps } from './components/browse/AuctionEmptyState';
+
+// Export Detail Components
+export { AuctionImageGallery, type AuctionImageGalleryProps } from './components/detail/AuctionImageGallery';
+export { AuctionInfoSection, type AuctionInfoSectionProps } from './components/detail/AuctionInfoSection';
+export { AuctionDescription, type AuctionDescriptionProps } from './components/detail/AuctionDescription';
+export { AuctionSellerCard, type AuctionSellerCardProps } from './components/detail/AuctionSellerCard';
+export { AuctionBiddingCTA, type AuctionBiddingCTAProps } from './components/detail/AuctionBiddingCTA';
+export { AuctionTermsSection, type AuctionTermsSectionProps } from './components/detail/AuctionTermsSection';
+export { AuctionDetailSkeleton, type AuctionDetailSkeletonProps } from './components/detail/AuctionDetailSkeleton';

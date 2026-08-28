@@ -23,6 +23,7 @@ import { Button } from '@/components/common/Button';
 import { Alert } from '@/components/common/Alert';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants/routes.constants';
+import { toLocalizedDigits } from '@/utils/formatters';
 
 export const AuctionListPage: React.FC = () => {
   const { t, i18n } = useTranslation('auctions');
@@ -183,8 +184,8 @@ export const AuctionListPage: React.FC = () => {
             {!isLoading && (
               <span className="font-semibold text-slate-700 dark:text-slate-300">
                 {t('browse.resultsCount', {
-                  count: auctions.length,
-                  total,
+                  count: isRTL ? toLocalizedDigits(auctions.length, true) : auctions.length,
+                  total: isRTL ? toLocalizedDigits(total, true) : total,
                 })}
               </span>
             )}
@@ -225,8 +226,8 @@ export const AuctionListPage: React.FC = () => {
 
             <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
               {t('browse.page', {
-                current: page,
-                total: totalPages,
+                current: isRTL ? toLocalizedDigits(page, true) : page,
+                total: isRTL ? toLocalizedDigits(totalPages, true) : totalPages,
               })}
             </span>
 
@@ -246,7 +247,7 @@ export const AuctionListPage: React.FC = () => {
       {/* Global Footer */}
       <footer className="w-full border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-400 dark:text-slate-600 mt-12">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span>© {new Date().getFullYear()} Mazadak Platform. {tCommon('rightsReserved')}</span>
+          <span>{tCommon('footerCopyright')}</span>
           <div className="flex items-center gap-4 text-xs font-medium">
             <Link to={ROUTES.HOME} className="hover:text-amber-500 transition-colors">
               {tCommon('nav.home')}

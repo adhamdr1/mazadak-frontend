@@ -27,7 +27,7 @@ import {
   ReactivatePage,
   UpdatePasswordPage,
 } from '@/features/auth';
-import { AuctionListPage } from '@/features/auctions';
+import { AuctionListPage, AuctionDetailPage } from '@/features/auctions';
 import { GuestRoute } from './GuestRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -187,9 +187,10 @@ const HomePage: React.FC = () => {
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Public Home / Landing Showcase */}
+      {/* Public Home / Landing Showcase & Auction Routes */}
       <Route path={ROUTES.HOME} element={<HomePage />} />
       <Route path={ROUTES.AUCTIONS} element={<AuctionListPage />} />
+      <Route path={ROUTES.AUCTION_DETAIL()} element={<AuctionDetailPage />} />
 
       {/* Guest Only Routes (Redirect to / if logged in) */}
       <Route element={<GuestRoute />}>

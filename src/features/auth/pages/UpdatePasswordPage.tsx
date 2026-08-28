@@ -71,7 +71,7 @@ export const UpdatePasswordPage: React.FC = () => {
                 size="lg"
                 rightIcon={isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
               >
-                {t('home.title', { defaultValue: 'الرئيسية' })}
+                {t('home.title')}
               </Button>
             </Link>
             <Button
@@ -81,7 +81,7 @@ export const UpdatePasswordPage: React.FC = () => {
               onClick={reset}
               className="text-xs text-slate-500"
             >
-              {t('updatePassword.title')} {t('common.again', { defaultValue: 'مرة أخرى' })}
+              {t('updatePassword.title')}
             </Button>
           </div>
         </div>
@@ -136,7 +136,7 @@ export const UpdatePasswordPage: React.FC = () => {
               className="font-medium text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:underline underline-offset-2 inline-flex items-center gap-1"
             >
               {isRTL ? <ArrowRight className="w-3.5 h-3.5" /> : <ArrowLeft className="w-3.5 h-3.5" />}
-              <span>{t('verifyNotice.backToLogin', { defaultValue: 'العودة للرئيسية' })}</span>
+              <span>{t('verifyNotice.backToLogin')}</span>
             </Link>
           </div>
         </form>

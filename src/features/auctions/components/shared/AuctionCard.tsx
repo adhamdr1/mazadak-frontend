@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ImageOff } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { ROUTES } from '@/constants/routes.constants';
+import { toLocalizedDigits } from '@/utils/formatters';
 import type { Auction, AuctionStatus } from '../../types/auctions.types';
 import { AuctionStatusBadge } from './AuctionStatusBadge';
 import { CategoryBadge } from './CategoryBadge';
@@ -26,7 +27,8 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
   onStatusExpire,
   className,
 }) => {
-  const { t } = useTranslation('auctions');
+  const { t, i18n } = useTranslation('auctions');
+  const isRTL = i18n.language?.startsWith('ar');
   const isListView = viewMode === 'list';
   const [imgError, setImgError] = useState(false);
 
@@ -74,7 +76,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
         {imgError ? (
           <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-900 text-slate-400 gap-2">
             <ImageOff className="w-8 h-8 opacity-60" />
-            <span className="text-xs">{t('card.noImage', { defaultValue: 'صورة المزاد' })}</span>
+            <span className="text-xs">{t('card.noImage')}</span>
           </div>
         ) : (
           <img
@@ -104,8 +106,8 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
             onEnd={() => onStatusExpire?.(auction._id)}
           />
           {auction.images && auction.images.length > 1 && (
-            <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-white/95 text-slate-800 border border-slate-200 shadow-sm backdrop-blur-md dark:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700/80 shrink-0">
-              +{auction.images.length - 1} {t('card.photos')}
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/95 text-slate-800 border border-slate-200 shadow-sm backdrop-blur-md dark:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700/80 shrink-0">
+              {t('card.morePhotos', { count: isRTL ? toLocalizedDigits(auction.images.length - 1, true) : auction.images.length - 1 })}
             </span>
           )}
         </div>

@@ -63,7 +63,7 @@ export const AuctionFilterBar: React.FC<AuctionFilterBarProps> = ({
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
           placeholder={t('browse.searchPlaceholder')}
-          className="w-full text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 py-2.5 ps-10 pe-9 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all shadow-sm"
+          className="w-full text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 py-2.5 ps-10 pe-9 outline-none focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 ring-0 focus:ring-0 ring-offset-0 focus:ring-offset-0 hover:border-slate-300 dark:hover:border-slate-700 transition-colors duration-150 shadow-sm"
         />
         {localSearch && (
           <button
