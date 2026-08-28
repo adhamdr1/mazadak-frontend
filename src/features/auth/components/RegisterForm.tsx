@@ -182,7 +182,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             leftIcon={<Mail className="w-4 h-4" />}
             error={errors.email?.message}
             autoComplete="email"
-            dir="ltr"
           />
 
           <Input

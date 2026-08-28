@@ -27,8 +27,10 @@
     "login": "Sign In",
     "register": "Register",
     "logout": "Logout",
-    "home": "Home"
+    "home": "Home",
+    "auctions": "Auctions"
   },
+  "rightsReserved": "All rights reserved.",
   "notFound": {
     "code": "404",
     "title": "Page Not Found",

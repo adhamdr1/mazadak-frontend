@@ -27,6 +27,7 @@ import {
   ReactivatePage,
   UpdatePasswordPage,
 } from '@/features/auth';
+import { AuctionListPage } from '@/features/auctions';
 import { GuestRoute } from './GuestRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -113,6 +114,15 @@ const HomePage: React.FC = () => {
             </p>
           </div>
 
+          {/* Action Button to Auctions */}
+          <div className="pt-2">
+            <Link to={ROUTES.AUCTIONS}>
+              <Button variant="accent" size="lg" leftIcon={<Gavel className="w-4 h-4" />}>
+                {t('nav.auctions')} →
+              </Button>
+            </Link>
+          </div>
+
           {/* Quick Links Showcase with Professional SVG Icons */}
           <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
@@ -179,6 +189,7 @@ export const AppRoutes: React.FC = () => {
     <Routes>
       {/* Public Home / Landing Showcase */}
       <Route path={ROUTES.HOME} element={<HomePage />} />
+      <Route path={ROUTES.AUCTIONS} element={<AuctionListPage />} />
 
       {/* Guest Only Routes (Redirect to / if logged in) */}
       <Route element={<GuestRoute />}>

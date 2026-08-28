@@ -4,18 +4,22 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import arCommon from '@/locales/ar/common.json';
 import arAuth from '@/locales/ar/auth.json';
+import arAuctions from '@/locales/ar/auctions.json';
 import enCommon from '@/locales/en/common.json';
 import enAuth from '@/locales/en/auth.json';
+import enAuctions from '@/locales/en/auctions.json';
 
 export const defaultNS = 'common';
 export const resources = {
   ar: {
     common: arCommon,
     auth: arAuth,
+    auctions: arAuctions,
   },
   en: {
     common: enCommon,
     auth: enAuth,
+    auctions: enAuctions,
   },
 } as const;
 
