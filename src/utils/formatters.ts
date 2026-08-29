@@ -9,6 +9,25 @@ export function toLocalizedDigits(value: number | string, isRTL = false): string
 }
 
 /**
+ * Normalizes Eastern Arabic numerals (٠-٩) and Persian numerals back to standard ASCII digits (0-9)
+ */
+export function normalizeArabicDigits(str: string): string {
+  const arabicEasternDigits: Record<string, string> = {
+    '٠': '0',
+    '١': '1',
+    '٢': '2',
+    '٣': '3',
+    '٤': '4',
+    '٥': '5',
+    '٦': '6',
+    '٧': '7',
+    '٨': '8',
+    '٩': '9',
+  };
+  return str.replace(/[٠-٩]/g, (w) => arabicEasternDigits[w] || w);
+}
+
+/**
  * Formats numeric amounts into clean currency numbers with localization support
  */
 export function formatPrice(value: number | string, isRTL = false): string {

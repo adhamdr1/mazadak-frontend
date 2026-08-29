@@ -89,7 +89,16 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const target = useMemo(() => new Date(targetDate), [targetDate]);
   const [time, setTime] = useState<TimeRemaining>(() => calculateTimeRemaining(target));
 
+  // Keep timer state strictly in sync with targetDate prop changes
   useEffect(() => {
+    const immediate = calculateTimeRemaining(target);
+    setTime(immediate);
+
+    // If already expired at mount, do NOT trigger onEnd to prevent infinite refetch loops
+    if (immediate.isExpired) {
+      return;
+    }
+
     const interval = setInterval(() => {
       const remaining = calculateTimeRemaining(target);
       setTime(remaining);
@@ -116,7 +125,8 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   };
 
   // Ended State: High-contrast Slate with strong grey border & text
-  if (status === 'ENDED' || status === 'CANCELLED' || time.isExpired) {
+  const isActuallyEnded = status === 'ENDED' || status === 'CANCELLED' || (status === 'ACTIVE' && time.isExpired);
+  if (isActuallyEnded) {
     const endedStyles =
       variant === 'pill'
         ? 'bg-white/95 text-slate-700 border-slate-300 dark:bg-slate-900/95 dark:text-slate-300 dark:border-slate-600 shadow-md backdrop-blur-md'
@@ -138,6 +148,24 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
     );
   }
 
+  // Pending State Just Expired -> Starting Now
+  if (status === 'PENDING' && time.isExpired) {
+    return (
+      <div
+        className={cn(
+          'inline-flex items-center gap-1.5 font-bold rounded-full select-none border transition-colors',
+          'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 shadow-sm animate-pulse',
+          sizeStyles[size],
+          variant === 'banner' && 'w-full justify-center rounded-2xl py-3 text-base',
+          className
+        )}
+      >
+        <Clock className={cn(iconSizes[size], 'text-emerald-500 shrink-0')} />
+        <span>{t('status.ACTIVE')}</span>
+      </div>
+    );
+  }
+
   const pad = (num: number) => {
     const padded = String(num).padStart(2, '0');
     return isRTL ? toLocalizedDigits(padded, true) : padded;
@@ -147,16 +175,16 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const getThemeStyles = () => {
     const isPill = variant === 'pill';
 
-    // 1. Starts Soon (PENDING) - Amber Border & Amber Text
+    // 1. Starts Soon (PENDING) - Amber Border & Crisp Contrast
     if (status === 'PENDING') {
       return {
         container: isPill
           ? 'bg-white/95 text-amber-900 border-amber-400 dark:bg-slate-900/95 dark:text-amber-300 dark:border-amber-500 shadow-md backdrop-blur-md'
-          : 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/40 dark:border-amber-500/40 shadow-sm',
+          : 'bg-white dark:bg-slate-900/90 text-slate-900 dark:text-amber-300 border-2 border-amber-500/60 dark:border-amber-500/40 shadow-xs',
         icon: <Hourglass className={cn(iconSizes[size], 'text-amber-500 dark:text-amber-400 shrink-0')} />,
         label: isPill
           ? 'text-amber-900 dark:text-amber-300 font-bold'
-          : 'text-amber-700 dark:text-amber-300 font-bold',
+          : 'text-slate-900 dark:text-amber-300 font-black',
       };
     }
 

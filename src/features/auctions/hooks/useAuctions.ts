@@ -50,10 +50,7 @@ export function useAuctions(initialLimit = 12) {
   const query = useQuery({
     queryKey: [...QUERY_KEYS.AUCTIONS.ALL, { page, limit: initialLimit, ...filter }],
     queryFn: () =>
-      auctionsService.getAll({
-        input: { page, limit: initialLimit },
-        filter,
-      }),
+      auctionsService.getAll({ page, limit: initialLimit }, filter),
     staleTime: 1000 * 30, // 30 seconds fresh cache
   });
 

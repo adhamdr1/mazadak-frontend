@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { auctionsService } from '../services/auctions.service';
@@ -17,6 +17,16 @@ export function useAuctionDetail(id?: string) {
   const { t, i18n } = useTranslation('auctions');
   const queryClient = useQueryClient();
   const { user } = useAuth();
+
+  // 1-second dynamic heartbeat ticker for smooth, glitch-free live transitions
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const query = useQuery({
     queryKey: id ? AUCTION_QUERY_KEYS.DETAIL(id) : ['auctions', 'detail', 'none'],
@@ -45,7 +55,7 @@ export function useAuctionDetail(id?: string) {
     };
   }, [id, queryClient]);
 
-  // Compute dynamic effective status
+  // Compute dynamic effective status with 1-second live heartbeat
   const effectiveStatus = useMemo<AuctionStatus | undefined>(() => {
     if (!query.data) return undefined;
     const { status, startTime, endTime } = query.data;
@@ -59,7 +69,8 @@ export function useAuctionDetail(id?: string) {
     if (startMs > nowMs) return 'PENDING';
 
     return 'ACTIVE';
-  }, [query.data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.data, tick]);
 
   const isSeller = Boolean(user && query.data && user._id === query.data.sellerId);
   const isWinner = Boolean(user && query.data && user._id === query.data.winnerId);

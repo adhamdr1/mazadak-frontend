@@ -1,14 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   UserCheck,
   Star,
-  MessageSquare,
   ShieldCheck,
+  MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { toLocalizedDigits } from '@/utils/formatters';
-import { Button } from '@/components/common/Button';
+import { auctionsService } from '../../services/auctions.service';
 
 export interface AuctionSellerCardProps {
   sellerId: string;
@@ -24,24 +25,36 @@ export interface AuctionSellerCardProps {
 export const AuctionSellerCard: React.FC<AuctionSellerCardProps> = ({
   sellerId,
   sellerName,
-  sellerRating = 4.9,
-  reviewsCount = 38,
-  memberSince = '2023',
+  sellerRating,
+  reviewsCount,
+  memberSince,
   isVerified = true,
   canContact = false,
   className,
 }) => {
   const { t, i18n } = useTranslation('auctions');
   const isRTL = i18n.language?.startsWith('ar');
-  const displayName = sellerName || t('detail.defaultSellerName');
 
-  const localizedRating = isRTL ? toLocalizedDigits(sellerRating, true) : sellerRating;
-  const localizedReviews = isRTL ? toLocalizedDigits(reviewsCount, true) : reviewsCount;
-  const localizedMemberSince = isRTL ? toLocalizedDigits(memberSince, true) : memberSince;
+  // Query real public profile from backend
+  const { data: profile } = useQuery({
+    queryKey: ['publicProfile', sellerId],
+    queryFn: () => auctionsService.getPublicProfile(sellerId),
+    enabled: Boolean(sellerId) && !sellerName,
+    staleTime: 60 * 1000,
+  });
 
-  const handleContactSeller = () => {
-    // Module 7: Chat integration point (sellerId available)
-  };
+  const realName = sellerName || (profile ? `${profile.firstName} ${profile.lastName}` : null);
+  const displayName = realName || t('detail.defaultSellerName');
+
+  const rating = typeof sellerRating === 'number' ? sellerRating : profile?.ratingStats?.averageRating;
+  const count = typeof reviewsCount === 'number' ? reviewsCount : profile?.ratingStats?.totalReviews;
+  const hasReviews = typeof count === 'number' && count > 0 && typeof rating === 'number';
+
+  const localizedRating = hasReviews && rating ? (isRTL ? toLocalizedDigits(rating, true) : rating) : null;
+  const localizedReviews = hasReviews && count ? (isRTL ? toLocalizedDigits(count, true) : count) : null;
+
+  const rawYear = memberSince || (profile?.memberSince ? new Date(profile.memberSince).getFullYear().toString() : new Date().getFullYear().toString());
+  const localizedMemberSince = isRTL ? toLocalizedDigits(rawYear, true) : rawYear;
 
   return (
     <div
@@ -76,12 +89,18 @@ export const AuctionSellerCard: React.FC<AuctionSellerCardProps> = ({
             <UserCheck className="w-4 h-4 text-emerald-500 shrink-0" />
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
-            <div className="flex items-center gap-1 text-amber-500 font-semibold">
-              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-              <span>{localizedRating}</span>
-              <span className="text-slate-400 font-normal">({localizedReviews})</span>
-            </div>
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-1 flex-wrap">
+            {hasReviews ? (
+              <div className="flex items-center gap-1 text-amber-500 font-semibold">
+                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                <span>{localizedRating}</span>
+                <span className="text-slate-400 font-normal">({localizedReviews})</span>
+              </div>
+            ) : (
+              <span className="text-[11px] text-amber-600 dark:text-amber-400/90 font-medium">
+                {t('detail.noReviewsYet')}
+              </span>
+            )}
 
             <span>•</span>
 
@@ -92,17 +111,13 @@ export const AuctionSellerCard: React.FC<AuctionSellerCardProps> = ({
 
       {/* Contact Seller Button — strictly restricted to auction winner */}
       {canContact && (
-        <Button
+        <button
           type="button"
-          variant="outline"
-          size="sm"
-          fullWidth
-          onClick={handleContactSeller}
-          leftIcon={<MessageSquare className="w-4 h-4 text-amber-500" />}
-          className="text-xs font-bold py-2.5 border-slate-200 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-500 text-slate-800 dark:text-slate-200 transition-colors"
+          className="w-full bg-slate-100 hover:bg-amber-500/10 text-slate-800 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-amber-500/50 dark:hover:border-amber-500/50 font-bold text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none active:scale-[0.99]"
         >
-          {t('detail.contactSeller')}
-        </Button>
+          <MessageSquare className="w-4 h-4 text-amber-500" />
+          <span>{t('detail.contactSeller')}</span>
+        </button>
       )}
     </div>
   );

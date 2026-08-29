@@ -38,12 +38,26 @@ export const registerSchema = z
       .string()
       .min(1, 'validation.dobRequired')
       .refine((dobString) => {
-        const date = new Date(dobString);
+        const parts = dobString.split('-');
+        if (parts.length !== 3) return false;
+        const [y, m, d] = parts.map((p) => parseInt(p, 10));
+        if (isNaN(y) || isNaN(m) || isNaN(d)) return false;
+        if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900) return false;
+        const date = new Date(y, m - 1, d);
         if (isNaN(date.getTime())) return false;
         const today = new Date();
+        // Disallow future dates
+        if (date.getTime() > today.getTime()) return false;
+        return true;
+      }, 'validation.dobInvalid')
+      .refine((dobString) => {
+        const parts = dobString.split('-');
+        const [y, m, d] = parts.map((p) => parseInt(p, 10));
+        const date = new Date(y, m - 1, d);
+        const today = new Date();
         let age = today.getFullYear() - date.getFullYear();
-        const m = today.getMonth() - date.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < date.getDate())) {
+        const monthDiff = today.getMonth() - date.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) {
           age--;
         }
         return age >= 18;

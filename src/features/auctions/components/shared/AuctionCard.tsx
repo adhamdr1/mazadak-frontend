@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ImageOff } from 'lucide-react';
@@ -48,6 +48,11 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
     }
     return 'ACTIVE';
   }, [auction.status, auction.startTime, auction.endTime]);
+
+  // Reset image error state whenever auction images change
+  useEffect(() => {
+    setImgError(false);
+  }, [auction.images]);
 
   const primaryImage =
     !imgError && auction.images && auction.images.length > 0
@@ -117,11 +122,11 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
       <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between gap-4">
         <div className="space-y-2">
           <Link to={detailUrl} className="block group-hover:text-amber-500 transition-colors">
-            <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
+            <h3 dir="auto" className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
               {auction.title}
             </h3>
           </Link>
-          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+          <p dir="auto" className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
             {auction.description}
           </p>
         </div>

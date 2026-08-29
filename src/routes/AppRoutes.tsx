@@ -27,7 +27,7 @@ import {
   ReactivatePage,
   UpdatePasswordPage,
 } from '@/features/auth';
-import { AuctionListPage, AuctionDetailPage } from '@/features/auctions';
+import { AuctionListPage, AuctionDetailPage, CreateAuctionPage } from '@/features/auctions';
 import { GuestRoute } from './GuestRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -178,7 +178,7 @@ const HomePage: React.FC = () => {
 
       {/* Footer */}
       <footer className="w-full py-4 text-center text-xs text-slate-400 dark:text-slate-600">
-        © {new Date().getFullYear()} Mazadak Platform. All rights reserved.
+        {t('footerCopyright')}
       </footer>
     </div>
   );
@@ -202,6 +202,7 @@ export const AppRoutes: React.FC = () => {
 
       {/* Authenticated / Protected Routes */}
       <Route element={<ProtectedRoute />}>
+        <Route path={ROUTES.CREATE_AUCTION} element={<CreateAuctionPage />} />
         <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
       </Route>
 

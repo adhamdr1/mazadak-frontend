@@ -24,19 +24,92 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
-// Response Interceptor: Catch 401, perform Single-Use Token Refresh Rotation, and retry
+// Shared Silent Token Refresh Rotation Helper
+async function attemptTokenRefresh(): Promise<string | null> {
+  const refreshToken = localStorage.getItem('refresh_token');
+  if (!refreshToken) return null;
+
+  try {
+    const refreshRes = await axios.post(
+      env.apiUrl,
+      {
+        query: `
+          mutation RefreshToken($refreshToken: String!) {
+            refreshToken(refreshToken: $refreshToken) {
+              accessToken
+              refreshToken
+              user {
+                _id
+                email
+                firstName
+                lastName
+                role
+              }
+            }
+          }
+        `,
+        variables: { refreshToken },
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    const authData = refreshRes.data?.data?.refreshToken;
+    if (authData?.accessToken) {
+      localStorage.setItem('access_token', authData.accessToken);
+      localStorage.setItem('refresh_token', authData.refreshToken);
+      if (authData.user) {
+        localStorage.setItem('mazadak_user', JSON.stringify(authData.user));
+      }
+      return authData.accessToken;
+    }
+  } catch {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('mazadak_user');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mazadak:auth_expired'));
+    }
+  }
+  return null;
+}
+
+// Response Interceptor: Handles both GraphQL 200 Auth errors and HTTP 401 errors
 apiClient.interceptors.response.use(
-  (response) => {
-    // Some GraphQL servers return 200 with UNAUTHORIZED in errors array
-    if (response.data?.errors && response.data.errors.length > 0) {
-      const isUnauthorized = response.data.errors.some(
-        (err: { extensions?: { code?: string; status?: number } }) =>
-          err.extensions?.code === 'UNAUTHORIZED' || err.extensions?.status === 401
+  async (response) => {
+    const originalConfig = response.config as CustomAxiosRequestConfig;
+
+    // Check if GraphQL response contains UNAUTHENTICATED / UNAUTHORIZED in errors array
+    const errors = response.data?.errors;
+    if (Array.isArray(errors) && errors.length > 0) {
+      const isAuthError = errors.some(
+        (err: {
+          extensions?: {
+            code?: string;
+            status?: number;
+            response?: { statusCode?: number };
+          };
+          message?: string;
+        }) =>
+          err.extensions?.code === 'UNAUTHENTICATED' ||
+          err.extensions?.code === 'UNAUTHORIZED' ||
+          err.extensions?.status === 401 ||
+          err.extensions?.response?.statusCode === 401 ||
+          err.message === 'Unauthorized' ||
+          err.message === 'UNAUTHENTICATED'
       );
-      if (isUnauthorized) {
-        // Trigger auth expired if token is unrefreshable
+
+      if (isAuthError && originalConfig && !originalConfig._retry) {
+        originalConfig._retry = true;
+        const newAccessToken = await attemptTokenRefresh();
+        if (newAccessToken) {
+          if (originalConfig.headers) {
+            originalConfig.headers.Authorization = `Bearer ${newAccessToken}`;
+          }
+          return apiClient(originalConfig);
+        }
       }
     }
+
     return response;
   },
   async (error: AxiosError) => {
@@ -44,63 +117,12 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = localStorage.getItem('refresh_token');
-
-      if (refreshToken) {
-        try {
-          // Direct POST without interceptors to avoid loops
-          const refreshRes = await axios.post(
-            env.apiUrl,
-            {
-              query: `
-                mutation RefreshToken($refreshToken: String!) {
-                  refreshToken(refreshToken: $refreshToken) {
-                    accessToken
-                    refreshToken
-                    user {
-                      _id
-                      email
-                      firstName
-                      lastName
-                      role
-                    }
-                  }
-                }
-              `,
-              variables: { refreshToken },
-            },
-            { headers: { 'Content-Type': 'application/json' } }
-          );
-
-          const authData = refreshRes.data?.data?.refreshToken;
-          if (authData?.accessToken) {
-            localStorage.setItem('access_token', authData.accessToken);
-            localStorage.setItem('refresh_token', authData.refreshToken);
-            if (authData.user) {
-              localStorage.setItem('mazadak_user', JSON.stringify(authData.user));
-            }
-
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${authData.accessToken}`;
-            }
-            return apiClient(originalRequest);
-          }
-        } catch {
-          // Refresh token expired or invalid (Single-Use invalidated)
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('mazadak_user');
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('mazadak:auth_expired'));
-          }
+      const newAccessToken = await attemptTokenRefresh();
+      if (newAccessToken) {
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
-      } else {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('mazadak_user');
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('mazadak:auth_expired'));
-        }
+        return apiClient(originalRequest);
       }
     }
 

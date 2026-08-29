@@ -206,11 +206,13 @@ export const AuctionDetailPage: React.FC = () => {
                   isWinner={isWinner}
                 />
 
-                {/* Verified Seller Profile Card — chat strictly enabled for winner */}
-                <AuctionSellerCard
-                  sellerId={auction.sellerId}
-                  canContact={isWinner}
-                />
+                {/* Verified Seller Profile Card — strictly visible for buyers and guests */}
+                {!isSeller && (
+                  <AuctionSellerCard
+                    sellerId={auction.sellerId}
+                    canContact={isWinner}
+                  />
+                )}
               </div>
             </div>
 

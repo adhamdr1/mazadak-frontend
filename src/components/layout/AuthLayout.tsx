@@ -71,9 +71,9 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 z-10 my-4">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 z-20 my-4">
         <div className="w-full max-w-md">
-          <Card glass padding="lg" className="border-slate-200 dark:border-slate-800 shadow-2xl">
+          <Card glass padding="lg" className="border-slate-200 dark:border-slate-800 shadow-2xl relative z-10">
             {/* Header Section */}
             <div className="text-center mb-6">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center justify-center gap-1.5">
@@ -101,8 +101,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
       </main>
 
       {/* Global Bottom Bar */}
-      <footer className="w-full py-4 text-center text-xs text-slate-400 dark:text-slate-600 z-10">
-        <p>© {new Date().getFullYear()} Mazadak Platform. {t('rightsReserved', 'All rights reserved.')}</p>
+      <footer className="w-full py-4 text-center text-xs text-slate-400 dark:text-slate-600 relative z-0">
+        <p>{t('footerCopyright')}</p>
       </footer>
     </div>
   );

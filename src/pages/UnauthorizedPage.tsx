@@ -41,7 +41,7 @@ export const UnauthorizedPage: React.FC = () => {
       </main>
 
       <footer className="text-center text-xs text-slate-400 dark:text-slate-600">
-        © {new Date().getFullYear()} Mazadak Platform
+        {t('footerCopyright')}
       </footer>
     </div>
   );
