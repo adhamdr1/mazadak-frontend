@@ -27,11 +27,17 @@ import {
   ReactivatePage,
   UpdatePasswordPage,
 } from '@/features/auth';
-import { AuctionListPage, AuctionDetailPage, CreateAuctionPage } from '@/features/auctions';
+import {
+  AuctionListPage,
+  AuctionDetailPage,
+  CreateAuctionPage,
+  EditAuctionPage,
+} from '@/features/auctions';
 import { GuestRoute } from './GuestRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
+import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/common/Button';
@@ -39,7 +45,6 @@ import { Card } from '@/components/common/Card';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants/routes.constants';
 
-// Clean Landing Page Component to test Auth & Routes interactively
 const HomePage: React.FC = () => {
   const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
@@ -48,14 +53,7 @@ const HomePage: React.FC = () => {
     <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Header */}
       <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
-            <Gavel className="w-5 h-5" />
-          </div>
-          <span className="text-xl font-extrabold tracking-tight">
-            {t('appName')}
-          </span>
-        </div>
+        <BrandLogo size="md" />
 
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
@@ -114,11 +112,16 @@ const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Action Button to Auctions */}
-          <div className="pt-2">
+          {/* Action Buttons to Auctions */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <Link to={ROUTES.AUCTIONS}>
               <Button variant="accent" size="lg" leftIcon={<Gavel className="w-4 h-4" />}>
                 {t('nav.auctions')} →
+              </Button>
+            </Link>
+            <Link to={ROUTES.CREATE_AUCTION}>
+              <Button variant="outline" size="lg" leftIcon={<UserPlus className="w-4 h-4" />}>
+                {t('create.title', { ns: 'auctions' })}
               </Button>
             </Link>
           </div>
@@ -190,7 +193,13 @@ export const AppRoutes: React.FC = () => {
       {/* Public Home / Landing Showcase & Auction Routes */}
       <Route path={ROUTES.HOME} element={<HomePage />} />
       <Route path={ROUTES.AUCTIONS} element={<AuctionListPage />} />
-      <Route path={ROUTES.AUCTION_DETAIL()} element={<AuctionDetailPage />} />
+
+      {/* Authenticated / Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route path={ROUTES.CREATE_AUCTION} element={<CreateAuctionPage />} />
+        <Route path={ROUTES.EDIT_AUCTION()} element={<EditAuctionPage />} />
+        <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
+      </Route>
 
       {/* Guest Only Routes (Redirect to / if logged in) */}
       <Route element={<GuestRoute />}>
@@ -200,11 +209,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.GOOGLE_REGISTER} element={<GoogleRegisterPage />} />
       </Route>
 
-      {/* Authenticated / Protected Routes */}
-      <Route element={<ProtectedRoute />}>
-        <Route path={ROUTES.CREATE_AUCTION} element={<CreateAuctionPage />} />
-        <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
-      </Route>
+      <Route path={ROUTES.AUCTION_DETAIL()} element={<AuctionDetailPage />} />
 
       {/* Public / Token Recovery Routes */}
       <Route path={ROUTES.VERIFY_NOTICE} element={<VerifyNoticePage />} />

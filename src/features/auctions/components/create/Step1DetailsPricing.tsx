@@ -24,12 +24,14 @@ import {
   Dumbbell,
   Gamepad2,
   Box,
+  AlertTriangle,
 } from 'lucide-react';
 import type { CreateAuctionSchemaType } from '../../schemas/createAuction.schema';
 import type { AuctionCategory } from '../../types/auctions.types';
 import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 import { LocalizedNumberInput } from '@/components/common/LocalizedNumberInput';
+import { AutoResizeTextarea } from '@/components/common/AutoResizeTextarea';
 import { AuctionDateTimePicker } from '@/components/common/AuctionDateTimePicker';
 
 export interface Step1DetailsPricingProps {
@@ -152,9 +154,6 @@ export const Step1DetailsPricing: React.FC<Step1DetailsPricingProps> = ({
 
   const durationText = calculateDuration();
 
-  const inputBaseClass =
-    'w-full text-sm rounded-2xl border border-slate-200/90 dark:border-slate-700/90 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 p-3.5 outline-none focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 ring-0 focus:ring-0 ring-offset-0 focus:ring-offset-0 hover:border-slate-300 dark:hover:border-slate-600 transition-colors duration-150 shadow-sm';
-
   return (
     <div className={cn('space-y-8', className)}>
       {/* 1. Item Details Section */}
@@ -170,7 +169,14 @@ export const Step1DetailsPricing: React.FC<Step1DetailsPricingProps> = ({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
             <label htmlFor="auction-title">{t('create.titleLabel')} *</label>
-            <span className="text-[11px] font-mono text-slate-400">
+            <span
+              className={cn(
+                'text-[11px] font-mono',
+                title.length > 90
+                  ? 'text-red-500 font-bold'
+                  : 'text-slate-400 dark:text-slate-500'
+              )}
+            >
               {isRTL ? toLocalizedDigits(title.length, true) : title.length} / {isRTL ? toLocalizedDigits(100, true) : 100}
             </span>
           </div>
@@ -181,8 +187,21 @@ export const Step1DetailsPricing: React.FC<Step1DetailsPricingProps> = ({
             maxLength={100}
             placeholder={t('create.titlePlaceholder')}
             {...register('title')}
-            className={cn(inputBaseClass, 'text-start')}
+            className={cn(
+              'w-full text-sm rounded-2xl border transition-all duration-150 leading-relaxed outline-none focus:outline-none p-3.5 sm:p-4 shadow-sm text-start',
+              'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500',
+              errors.title
+                ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                : 'border-slate-200/90 dark:border-slate-700/90 hover:border-slate-300 dark:hover:border-slate-600 focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
+            )}
           />
+          {title.length > 0 && title.length < 5 && !errors.title && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 font-medium animate-fadeIn">
+              {t('create.titleMinHint', {
+                count: isRTL ? toLocalizedDigits(5 - title.length, true) : 5 - title.length,
+              })}
+            </p>
+          )}
           {errors.title && (
             <p className="text-xs text-red-500 font-semibold">
               {t(errors.title.message as string, { ns: 'auctions', defaultValue: errors.title.message })}
@@ -229,19 +248,33 @@ export const Step1DetailsPricing: React.FC<Step1DetailsPricingProps> = ({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
             <label htmlFor="auction-description">{t('create.descriptionLabel')} *</label>
-            <span className="text-[11px] font-mono text-slate-400">
+            <span
+              className={cn(
+                'text-[11px] font-mono',
+                description.length > 1950
+                  ? 'text-red-500 font-bold'
+                  : 'text-slate-400 dark:text-slate-500'
+              )}
+            >
               {isRTL ? toLocalizedDigits(description.length, true) : description.length} / {isRTL ? toLocalizedDigits(2000, true) : 2000}
             </span>
           </div>
-          <textarea
+          <AutoResizeTextarea
             id="auction-description"
             dir={description ? 'auto' : (isRTL ? 'rtl' : 'ltr')}
-            rows={5}
             maxLength={2000}
+            minRows={5}
             placeholder={t('create.descriptionPlaceholder')}
             {...register('description')}
-            className={cn(inputBaseClass, 'resize-none leading-relaxed text-start')}
+            hasError={Boolean(errors.description)}
           />
+          {description.length > 0 && description.length < 20 && !errors.description && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 font-medium animate-fadeIn">
+              {t('create.descriptionMinHint', {
+                count: isRTL ? toLocalizedDigits(20 - description.length, true) : 20 - description.length,
+              })}
+            </p>
+          )}
           {errors.description && (
             <p className="text-xs text-red-500 font-semibold">
               {t(errors.description.message as string, { ns: 'auctions', defaultValue: errors.description.message })}
@@ -257,6 +290,12 @@ export const Step1DetailsPricing: React.FC<Step1DetailsPricingProps> = ({
             <DollarSign className="w-4 h-4" />
           </div>
           <h2>{t('create.pricingSectionTitle')}</h2>
+        </div>
+
+        {/* Informative Warning: Locked rules */}
+        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 flex items-start gap-2.5 text-xs leading-relaxed">
+          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <span>{t('create.pricingLockedWarning')}</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

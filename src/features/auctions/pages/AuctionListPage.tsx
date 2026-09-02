@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Gavel,
   PlusCircle,
   ChevronLeft,
   ChevronRight,
@@ -17,6 +16,7 @@ import { CategoryPillNav } from '../components/browse/CategoryPillNav';
 import { AuctionFilterBar } from '../components/browse/AuctionFilterBar';
 import { AuctionSortDropdown } from '../components/browse/AuctionSortDropdown';
 import { AuctionGrid } from '../components/browse/AuctionGrid';
+import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/common/Button';
@@ -51,14 +51,7 @@ export const AuctionListPage: React.FC = () => {
       <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
           {/* Brand Logo */}
-          <Link to={ROUTES.HOME} className="flex items-center gap-2 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20 group-hover:scale-105 transition-transform">
-              <Gavel className="w-5 h-5" />
-            </div>
-            <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
-              {tCommon('appName')}
-            </span>
-          </Link>
+          <BrandLogo size="md" />
 
           {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold">

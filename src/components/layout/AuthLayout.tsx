@@ -1,14 +1,12 @@
 import React from 'react';
-import { Gavel, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Sparkles, User, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
+import { BrandLogo } from '@/components/common/BrandLogo';
 import { Card } from '@/components/common/Card';
-import { ROUTES } from '@/constants/routes.constants';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/common/Button';
-import { User, LogOut } from 'lucide-react';
 
 export interface AuthLayoutProps {
   title: string;
@@ -34,17 +32,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
 
       {/* Header */}
       <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between z-10">
-        <Link
-          to={ROUTES.HOME}
-          className="inline-flex items-center gap-2.5 text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white group"
-        >
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20 group-hover:scale-105 transition-transform">
-            <Gavel className="w-5 h-5" />
-          </div>
-          <span className="font-extrabold tracking-tight">
-            {t('appName')}
-          </span>
-        </Link>
+        <BrandLogo size="md" />
 
         <div className="flex items-center gap-2.5">
           <LanguageSwitcher />

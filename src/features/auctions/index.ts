@@ -3,6 +3,7 @@ export * from './types/auctions.types';
 
 // Export Schemas
 export * from './schemas/createAuction.schema';
+export * from './schemas/updateAuction.schema';
 
 // Export Services & Mock Data
 export { auctionsService } from './services/auctions.service';
@@ -12,11 +13,13 @@ export { MOCK_AUCTIONS } from './services/auctions.mock';
 export { useAuctions } from './hooks/useAuctions';
 export { useAuctionDetail, AUCTION_QUERY_KEYS } from './hooks/useAuctionDetail';
 export { useCreateAuction } from './hooks/useCreateAuction';
+export { useEditAuction, type UseEditAuctionReturn } from './hooks/useEditAuction';
 
 // Export Pages
 export { AuctionListPage } from './pages/AuctionListPage';
 export { AuctionDetailPage } from './pages/AuctionDetailPage';
 export { CreateAuctionPage } from './pages/CreateAuctionPage';
+export { EditAuctionPage } from './pages/EditAuctionPage';
 
 // Export Shared Components
 export { AuctionCard, type AuctionCardProps } from './components/shared/AuctionCard';
@@ -47,3 +50,7 @@ export { CreateAuctionStepper, type CreateAuctionStepperProps } from './componen
 export { Step1DetailsPricing, type Step1DetailsPricingProps } from './components/create/Step1DetailsPricing';
 export { Step2MediaPreview, type Step2MediaPreviewProps } from './components/create/Step2MediaPreview';
 export { LiveAuctionPreviewCard, type LiveAuctionPreviewCardProps } from './components/create/LiveAuctionPreviewCard';
+
+// Export Edit Components
+export { EditAuctionForm, type EditAuctionFormProps } from './components/edit/EditAuctionForm';
+export { AuctionLockedBanner } from './components/edit/AuctionLockedBanner';

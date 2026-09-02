@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Calendar as CalendarIcon,
@@ -210,18 +211,20 @@ export const CustomDateTimePickerModal: React.FC<CustomDateTimePickerModalProps>
   const previewTime = `${isRTL ? toLocalizedDigits(padStr(selectedHour), true) : padStr(selectedHour)}:${isRTL ? toLocalizedDigits(padStr(selectedMinute), true) : padStr(selectedMinute)} ${period === 'PM' ? (isRTL ? 'م' : 'PM') : (isRTL ? 'ص' : 'AM')}`;
   const previewFullDate = `${isRTL ? toLocalizedDigits(previewDay, true) : previewDay} ${previewMonthName} ${isRTL ? toLocalizedDigits(previewYear, true) : previewYear}`;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-hidden border-0 outline-none ring-0">
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto outline-none">
       {/* Click outside backdrop */}
       <div 
-        className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm animate-fadeIn border-0 outline-none ring-0" 
+        className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm animate-fadeIn cursor-pointer" 
         onClick={onClose} 
       />
 
       {/* Modal Container: Perfectly fitted, Symmetrical in Light & Dark */}
       <div
         ref={modalRef}
-        className="relative w-full max-w-sm sm:max-w-md max-h-[92vh] sm:max-h-[90vh] rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col z-10 my-auto transition-all duration-200"
+        className="relative w-full max-w-sm sm:max-w-md max-h-[90vh] rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col z-10 my-auto transition-all duration-200"
       >
         {/* 1. Header */}
         <div className="shrink-0 bg-white dark:bg-slate-900 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800">
@@ -530,7 +533,8 @@ export const CustomDateTimePickerModal: React.FC<CustomDateTimePickerModalProps>
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

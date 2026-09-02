@@ -98,8 +98,8 @@ export const LocalizedNumberInput: React.FC<LocalizedNumberInputProps> = ({
             inputBaseClass,
             'text-start',
             error
-              ? 'border-red-500 focus:border-red-500'
-              : 'border-slate-200/90 dark:border-slate-700/90 focus:border-amber-500 dark:focus:border-amber-500 hover:border-slate-300 dark:hover:border-slate-600'
+              ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+              : 'border-slate-200/90 dark:border-slate-700/90 hover:border-slate-300 dark:hover:border-slate-600 focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
           )}
         />
         {suffix && (
