@@ -302,7 +302,30 @@
     "IMAGE_SIZE_EXCEEDS_LIMIT": "Image file size exceeds maximum limit (5MB)",
     "UNAUTHENTICATED": "Session expired or please log in first to continue",
     "UNAUTHORIZED": "Session expired or please log in first to continue",
-    "FORBIDDEN": "You do not have permission to perform this action",
     "UPLOAD_FAILED": "Failed to upload image, please check your connection and try again"
+  },
+  "landing": {
+    "heroBadge": "Live & Secure Auction Platform",
+    "heroTitlePrefix": "Discover & Bid in the",
+    "heroTitleHighlight": "Premier Live Auction Market",
+    "heroSubtitle": "Real-time instant bidding backed by certified escrow protection for every single deal.",
+    "exploreLiveButton": "Explore Auctions",
+    "createAuctionButton": "Create Auction",
+    "myAuctionsButton": "My Auctions",
+    "browseByCategory": "Browse by Category",
+    "browseByCategorySubtitle": "Select a category to discover items and start bidding instantly",
+    "liveNowBadge": "Live Now",
+    "latestActiveAuctions": "Latest Active Auctions",
+    "viewAllAuctions": "View All Auctions",
+    "noActiveAuctions": "No active auctions listed currently",
+    "noActiveAuctionsHint": "Be the first to list an item and receive live competitive bids!",
+    "whyTrustUsTitle": "Why Thousands Trust Mazadak?",
+    "whyTrustUsSubtitle": "A secure, enterprise-grade ecosystem ensuring buyer and seller protection across every step.",
+    "escrowPillarTitle": "Payment Protection & Escrow",
+    "escrowPillarDesc": "Winning funds are safely held in escrow until the buyer receives and inspects the item for full satisfaction.",
+    "liveBiddingPillarTitle": "Live Real-Time Bidding",
+    "liveBiddingPillarDesc": "Instant WebSocket price and timer updates without page refreshes, powered by smart automated proxy-bidding.",
+    "trustedSellersPillarTitle": "Verified Sellers & True Reviews",
+    "trustedSellersPillarDesc": "Strict seller identity verification and 100% authentic buyer reviews ensuring peak transparency and confidence."
   }
 }

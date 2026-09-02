@@ -1,25 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  User,
-  LogOut,
-} from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { useCreateAuction } from '../hooks/useCreateAuction';
 import { CreateAuctionStepper } from '../components/create/CreateAuctionStepper';
 import { Step1DetailsPricing } from '../components/create/Step1DetailsPricing';
 import { Step2MediaPreview } from '../components/create/Step2MediaPreview';
-import { BrandLogo } from '@/components/common/BrandLogo';
-import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
-import { Button } from '@/components/common/Button';
-import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants/routes.constants';
 
 export const CreateAuctionPage: React.FC = () => {
-  const { t } = useTranslation('auctions');
+  const { t, i18n } = useTranslation('auctions');
   const { t: tCommon } = useTranslation('common');
-  const { user, logout } = useAuth();
+  const isRTL = i18n.language?.startsWith('ar');
+  const ChevronIcon = isRTL ? ChevronLeft : ChevronRight;
 
   const {
     form,
@@ -41,133 +34,66 @@ export const CreateAuctionPage: React.FC = () => {
   } = useCreateAuction();
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-30 w-full bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-          {/* Brand Logo */}
-          <BrandLogo size="md" />
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
+      {/* Breadcrumb Navigation */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <Link to={ROUTES.HOME} className="hover:text-amber-500 transition-colors">
+          {tCommon('nav.home')}
+        </Link>
+        <ChevronIcon className="w-3 h-3 text-slate-400" />
+        <Link to={ROUTES.AUCTIONS} className="hover:text-amber-500 transition-colors">
+          {t('title')}
+        </Link>
+        <ChevronIcon className="w-3 h-3 text-slate-400" />
+        <span className="text-amber-500 font-bold">
+          {t('create.title')}
+        </span>
+      </nav>
 
-          {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold">
-            <Link
-              to={ROUTES.HOME}
-              className="text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
-            >
-              {tCommon('nav.home')}
-            </Link>
-            <Link
-              to={ROUTES.AUCTIONS}
-              className="text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
-            >
-              {t('title')}
-            </Link>
-            <Link
-              to={ROUTES.MY_AUCTIONS}
-              className="text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
-            >
-              {t('myAuctions.title')}
-            </Link>
-          </nav>
+      {/* Page Title & Subtitle */}
+      <div className="space-y-1">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+          {t('create.title')}
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          {t('create.subtitle')}
+        </p>
+      </div>
 
-          {/* User & Settings Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSwitcher />
-            <ThemeToggle />
+      {/* Progress Stepper */}
+      <CreateAuctionStepper
+        currentStep={step}
+        onStepClick={(targetStep) => {
+          if (targetStep === 1) goToStep1();
+          if (targetStep === 2 && step >= 2) setStep(2);
+        }}
+      />
 
-            <div className="flex items-center gap-2">
-              <div className="hidden lg:flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                <User className="w-3.5 h-3.5 text-amber-500" />
-                <span>{user?.firstName}</span>
-              </div>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={logout}
-                leftIcon={<LogOut className="w-3.5 h-3.5" />}
-                className="text-xs text-slate-500 hover:text-red-500"
-              >
-                {tCommon('nav.logout')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-        {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <Link to={ROUTES.HOME} className="hover:text-amber-500 transition-colors">
-            {tCommon('nav.home')}
-          </Link>
-          <span>/</span>
-          <Link to={ROUTES.AUCTIONS} className="hover:text-amber-500 transition-colors">
-            {t('title')}
-          </Link>
-          <span>/</span>
-          <span className="text-slate-800 dark:text-slate-200 font-semibold">
-            {t('create.title')}
-          </span>
-        </nav>
-
-        {/* Page Header */}
-        <div className="space-y-1.5">
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            {t('create.title')}
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            {t('create.subtitle')}
-          </p>
-        </div>
-
-        {/* 2-Step Interactive Stepper */}
-        <CreateAuctionStepper
-          currentStep={step}
-          onStepClick={(targetStep) => setStep(targetStep)}
+      {/* Step 1: Details & Pricing */}
+      {step === 1 && (
+        <Step1DetailsPricing
+          form={form}
+          onNext={goToStep2}
         />
+      )}
 
-        {/* Wizard Form View */}
-        {step === 1 && (
-          <Step1DetailsPricing
-            form={form}
-            onNext={goToStep2}
-          />
-        )}
-
-        {step === 2 && (
-          <Step2MediaPreview
-            formData={watchedValues}
-            images={images}
-            isUploading={isUploading}
-            uploadError={uploadError}
-            errorMessage={errorMessage}
-            isPending={isPending}
-            onFilesSelected={handleFiles}
-            onRemoveImage={removeImage}
-            onSetCoverImage={setCoverImage}
-            onBack={goToStep1}
-            onSubmit={onSubmit}
-            imagesError={errors.images?.message as string | undefined}
-          />
-        )}
-      </main>
-
-      {/* Global Footer */}
-      <footer className="w-full border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-400 dark:text-slate-600 mt-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span>{tCommon('footerCopyright')}</span>
-          <div className="flex items-center gap-4 text-xs font-medium">
-            <Link to={ROUTES.HOME} className="hover:text-amber-500 transition-colors">
-              {tCommon('nav.home')}
-            </Link>
-            <Link to={ROUTES.AUCTIONS} className="hover:text-amber-500 transition-colors">
-              {t('title')}
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* Step 2: Media & Summary Preview */}
+      {step === 2 && (
+        <Step2MediaPreview
+          formData={watchedValues}
+          images={images}
+          isUploading={isUploading}
+          uploadError={uploadError}
+          isPending={isPending}
+          errorMessage={errorMessage}
+          onFilesSelected={handleFiles}
+          onRemoveImage={removeImage}
+          onSetCoverImage={setCoverImage}
+          onBack={goToStep1}
+          onSubmit={onSubmit}
+          imagesError={errors.images?.message as string | undefined}
+        />
+      )}
     </div>
   );
 };

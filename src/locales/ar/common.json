@@ -20,6 +20,7 @@
     "dark": "داكن",
     "system": "تلقائي (النظام)"
   },
+  "themeAndLanguage": "المظهر واللغة",
   "language": {
     "ar": "العربية",
     "en": "English"
@@ -33,6 +34,14 @@
   },
   "rightsReserved": "جميع الحقوق محفوظة.",
   "footerCopyright": "منصة مزادك. جميع الحقوق محفوظة.",
+  "footer": {
+    "escrowBadge": "نظام حماية Escrow",
+    "liveBiddingBadge": "مزايدة مباشرة وحية",
+    "quickLinksTitle": "روابط سريعة",
+    "accountLinksTitle": "الحساب والمصادقة",
+    "craftedWith": "صُنِع بكل",
+    "forCommunity": "لعشاق المزايدات والمقتنيات"
+  },
   "notFound": {
     "code": "404",
     "title": "الصفحة غير موجودة",

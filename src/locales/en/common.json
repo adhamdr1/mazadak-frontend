@@ -20,6 +20,7 @@
     "dark": "Dark",
     "system": "System"
   },
+  "themeAndLanguage": "Theme & Language",
   "language": {
     "ar": "العربية",
     "en": "English"
@@ -33,6 +34,14 @@
   },
   "rightsReserved": "All rights reserved.",
   "footerCopyright": "Mazadak Platform. All rights reserved.",
+  "footer": {
+    "escrowBadge": "Escrow Protection",
+    "liveBiddingBadge": "Live Real-Time Bidding",
+    "quickLinksTitle": "Quick Links",
+    "accountLinksTitle": "Account & Auth",
+    "craftedWith": "Crafted with",
+    "forCommunity": "for modern bidding enthusiasts"
+  },
   "notFound": {
     "code": "404",
     "title": "Page Not Found",

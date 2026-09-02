@@ -30,7 +30,17 @@
   }
 
   body {
-    font-family: 'Cairo', 'Inter', system-ui, sans-serif;
+    font-family: 'Cairo', 'Outfit', 'Inter', system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html[dir="rtl"] h1,
+  html[dir="rtl"] h2,
+  html[dir="rtl"] h3,
+  html[dir="rtl"] h4 {
+    line-height: 1.35;
   }
 
   /* =================================================== */

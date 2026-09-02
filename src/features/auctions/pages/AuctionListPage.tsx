@@ -1,35 +1,22 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  PlusCircle,
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  User,
-  LogOut,
-  LogIn,
-  UserPlus,
 } from 'lucide-react';
 import { useAuctions } from '../hooks/useAuctions';
 import { CategoryPillNav } from '../components/browse/CategoryPillNav';
 import { AuctionFilterBar } from '../components/browse/AuctionFilterBar';
 import { AuctionSortDropdown } from '../components/browse/AuctionSortDropdown';
 import { AuctionGrid } from '../components/browse/AuctionGrid';
-import { BrandLogo } from '@/components/common/BrandLogo';
-import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/common/Button';
 import { Alert } from '@/components/common/Alert';
-import { useAuth } from '@/hooks/useAuth';
-import { ROUTES } from '@/constants/routes.constants';
 import { toLocalizedDigits } from '@/utils/formatters';
 
 export const AuctionListPage: React.FC = () => {
   const { t, i18n } = useTranslation('auctions');
-  const { t: tCommon } = useTranslation('common');
   const isRTL = i18n.language?.startsWith('ar');
-  const { user, isAuthenticated, logout } = useAuth();
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -46,211 +33,112 @@ export const AuctionListPage: React.FC = () => {
   } = useAuctions(12);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-          {/* Brand Logo */}
-          <BrandLogo size="md" />
-
-          {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold">
-            <Link
-              to={ROUTES.HOME}
-              className="text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
-            >
-              {tCommon('nav.home')}
-            </Link>
-            <Link
-              to={ROUTES.AUCTIONS}
-              className="text-amber-500 font-bold border-b-2 border-amber-500 pb-0.5"
-            >
-              {t('title')}
-            </Link>
-            {isAuthenticated && (
-              <Link
-                to={ROUTES.MY_AUCTIONS}
-                className="text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-colors"
-              >
-                {t('myAuctions.title')}
-              </Link>
-            )}
-          </nav>
-
-          {/* User & Settings Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSwitcher />
-            <ThemeToggle />
-
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <Link to={ROUTES.CREATE_AUCTION}>
-                  <Button
-                    variant="accent"
-                    size="sm"
-                    leftIcon={<PlusCircle className="w-3.5 h-3.5" />}
-                    className="hidden sm:inline-flex"
-                  >
-                    {t('create.title')}
-                  </Button>
-                </Link>
-
-                <div className="hidden lg:flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                  <User className="w-3.5 h-3.5 text-amber-500" />
-                  <span>{user?.firstName}</span>
-                </div>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={logout}
-                  leftIcon={<LogOut className="w-3.5 h-3.5" />}
-                  className="text-xs text-slate-500 hover:text-red-500"
-                >
-                  {tCommon('nav.logout')}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                <Link to={ROUTES.LOGIN}>
-                  <Button variant="ghost" size="sm" leftIcon={<LogIn className="w-3.5 h-3.5" />}>
-                    {tCommon('nav.login')}
-                  </Button>
-                </Link>
-                <Link to={ROUTES.REGISTER}>
-                  <Button variant="accent" size="sm" leftIcon={<UserPlus className="w-3.5 h-3.5" />}>
-                    {tCommon('nav.register')}
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
-        {/* Minimalist, Elegant Hero Section */}
-        <div className="text-center pt-2 pb-4 space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>{t('hero.badge')}</span>
-          </div>
-
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-            {t('hero.title')}
-          </h1>
-
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-lg mx-auto">
-            {t('hero.subtitle')}
-          </p>
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      {/* Minimalist, Elegant Hero Section */}
+      <div className="text-center pt-2 pb-4 space-y-3 max-w-2xl mx-auto">
+        <div className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          <span>{t('hero.badge')}</span>
         </div>
 
-        {/* Error Alert */}
-        {error && <Alert variant="error">{error}</Alert>}
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+          {t('hero.title')}
+        </h1>
 
-        {/* Horizontal Category Navigation with Smooth Arrows */}
-        <section aria-label="Categories">
-          <CategoryPillNav
-            selectedCategory={filters.category}
-            onSelectCategory={actions.setCategory}
-          />
-        </section>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-lg mx-auto">
+          {t('hero.subtitle')}
+        </p>
+      </div>
 
-        {/* Search & Filter Bar */}
-        <section aria-label="Filters">
-          <AuctionFilterBar
-            search={filters.search}
-            onSearchChange={actions.setSearch}
-            selectedStatus={filters.status}
-            onStatusChange={actions.setStatus}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            hasActiveFilters={filters.hasActiveFilters}
-            onResetFilters={actions.resetFilters}
-          />
-        </section>
+      {/* Error Alert */}
+      {error && <Alert variant="error">{error}</Alert>}
 
-        {/* Results Counter & Sort Dropdown */}
-        <div className="flex items-center justify-between gap-4 pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400">
-          <div>
-            {!isLoading && (
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                {t('browse.resultsCount', {
-                  count: isRTL ? toLocalizedDigits(auctions.length, true) : auctions.length,
-                  total: isRTL ? toLocalizedDigits(total, true) : total,
-                })}
-              </span>
-            )}
-          </div>
+      {/* Horizontal Category Navigation with Smooth Arrows */}
+      <section aria-label="Categories">
+        <CategoryPillNav
+          selectedCategory={filters.category}
+          onSelectCategory={actions.setCategory}
+        />
+      </section>
 
-          <div className="flex items-center gap-2">
-            <span className="hidden sm:inline font-medium text-slate-600 dark:text-slate-400">{t('sort.label')}</span>
-            <AuctionSortDropdown
-              selectedSort={filters.sort}
-              onSortChange={actions.setSort}
-            />
-          </div>
-        </div>
+      {/* Search & Filter Bar */}
+      <section aria-label="Filters">
+        <AuctionFilterBar
+          search={filters.search}
+          onSearchChange={actions.setSearch}
+          selectedStatus={filters.status}
+          onStatusChange={actions.setStatus}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          hasActiveFilters={filters.hasActiveFilters}
+          onResetFilters={actions.resetFilters}
+        />
+      </section>
 
-        {/* Auctions Grid / List View */}
-        <section aria-label="Auction Catalog">
-          <AuctionGrid
-            auctions={auctions}
-            isLoading={isLoading}
-            viewMode={viewMode}
-            onResetFilters={actions.resetFilters}
-            onStatusExpire={() => actions.refetch()}
-          />
-        </section>
-
-        {/* Pagination Navigation */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-3 pt-6 border-t border-slate-200 dark:border-slate-800">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1 || isLoading}
-              onClick={() => actions.setPage(page - 1)}
-              leftIcon={isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-            >
-              {t('browse.prevPage')}
-            </Button>
-
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-              {t('browse.page', {
-                current: isRTL ? toLocalizedDigits(page, true) : page,
-                total: isRTL ? toLocalizedDigits(totalPages, true) : totalPages,
+      {/* Results Counter & Sort Dropdown */}
+      <div className="flex items-center justify-between gap-4 pt-2 border-t border-slate-200 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400">
+        <div>
+          {!isLoading && (
+            <span className="font-semibold text-slate-700 dark:text-slate-300">
+              {t('browse.resultsCount', {
+                count: isRTL ? toLocalizedDigits(auctions.length, true) : auctions.length,
+                total: isRTL ? toLocalizedDigits(total, true) : total,
               })}
             </span>
-
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!hasNextPage || page >= totalPages || isLoading}
-              onClick={() => actions.setPage(page + 1)}
-              rightIcon={isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            >
-              {t('browse.nextPage')}
-            </Button>
-          </div>
-        )}
-      </main>
-
-      {/* Global Footer */}
-      <footer className="w-full border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-400 dark:text-slate-600 mt-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span>{tCommon('footerCopyright')}</span>
-          <div className="flex items-center gap-4 text-xs font-medium">
-            <Link to={ROUTES.HOME} className="hover:text-amber-500 transition-colors">
-              {tCommon('nav.home')}
-            </Link>
-            <Link to={ROUTES.AUCTIONS} className="hover:text-amber-500 transition-colors">
-              {t('title')}
-            </Link>
-          </div>
+          )}
         </div>
-      </footer>
+
+        <div className="flex items-center gap-2">
+          <span className="hidden sm:inline font-medium text-slate-600 dark:text-slate-400">{t('sort.label')}</span>
+          <AuctionSortDropdown
+            selectedSort={filters.sort}
+            onSortChange={actions.setSort}
+          />
+        </div>
+      </div>
+
+      {/* Auctions Grid / List View */}
+      <section aria-label="Auction Catalog">
+        <AuctionGrid
+          auctions={auctions}
+          isLoading={isLoading}
+          viewMode={viewMode}
+          onResetFilters={actions.resetFilters}
+          onStatusExpire={() => actions.refetch()}
+        />
+      </section>
+
+      {/* Pagination Navigation */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 pt-6 border-t border-slate-200 dark:border-slate-800">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page <= 1 || isLoading}
+            onClick={() => actions.setPage(page - 1)}
+            leftIcon={isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          >
+            {t('browse.prevPage')}
+          </Button>
+
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+            {t('browse.page', {
+              current: isRTL ? toLocalizedDigits(page, true) : page,
+              total: isRTL ? toLocalizedDigits(totalPages, true) : totalPages,
+            })}
+          </span>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!hasNextPage || page >= totalPages || isLoading}
+            onClick={() => actions.setPage(page + 1)}
+            rightIcon={isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          >
+            {t('browse.nextPage')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
