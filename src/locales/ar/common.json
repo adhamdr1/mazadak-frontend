@@ -14,11 +14,13 @@
   "close": "إغلاق",
   "error": "حدث خطأ غير متوقع",
   "success": "تمت العملية بنجاح",
+  "switchToLanguage": "تحويل الي انجليزي",
   "theme": {
     "light": "فاتح",
     "dark": "داكن",
     "system": "تلقائي (النظام)"
   },
+  "themeAndLanguage": "المظهر واللغة",
   "language": {
     "ar": "العربية",
     "en": "English"
@@ -27,7 +29,18 @@
     "login": "دخول",
     "register": "تسجيل جديد",
     "logout": "خروج",
-    "home": "الرئيسية"
+    "home": "الرئيسية",
+    "auctions": "المزادات"
+  },
+  "rightsReserved": "جميع الحقوق محفوظة.",
+  "footerCopyright": "منصة مزادك. جميع الحقوق محفوظة.",
+  "footer": {
+    "escrowBadge": "نظام حماية Escrow",
+    "liveBiddingBadge": "مزايدة مباشرة وحية",
+    "quickLinksTitle": "روابط سريعة",
+    "accountLinksTitle": "الحساب والمصادقة",
+    "craftedWith": "صُنِع بكل",
+    "forCommunity": "لعشاق المزايدات والمقتنيات"
   },
   "notFound": {
     "code": "404",

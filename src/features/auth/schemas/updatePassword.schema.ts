@@ -7,13 +7,13 @@ export const updatePasswordSchema = z
       .string()
       .min(8, 'validation.passwordMin')
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_\-+={}[\]:;"'<>,./~`|\\])/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/,
         'validation.passwordComplexity'
       ),
     confirmPassword: z.string().min(1, 'validation.confirmPasswordRequired'),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'errors.PASSWORD_MISMATCH',
+    message: 'validation.passwordsDoNotMatch',
     path: ['confirmPassword'],
   })
   .refine((data) => data.oldPassword !== data.password, {

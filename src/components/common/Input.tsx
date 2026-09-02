@@ -29,11 +29,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const { t } = useTranslation('auth');
+    const { t, i18n } = useTranslation('auth');
     const [showPassword, setShowPassword] = useState(false);
     const inputId = id || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
     const isPasswordType = type === 'password';
     const computedType = isPasswordType ? (showPassword ? 'text' : 'password') : type;
+    const getTranslatedError = (err: string): string => {
+      if (i18n.exists(err, { ns: 'auth' })) return t(err, { ns: 'auth' });
+      if (i18n.exists(err, { ns: 'auctions' })) return t(err, { ns: 'auctions' });
+      if (i18n.exists(err, { ns: 'common' })) return t(err, { ns: 'common' });
+      if (i18n.exists(err)) return t(err);
+      return err;
+    };
 
     return (
       <div className={cn('flex flex-col gap-1.5', fullWidth ? 'w-full' : 'w-auto')}>
@@ -57,6 +64,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             type={computedType}
+            dir={props.dir || (i18n.language.startsWith('ar') ? 'rtl' : 'ltr')}
             disabled={disabled}
             spellCheck={false}
             className={cn(
@@ -92,7 +100,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         {error ? (
           <p className="text-xs text-red-500 dark:text-red-400 mt-0.5 flex items-center gap-1 font-medium animate-fadeIn">
-            {t(error, { defaultValue: error })}
+            {getTranslatedError(error)}
           </p>
         ) : helperText ? (
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{helperText}</p>

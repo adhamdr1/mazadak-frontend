@@ -36,11 +36,22 @@ export const ReactivatePage: React.FC = () => {
     }
   }, [token, confirmReactivation]);
 
+  const [emailError, setEmailError] = useState<string | null>(null);
+
   const handleRequestSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      requestReactivation(email.trim());
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
+      setEmailError('validation.emailRequired');
+      return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      setEmailError('validation.emailInvalid');
+      return;
+    }
+    setEmailError(null);
+    requestReactivation(cleanEmail);
   };
 
   return (
@@ -131,10 +142,14 @@ export const ReactivatePage: React.FC = () => {
           <Input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError(null);
+            }}
             label={t('reactivate.emailLabel')}
             placeholder={t('reactivate.emailPlaceholder')}
             leftIcon={<Mail className="w-4 h-4" />}
+            error={emailError || undefined}
             required
             autoComplete="email"
           />

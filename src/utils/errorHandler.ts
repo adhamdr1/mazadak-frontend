@@ -206,9 +206,7 @@ export function getLocalizedErrorMessage(
 
   // 5. If message contains common keywords, provide sensible translations or return parsed message
   if (parsed.message === 'NETWORK_ERROR') {
-    return i18n.t('common:errors.NETWORK_ERROR', {
-      defaultValue: 'تعذر الاتصال بالخادم، يرجى التحقق من اتصال الإنترنت',
-    });
+    return i18n.t('common:errors.NETWORK_ERROR');
   }
 
   return parsed.message || parsed.code;

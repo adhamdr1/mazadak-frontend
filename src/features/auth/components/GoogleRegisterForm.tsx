@@ -11,6 +11,7 @@ import { Alert } from '@/components/common/Alert';
 import { googleRegisterSchema, type GoogleRegisterSchema } from '../schemas/googleRegister.schema';
 import { useGoogleRegister } from '../hooks/useGoogleRegister';
 import { ROUTES } from '@/constants/routes.constants';
+import { toLocalizedDigits } from '@/utils/formatters';
 
 interface GoogleRegisterFormProps {
   googleToken: string;
@@ -39,7 +40,8 @@ function parseJwtPayload(token: string): {
 }
 
 export const GoogleRegisterForm: React.FC<GoogleRegisterFormProps> = ({ googleToken }) => {
-  const { t } = useTranslation('auth');
+  const { t, i18n } = useTranslation('auth');
+  const isRTL = i18n.language.startsWith('ar');
   const { googleRegister, isLoading, error } = useGoogleRegister();
 
   const {
@@ -133,15 +135,31 @@ export const GoogleRegisterForm: React.FC<GoogleRegisterFormProps> = ({ googleTo
       />
 
       {/* Phone */}
-      <Input
-        id="google-register-phone"
-        {...register('phoneNumber')}
-        type="tel"
-        label={t('register.phoneLabel')}
-        placeholder={t('register.phonePlaceholder')}
-        leftIcon={<Phone className="w-4 h-4" />}
-        error={errors.phoneNumber?.message}
-        autoComplete="tel"
+      <Controller
+        name="phoneNumber"
+        control={control}
+        render={({ field }) => (
+          <Input
+            id="google-register-phone"
+            type="tel"
+            inputMode="numeric"
+            dir={isRTL ? 'rtl' : 'ltr'}
+            label={t('register.phoneLabel')}
+            placeholder={t('register.phonePlaceholder')}
+            leftIcon={<Phone className="w-4 h-4" />}
+            value={isRTL && field.value ? toLocalizedDigits(field.value, true) : (field.value || '')}
+            onChange={(e) => {
+              const raw = e.target.value
+                .replace(/[\u0660-\u0669]/g, (d) => (d.charCodeAt(0) - 0x0660).toString())
+                .replace(/[\u06F0-\u06F9]/g, (d) => (d.charCodeAt(0) - 0x06f0).toString())
+                .replace(/\D/g, '')
+                .slice(0, 11);
+              field.onChange(raw);
+            }}
+            error={errors.phoneNumber?.message}
+            autoComplete="tel"
+          />
+        )}
       />
 
       {/* Date of Birth */}

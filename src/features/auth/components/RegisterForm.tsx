@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { User as UserIcon, Mail, Lock, Phone, MapPin, ArrowRight, ArrowLeft } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, Phone, MapPin, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { Input } from '@/components/common/Input';
 import { DateOfBirthPicker } from '@/components/common/DateOfBirthPicker';
 import { Button } from '@/components/common/Button';
@@ -14,6 +14,7 @@ import { registerSchema, type RegisterSchema } from '../schemas/register.schema'
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
 import { ROUTES } from '@/constants/routes.constants';
 import { cn } from '@/utils/cn';
+import { toLocalizedDigits } from '@/utils/formatters';
 import type { RegisterFormData, AuthErrorCode } from '../types/auth.types';
 
 export interface RegisterFormProps {
@@ -42,7 +43,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     formState: { errors },
   } = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
-    mode: 'onTouched',
+    mode: 'onChange',
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -87,41 +88,86 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Wizard Step Indicator */}
-      <div className="flex items-center justify-between gap-2 px-2 pb-2">
-        <div className="flex-1 flex items-center gap-2">
+      {/* 2-Step Interactive Wizard Header */}
+      <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 select-none">
+        {/* Step 1 Tab */}
+        <button
+          type="button"
+          onClick={() => setCurrentStep(1)}
+          className={cn(
+            'flex items-center gap-2 p-2 rounded-xl text-start transition-all cursor-pointer border',
+            currentStep === 1 &&
+              'bg-white dark:bg-slate-800 shadow-sm border-slate-200/60 dark:border-slate-700 text-slate-900 dark:text-white font-bold',
+            currentStep === 2 &&
+              'bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-500/20'
+          )}
+        >
           <div
             className={cn(
-              'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
-              currentStep >= 1
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+              'w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
+              currentStep === 1 && 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-500/20',
+              currentStep === 2 && 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30'
             )}
           >
-            1
+            {currentStep === 2 ? (
+              <Check className="w-3.5 h-3.5 stroke-[3]" />
+            ) : isRTL ? (
+              toLocalizedDigits(1, true)
+            ) : (
+              '1'
+            )}
           </div>
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 hidden sm:inline">
-            {t('register.step1Title')}
-          </span>
-        </div>
+          <div className="min-w-0 flex-1">
+            <span
+              className={cn(
+                'block text-[10px] font-medium leading-none',
+                currentStep === 2
+                  ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                  : 'text-slate-400 dark:text-slate-500'
+              )}
+            >
+              {currentStep === 2 ? t('register.stepCompleted') : t('register.step1Indicator')}
+            </span>
+            <span className="block text-xs font-bold truncate mt-0.5">
+              {t('register.step1Title')}
+            </span>
+          </div>
+        </button>
 
-        <div className="w-8 h-0.5 bg-slate-200 dark:bg-slate-800" />
-
-        <div className="flex-1 flex items-center justify-end gap-2">
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 hidden sm:inline">
-            {t('register.step2Title')}
-          </span>
+        {/* Step 2 Tab */}
+        <button
+          type="button"
+          onClick={async () => {
+            if (currentStep === 1) {
+              await handleNextStep();
+            }
+          }}
+          className={cn(
+            'flex items-center gap-2 p-2 rounded-xl text-start transition-all cursor-pointer border',
+            currentStep === 2
+              ? 'bg-white dark:bg-slate-800 shadow-sm border-slate-200/60 dark:border-slate-700 text-slate-900 dark:text-white font-bold'
+              : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+          )}
+        >
           <div
             className={cn(
-              'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
+              'w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
               currentStep === 2
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-500/20'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
             )}
           >
-            2
+            {isRTL ? toLocalizedDigits(2, true) : '2'}
           </div>
-        </div>
+          <div className="min-w-0 flex-1">
+            <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-medium leading-none">
+              {t('register.step2Indicator')}
+            </span>
+            <span className="block text-xs font-bold truncate mt-0.5">
+              {t('register.step2Title')}
+            </span>
+          </div>
+        </button>
       </div>
 
       {activeError && (
@@ -149,7 +195,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4" noValidate>
         {/* STEP 1: Personal Credentials */}
         <div className={cn('space-y-3.5', currentStep !== 1 && 'hidden')}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <Input
               key="reg-first-name"
               id="register-firstName"
@@ -182,7 +228,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             leftIcon={<Mail className="w-4 h-4" />}
             error={errors.email?.message}
             autoComplete="email"
-            dir="ltr"
           />
 
           <Input
@@ -227,16 +272,32 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
         {/* STEP 2: Contact & Address */}
         <div className={cn('space-y-3.5', currentStep !== 2 && 'hidden')}>
-          <Input
-            key="reg-phone"
-            id="register-phoneNumber"
-            {...register('phoneNumber')}
-            type="tel"
-            label={t('register.phoneLabel')}
-            placeholder={t('register.phonePlaceholder')}
-            leftIcon={<Phone className="w-4 h-4" />}
-            error={errors.phoneNumber?.message}
-            autoComplete="tel"
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({ field }) => (
+              <Input
+                key="reg-phone"
+                id="register-phoneNumber"
+                type="tel"
+                inputMode="numeric"
+                dir={isRTL ? 'rtl' : 'ltr'}
+                label={t('register.phoneLabel')}
+                placeholder={t('register.phonePlaceholder')}
+                leftIcon={<Phone className="w-4 h-4" />}
+                value={isRTL && field.value ? toLocalizedDigits(field.value, true) : (field.value || '')}
+                onChange={(e) => {
+                  const raw = e.target.value
+                    .replace(/[\u0660-\u0669]/g, (d) => (d.charCodeAt(0) - 0x0660).toString())
+                    .replace(/[\u06F0-\u06F9]/g, (d) => (d.charCodeAt(0) - 0x06f0).toString())
+                    .replace(/\D/g, '')
+                    .slice(0, 11);
+                  field.onChange(raw);
+                }}
+                error={errors.phoneNumber?.message}
+                autoComplete="tel"
+              />
+            )}
           />
 
           <Controller
@@ -252,7 +313,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             )}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <Input
               key="reg-city"
               id="register-city"

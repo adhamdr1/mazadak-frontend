@@ -12,7 +12,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   className,
   variant = 'pill',
 }) => {
-  const { i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const currentLang = i18n.language.startsWith('ar') ? 'ar' : 'en';
 
   const toggleLanguage = () => {
@@ -21,7 +21,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   };
 
   const isArabic = currentLang === 'ar';
-  const label = isArabic ? 'Switch to English' : 'التحويل إلى العربية';
+  const label = t('switchToLanguage');
 
   return (
     <button

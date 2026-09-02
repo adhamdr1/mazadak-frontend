@@ -11,6 +11,7 @@ import { Alert } from '@/components/common/Alert';
 import { useResetPassword } from '../hooks/useResetPassword';
 import { resetPasswordSchema, type ResetPasswordSchema } from '../schemas/resetPassword.schema';
 import { ROUTES } from '@/constants/routes.constants';
+
 export const ResetPasswordPage: React.FC = () => {
   const { t, i18n } = useTranslation('auth');
   const [searchParams] = useSearchParams();
@@ -26,6 +27,7 @@ export const ResetPasswordPage: React.FC = () => {
     formState: { errors },
   } = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
+    mode: 'onChange',
     defaultValues: { password: '', confirmPassword: '' },
   });
 
@@ -109,7 +111,7 @@ export const ResetPasswordPage: React.FC = () => {
             size="lg"
             fullWidth
             isLoading={isLoading}
-            className="mt-2"
+            className="mt-2 font-bold shadow-md shadow-amber-500/20"
           >
             {t('resetPassword.submitButton')}
           </Button>
