@@ -1,0 +1,49 @@
+name: CI - Frontend Quality & Build Validation
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# Cancel redundant workflows on new commits to the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Lint, Type Check & Production Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies (Clean Install)
+        run: npm ci
+
+      - name: 🔍 Run ESLint Check
+        run: npm run lint
+
+      - name: 📐 Run TypeScript Type Check
+        run: npx tsc --noEmit
+
+      - name: 🏗️ Verify Production Build
+        run: npm run build
