@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,6 +10,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useAuctionDetail } from '../hooks/useAuctionDetail';
+import { useCancelAuction } from '../hooks/useCancelAuction';
 import { AuctionImageGallery } from '../components/detail/AuctionImageGallery';
 import { AuctionInfoSection } from '../components/detail/AuctionInfoSection';
 import { AuctionDescription } from '../components/detail/AuctionDescription';
@@ -17,6 +18,7 @@ import { AuctionTermsSection } from '../components/detail/AuctionTermsSection';
 import { AuctionSellerCard } from '../components/detail/AuctionSellerCard';
 import { AuctionBiddingCTA } from '../components/detail/AuctionBiddingCTA';
 import { AuctionDetailSkeleton } from '../components/detail/AuctionDetailSkeleton';
+import { CancelAuctionModal } from '../components/shared/CancelAuctionModal';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
@@ -30,6 +32,8 @@ export const AuctionDetailPage: React.FC = () => {
   const { t: tCommon } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
 
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
   const {
     auction,
     effectiveStatus,
@@ -38,7 +42,31 @@ export const AuctionDetailPage: React.FC = () => {
     error,
     isSeller,
     isWinner,
+    refetch,
   } = useAuctionDetail(id);
+
+  const {
+    cancel,
+    isLoading: isCancelling,
+    error: cancelError,
+    reset: resetCancelState,
+  } = useCancelAuction({
+    onSuccess: () => {
+      setIsCancelModalOpen(false);
+      refetch();
+    },
+  });
+
+  const handleOpenCancelModal = () => {
+    resetCancelState();
+    setIsCancelModalOpen(true);
+  };
+
+  const handleCloseCancelModal = () => {
+    if (isCancelling) return;
+    setIsCancelModalOpen(false);
+    resetCancelState();
+  };
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
@@ -197,6 +225,12 @@ export const AuctionDetailPage: React.FC = () => {
                   effectiveStatus={effectiveStatus}
                   isSeller={isSeller}
                   isWinner={isWinner}
+                  onCancelAuction={
+                    isSeller && effectiveStatus === 'PENDING'
+                      ? handleOpenCancelModal
+                      : undefined
+                  }
+                  isCancelling={isCancelling}
                 />
 
                 {/* Verified Seller Profile Card — strictly visible for buyers and guests */}
@@ -213,6 +247,16 @@ export const AuctionDetailPage: React.FC = () => {
             <section aria-label="Auction Terms">
               <AuctionTermsSection />
             </section>
+
+            {/* Cancel Confirmation Modal */}
+            <CancelAuctionModal
+              isOpen={isCancelModalOpen}
+              auction={auction}
+              isLoading={isCancelling}
+              error={cancelError}
+              onClose={handleCloseCancelModal}
+              onConfirm={cancel}
+            />
           </>
         )}
       </main>

@@ -196,6 +196,7 @@ export function useCreateAuction() {
     },
     onSuccess: (newAuction) => {
       queryClient.invalidateQueries({ queryKey: ['auctions'] });
+      queryClient.invalidateQueries({ queryKey: ['my-auctions'] });
       navigate(ROUTES.AUCTION_DETAIL(newAuction._id));
     },
   });

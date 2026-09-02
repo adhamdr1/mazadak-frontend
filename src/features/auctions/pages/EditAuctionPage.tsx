@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import { useAuctionDetail } from '../hooks/useAuctionDetail';
 import { useEditAuction } from '../hooks/useEditAuction';
+import { useCancelAuction } from '../hooks/useCancelAuction';
 import { EditAuctionForm } from '../components/edit/EditAuctionForm';
 import { AuctionLockedBanner } from '../components/edit/AuctionLockedBanner';
+import { CancelAuctionModal } from '../components/shared/CancelAuctionModal';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
@@ -25,8 +27,11 @@ export const EditAuctionPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { t, i18n } = useTranslation(['auctions', 'common']);
   const isRTL = i18n.language?.startsWith('ar');
+  const navigate = useNavigate();
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
   const ChevronIcon = isRTL ? ChevronLeft : ChevronRight;
+
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const {
     auction,
@@ -48,6 +53,29 @@ export const EditAuctionPage: React.FC = () => {
     isSeller,
     isLocked,
   } = useEditAuction(auction);
+
+  const {
+    cancel,
+    isLoading: isCancelling,
+    error: cancelError,
+    reset: resetCancelState,
+  } = useCancelAuction({
+    onSuccess: () => {
+      setIsCancelModalOpen(false);
+      navigate(ROUTES.MY_AUCTIONS);
+    },
+  });
+
+  const handleOpenCancelModal = () => {
+    resetCancelState();
+    setIsCancelModalOpen(true);
+  };
+
+  const handleCloseCancelModal = () => {
+    if (isCancelling) return;
+    setIsCancelModalOpen(false);
+    resetCancelState();
+  };
 
   // Set document title
   useEffect(() => {
@@ -172,6 +200,11 @@ export const EditAuctionPage: React.FC = () => {
               onSubmit={onSubmit}
               isSubmitting={isSubmitting}
               serverError={submitError}
+              onCancelAuction={
+                !isLocked && isSeller && auction.status === 'PENDING'
+                  ? handleOpenCancelModal
+                  : undefined
+              }
             />
           </div>
         )}
@@ -181,6 +214,16 @@ export const EditAuctionPage: React.FC = () => {
       <footer className="w-full py-6 text-center text-xs text-slate-400 dark:text-slate-600 border-t border-slate-200/80 dark:border-slate-800/80">
         {t('footerCopyright', { ns: 'common' })}
       </footer>
+
+      {/* Cancel Confirmation Modal */}
+      <CancelAuctionModal
+        isOpen={isCancelModalOpen}
+        auction={auction || null}
+        isLoading={isCancelling}
+        error={cancelError}
+        onClose={handleCloseCancelModal}
+        onConfirm={cancel}
+      />
     </div>
   );
 };

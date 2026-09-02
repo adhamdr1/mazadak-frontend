@@ -14,14 +14,18 @@ export { useAuctions } from './hooks/useAuctions';
 export { useAuctionDetail, AUCTION_QUERY_KEYS } from './hooks/useAuctionDetail';
 export { useCreateAuction } from './hooks/useCreateAuction';
 export { useEditAuction, type UseEditAuctionReturn } from './hooks/useEditAuction';
+export { useCancelAuction, type UseCancelAuctionOptions } from './hooks/useCancelAuction';
+export { useMyAuctions, type MyAuctionsTab, type FilterStatus } from './hooks/useMyAuctions';
 
 // Export Pages
 export { AuctionListPage } from './pages/AuctionListPage';
 export { AuctionDetailPage } from './pages/AuctionDetailPage';
 export { CreateAuctionPage } from './pages/CreateAuctionPage';
 export { EditAuctionPage } from './pages/EditAuctionPage';
+export { MyAuctionsPage } from './pages/MyAuctionsPage';
 
 // Export Shared Components
+export { CancelAuctionModal, type CancelAuctionModalProps } from './components/shared/CancelAuctionModal';
 export { AuctionCard, type AuctionCardProps } from './components/shared/AuctionCard';
 export { AuctionCardSkeleton, type AuctionCardSkeletonProps } from './components/shared/AuctionCardSkeleton';
 export { AuctionStatusBadge, type AuctionStatusBadgeProps } from './components/shared/AuctionStatusBadge';
@@ -54,3 +58,8 @@ export { LiveAuctionPreviewCard, type LiveAuctionPreviewCardProps } from './comp
 // Export Edit Components
 export { EditAuctionForm, type EditAuctionFormProps } from './components/edit/EditAuctionForm';
 export { AuctionLockedBanner } from './components/edit/AuctionLockedBanner';
+
+// Export My Auctions Components
+export { MyAuctionsStats, type MyAuctionsStatsProps } from './components/my-auctions/MyAuctionsStats';
+export { MyAuctionsFilterBar, type MyAuctionsFilterBarProps } from './components/my-auctions/MyAuctionsFilterBar';
+export { MyAuctionCard, type MyAuctionCardProps } from './components/my-auctions/MyAuctionCard';

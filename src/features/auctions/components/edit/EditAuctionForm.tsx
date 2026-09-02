@@ -50,6 +50,7 @@ export interface EditAuctionFormProps {
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   isSubmitting: boolean;
   serverError: string | null;
+  onCancelAuction?: () => void;
 }
 
 const CATEGORIES: Array<{
@@ -87,6 +88,7 @@ export const EditAuctionForm: React.FC<EditAuctionFormProps> = ({
   onSubmit,
   isSubmitting,
   serverError,
+  onCancelAuction,
 }) => {
   const { t, i18n } = useTranslation('auctions');
   const isRTL = i18n.language?.startsWith('ar');
@@ -457,11 +459,26 @@ export const EditAuctionForm: React.FC<EditAuctionFormProps> = ({
 
       {/* Form Action Buttons */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <Link to={ROUTES.AUCTION_DETAIL(auction._id)}>
-          <Button variant="ghost" size="md">
-            {t('edit.cancel')}
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Link to={ROUTES.AUCTION_DETAIL(auction._id)}>
+            <Button variant="ghost" size="md">
+              {t('edit.cancel')}
+            </Button>
+          </Link>
+
+          {onCancelAuction && (
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={onCancelAuction}
+              leftIcon={<Trash2 className="w-4 h-4 text-red-500" />}
+              className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/40 hover:bg-red-500/10"
+            >
+              {t('myAuctions.actionCancel')}
+            </Button>
+          )}
+        </div>
 
         <Button
           type="submit"

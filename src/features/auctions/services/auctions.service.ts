@@ -69,8 +69,8 @@ const AUCTION_BY_ID_QUERY = `
 
 const MY_AUCTIONS_QUERY = `
   ${AUCTION_FIELDS_FRAGMENT}
-  query MyAuctions($input: PaginationInput!, $status: AuctionStatus) {
-    myAuctions(input: $input, status: $status) {
+  query MyAuctions($input: PaginationInput!, $filter: AuctionsFilterInput) {
+    myAuctions(input: $input, filter: $filter) {
       items {
         ...AuctionFields
       }
@@ -83,8 +83,8 @@ const MY_AUCTIONS_QUERY = `
 
 const MY_WON_AUCTIONS_QUERY = `
   ${AUCTION_FIELDS_FRAGMENT}
-  query MyWonAuctions($input: PaginationInput!) {
-    myWonAuctions(input: $input) {
+  query MyWonAuctions($input: PaginationInput!, $filter: AuctionsFilterInput) {
+    myWonAuctions(input: $input, filter: $filter) {
       items {
         ...AuctionFields
       }
@@ -210,11 +210,11 @@ export const auctionsService = {
    */
   getMyAuctions: async (
     input: PaginationInput = { page: 1, limit: 12 },
-    status?: string
+    filter?: AuctionsFilterInput
   ): Promise<AuctionsPage> => {
     const data = await executeGraphQL<{ myAuctions: AuctionsPage }>(MY_AUCTIONS_QUERY, {
       input,
-      status: status || null,
+      filter: filter || null,
     });
     return data.myAuctions;
   },
@@ -223,10 +223,12 @@ export const auctionsService = {
    * Fetch auctions that the current user has won
    */
   getMyWonAuctions: async (
-    input: PaginationInput = { page: 1, limit: 12 }
+    input: PaginationInput = { page: 1, limit: 12 },
+    filter?: AuctionsFilterInput
   ): Promise<AuctionsPage> => {
     const data = await executeGraphQL<{ myWonAuctions: AuctionsPage }>(MY_WON_AUCTIONS_QUERY, {
       input,
+      filter: filter || null,
     });
     return data.myWonAuctions;
   },

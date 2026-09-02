@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Flame, Hourglass, CheckCircle2 } from 'lucide-react';
+import { Clock, Flame, Hourglass, CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { toLocalizedDigits } from '@/utils/formatters';
 import type { AuctionStatus } from '../../types/auctions.types';
@@ -124,8 +124,31 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
     lg: 'w-4.5 h-4.5',
   };
 
+  // Cancelled State: Red badge with XCircle
+  if (status === 'CANCELLED') {
+    const cancelledStyles =
+      variant === 'pill'
+        ? 'bg-red-500/10 text-red-600 border-red-300 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 shadow-sm backdrop-blur-md'
+        : 'bg-red-500/10 text-red-600 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50 shadow-sm';
+
+    return (
+      <div
+        className={cn(
+          'inline-flex items-center gap-1.5 font-bold rounded-full select-none border transition-colors',
+          cancelledStyles,
+          sizeStyles[size],
+          variant === 'banner' && 'w-full justify-center rounded-2xl py-3 text-base',
+          className
+        )}
+      >
+        <XCircle className={cn(iconSizes[size], 'text-red-500 shrink-0')} />
+        <span>{t('status.CANCELLED')}</span>
+      </div>
+    );
+  }
+
   // Ended State: High-contrast Slate with strong grey border & text
-  const isActuallyEnded = status === 'ENDED' || status === 'CANCELLED' || (status === 'ACTIVE' && time.isExpired);
+  const isActuallyEnded = status === 'ENDED' || (status === 'ACTIVE' && time.isExpired);
   if (isActuallyEnded) {
     const endedStyles =
       variant === 'pill'

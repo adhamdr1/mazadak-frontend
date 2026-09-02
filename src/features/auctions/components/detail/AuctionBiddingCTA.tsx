@@ -157,8 +157,21 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         />
       </div>
 
-      {/* 2. Seller Controls & Status Banner (If viewing own auction) */}
-      {isSeller && (
+      {/* 2. Cancelled Banner (Strictly if CANCELLED) */}
+      {activeTimerStatus === 'CANCELLED' && (
+        <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-center space-y-2">
+          <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-red-600 dark:text-red-400">
+            <XCircle className="w-4 h-4 text-red-500" />
+            <span>{t('status.CANCELLED')}</span>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+            {t('detail.auctionCancelledMessage')}
+          </p>
+        </div>
+      )}
+
+      {/* 3. Seller Controls & Status Banner (If viewing own active/pending/ended auction) */}
+      {isSeller && activeTimerStatus !== 'CANCELLED' && (
         <div className="p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/90 dark:border-amber-500/30 text-amber-950 dark:text-amber-200 space-y-3 text-xs shadow-xs">
           <div className="flex items-center gap-2 font-bold text-xs sm:text-sm">
             <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
@@ -218,7 +231,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 3. Winner Trophy Banner (Only if ENDED and current user is winner) */}
+      {/* 4. Winner Trophy Banner (Only if ENDED and current user is winner) */}
       {activeTimerStatus === 'ENDED' && isWinner && (
         <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-950 dark:text-emerald-300 space-y-2">
           <div className="flex items-center gap-2 font-extrabold text-sm">
@@ -236,7 +249,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 4. Concluded Banner (STRICTLY If ENDED and NOT seller and NOT winner) */}
+      {/* 5. Concluded Banner (STRICTLY If ENDED and NOT seller and NOT winner) */}
       {activeTimerStatus === 'ENDED' && !isSeller && !isWinner && (
         <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-center space-y-1.5">
           <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
@@ -245,7 +258,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 5. Pending State Banner (If PENDING and not seller) */}
+      {/* 6. Pending State Banner (If PENDING and not seller) */}
       {activeTimerStatus === 'PENDING' && !isSeller && (
         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/40 text-amber-700 dark:text-amber-300 text-center space-y-2">
           <div className="flex items-center justify-center gap-1.5 text-xs font-bold">

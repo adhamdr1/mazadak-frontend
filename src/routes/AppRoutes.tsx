@@ -32,6 +32,7 @@ import {
   AuctionDetailPage,
   CreateAuctionPage,
   EditAuctionPage,
+  MyAuctionsPage,
 } from '@/features/auctions';
 import { GuestRoute } from './GuestRoute';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -198,6 +199,7 @@ export const AppRoutes: React.FC = () => {
       <Route element={<ProtectedRoute />}>
         <Route path={ROUTES.CREATE_AUCTION} element={<CreateAuctionPage />} />
         <Route path={ROUTES.EDIT_AUCTION()} element={<EditAuctionPage />} />
+        <Route path={ROUTES.MY_AUCTIONS} element={<MyAuctionsPage />} />
         <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
       </Route>
 

@@ -199,6 +199,7 @@ export function useEditAuction(auction: Auction | undefined) {
     },
     onSuccess: (updatedAuction) => {
       queryClient.invalidateQueries({ queryKey: ['auctions'] });
+      queryClient.invalidateQueries({ queryKey: ['my-auctions'] });
       queryClient.invalidateQueries({ queryKey: ['auction', auction?._id] });
       navigate(ROUTES.AUCTION_DETAIL(updatedAuction._id));
     },
