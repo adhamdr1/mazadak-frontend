@@ -13,6 +13,16 @@ import type {
   AuctionsFilterInput,
 } from '../types/auctions.types';
 
+const VALID_SORT_FIELDS = new Set<AuctionsSortField>([
+  'CREATED_AT',
+  'START_TIME',
+  'END_TIME',
+  'CURRENT_PRICE',
+  'TITLE',
+]);
+
+const VALID_ORDERS = new Set<SortOrder>(['ASC', 'DESC']);
+
 export function useAuctions(initialLimit = 12) {
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation('auctions');
@@ -24,13 +34,18 @@ export function useAuctions(initialLimit = 12) {
   const status = (searchParams.get('status') as AuctionStatus) || undefined;
   const sortParam = searchParams.get('sort') || 'CREATED_AT_DESC';
 
-  // Parse sort field and direction
+  // Parse sort field and direction with validation
   const [sortField, sortOrder] = useMemo((): [AuctionsSortField, SortOrder] => {
     const lastUnderscore = sortParam.lastIndexOf('_');
     if (lastUnderscore !== -1) {
-      const field = sortParam.substring(0, lastUnderscore) as AuctionsSortField;
-      const order = sortParam.substring(lastUnderscore + 1) as SortOrder;
-      return [field, order];
+      const field = sortParam.substring(0, lastUnderscore);
+      const order = sortParam.substring(lastUnderscore + 1);
+      if (
+        VALID_SORT_FIELDS.has(field as AuctionsSortField) &&
+        VALID_ORDERS.has(order as SortOrder)
+      ) {
+        return [field as AuctionsSortField, order as SortOrder];
+      }
     }
     return ['CREATED_AT', 'DESC'];
   }, [sortParam]);

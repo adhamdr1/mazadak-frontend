@@ -86,10 +86,10 @@ export const AuctionDetailPage: React.FC = () => {
       {!isLoading && auction && (
         <>
           {/* Main 2-Column Responsive Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column (Desktop 7 cols): Gallery & Description & Seller */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-              {/* Media Image Gallery */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Left Column (Desktop 7/8 cols): Gallery, Specs & Description */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+              {/* 1. Media Image Gallery Showcase */}
               <section aria-label="Auction Media Gallery">
                 <AuctionImageGallery
                   images={auction.images}
@@ -99,30 +99,20 @@ export const AuctionDetailPage: React.FC = () => {
                 />
               </section>
 
-              {/* Product Specifications & Description */}
+              {/* 2. Core Auction Meta Specs, Title, ID & Details */}
+              <section aria-label="Auction Specifications">
+                <AuctionInfoSection auction={auction} />
+              </section>
+
+              {/* 3. Product Description */}
               <section aria-label="Product Description">
                 <AuctionDescription description={auction.description} />
               </section>
-
-              {/* Seller Identity & Verified Credentials */}
-              {auction.sellerId && (
-                <section aria-label="Seller Information">
-                  <AuctionSellerCard
-                    sellerId={auction.sellerId}
-                    canContact={isWinner}
-                  />
-                </section>
-              )}
             </div>
 
-            {/* Right Column (Desktop 5 cols): Title, Price, Bidding Box & CTA */}
-            <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-20">
-              {/* Core Auction Meta & Breadcrumbs */}
-              <AuctionInfoSection
-                auction={auction}
-              />
-
-              {/* Action Box: Price, Timer, Bidding Controls or Escrow Action */}
+            {/* Right Column (Desktop 5/4 cols): Sticky Sidebar with Price, Timer, Bidding Controls & Seller Card */}
+            <div className="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-24 self-start">
+              {/* Action Box: Price, Timer, Bidding Controls or Seller Controls */}
               <AuctionBiddingCTA
                 auction={auction}
                 effectiveStatus={effectiveStatus || auction.status}
@@ -136,14 +126,14 @@ export const AuctionDetailPage: React.FC = () => {
                 isCancelling={isCancelling}
               />
 
-              {/* Mobile-only Seller Card Placement */}
-              {auction.sellerId && (
-                <div className="block lg:hidden">
+              {/* Verified Seller Profile Card — strictly visible for bidders/visitors, NOT the seller themselves */}
+              {!isSeller && auction.sellerId && (
+                <section aria-label="Seller Information">
                   <AuctionSellerCard
                     sellerId={auction.sellerId}
                     canContact={isWinner}
                   />
-                </div>
+                </section>
               )}
             </div>
           </div>

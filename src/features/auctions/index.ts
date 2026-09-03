@@ -11,7 +11,8 @@ export { MOCK_AUCTIONS } from './services/auctions.mock';
 
 // Export Hooks
 export { useAuctions } from './hooks/useAuctions';
-export { useAuctionDetail, AUCTION_QUERY_KEYS } from './hooks/useAuctionDetail';
+export { useAuctionDetail } from './hooks/useAuctionDetail';
+export { usePublicProfile } from './hooks/usePublicProfile';
 export { useCreateAuction } from './hooks/useCreateAuction';
 export { useEditAuction, type UseEditAuctionReturn } from './hooks/useEditAuction';
 export { useCancelAuction, type UseCancelAuctionOptions } from './hooks/useCancelAuction';

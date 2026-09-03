@@ -402,6 +402,8 @@ export const auctionsService = {
 
   /**
    * Fetch public user profile with real name, avatar, and rating statistics
+   * @todo ستنتقل هذه الدالة إلى users.service.ts عند بناء Users Module (Module 10)
+   * مُبقَّاة هنا مؤقتاً لأن Users Module لم يُبنَ بعد.
    */
   getPublicProfile: async (userId: string) => {
     const data = await executeGraphQL<{

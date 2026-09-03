@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { auctionsService } from '../services/auctions.service';
 import type {
@@ -13,12 +14,17 @@ export type MyAuctionsTab = 'created' | 'won';
 export type FilterStatus = 'ALL' | AuctionStatus;
 
 export const useMyAuctions = () => {
-  const [activeTab, setActiveTab] = useState<MyAuctionsTab>('created');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // URL-persisted state
+  const activeTab = (searchParams.get('tab') as MyAuctionsTab) || 'created';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = 12;
+
+  // Local filter states
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('ALL');
   const [categoryFilter, setCategoryFilter] = useState<AuctionCategory | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [page, setPage] = useState<number>(1);
-  const limit = 12;
 
   // Build filter input
   const filterInput = useMemo<AuctionsFilterInput>(() => {
@@ -59,16 +65,15 @@ export const useMyAuctions = () => {
       }
       return auctionsService.getMyAuctions({ page, limit }, filterInput);
     },
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 30 * 1000, // 30s fresh cache
+    refetchOnMount: true,
   });
 
-  // Background queries for quick stats indicators
+  // Background queries for stats indicators with 30s caching
   const { data: allCreatedData } = useQuery({
     queryKey: ['my-auctions', 'stats', 'created'],
     queryFn: async () => auctionsService.getMyAuctions({ page: 1, limit: 1 }),
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 30 * 1000,
   });
 
   const { data: activeCreatedData } = useQuery({
@@ -78,8 +83,7 @@ export const useMyAuctions = () => {
         { page: 1, limit: 1 },
         { status: 'ACTIVE' as AuctionStatus }
       ),
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 30 * 1000,
   });
 
   const { data: pendingCreatedData } = useQuery({
@@ -89,15 +93,13 @@ export const useMyAuctions = () => {
         { page: 1, limit: 1 },
         { status: 'PENDING' as AuctionStatus }
       ),
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 30 * 1000,
   });
 
   const { data: allWonData } = useQuery({
     queryKey: ['my-auctions', 'stats', 'won'],
     queryFn: async () => auctionsService.getMyWonAuctions({ page: 1, limit: 1 }),
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 30 * 1000,
   });
 
   const stats = useMemo(
@@ -110,31 +112,58 @@ export const useMyAuctions = () => {
     [allCreatedData, activeCreatedData, pendingCreatedData, allWonData]
   );
 
-  const handleTabChange = (newTab: MyAuctionsTab) => {
-    setActiveTab(newTab);
-    setPage(1);
-  };
+  const handleTabChange = useCallback(
+    (newTab: MyAuctionsTab) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('tab', newTab);
+          next.set('page', '1');
+          return next;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
+  const handleSetPage = useCallback(
+    (newPage: number) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('page', String(newPage));
+          return next;
+        },
+        { replace: true }
+      );
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    },
+    [setSearchParams]
+  );
 
   const handleStatusChange = (newStatus: FilterStatus) => {
     setStatusFilter(newStatus);
-    setPage(1);
+    handleSetPage(1);
   };
 
   const handleCategoryChange = (newCategory: AuctionCategory | undefined) => {
     setCategoryFilter(newCategory);
-    setPage(1);
+    handleSetPage(1);
   };
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    setPage(1);
+    handleSetPage(1);
   };
 
   const handleResetFilters = () => {
     setStatusFilter('ALL');
     setCategoryFilter(undefined);
     setSearchQuery('');
-    setPage(1);
+    handleSetPage(1);
   };
 
   return {
@@ -156,7 +185,7 @@ export const useMyAuctions = () => {
     setStatus: handleStatusChange,
     setCategory: handleCategoryChange,
     setSearch: handleSearchChange,
-    setPage,
+    setPage: handleSetPage,
     resetFilters: handleResetFilters,
     refetch,
   };

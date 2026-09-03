@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ImageOff } from 'lucide-react';
 import { cn } from '@/utils/cn';
@@ -28,6 +28,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
   className,
 }) => {
   const { t, i18n } = useTranslation('auctions');
+  const navigate = useNavigate();
   const isRTL = i18n.language?.startsWith('ar');
   const isListView = viewMode === 'list';
   const [imgError, setImgError] = useState(false);
@@ -61,10 +62,19 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
 
   const detailUrl = ROUTES.AUCTION_DETAIL(auction._id);
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, [role="button"], input, select, textarea')) {
+      return;
+    }
+    navigate(detailUrl);
+  };
+
   return (
     <div
+      onClick={handleCardClick}
       className={cn(
-        'group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 transition-all duration-300 overflow-hidden flex flex-col',
+        'group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer',
         'shadow-sm hover:shadow-2xl hover:border-amber-500/70 hover:-translate-y-1',
         'dark:hover:border-amber-500/80 dark:hover:shadow-[0_12px_36px_rgba(245,158,11,0.22)] dark:hover:ring-1 dark:hover:ring-amber-500/40',
         isListView ? 'md:flex-row md:items-stretch' : 'w-full',
