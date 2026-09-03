@@ -117,16 +117,15 @@ export const EditAuctionPage: React.FC = () => {
           </p>
         </div>
 
-        <Link to={ROUTES.MY_AUCTIONS}>
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<ArrowIcon className="w-4 h-4" />}
-            className="text-xs font-bold"
-          >
-            {t('edit.backToMyAuctions')}
-          </Button>
-        </Link>
+        <Button
+          to={ROUTES.MY_AUCTIONS}
+          variant="outline"
+          size="sm"
+          leftIcon={<ArrowIcon className="w-4 h-4" />}
+          className="text-xs font-bold"
+        >
+          {t('edit.backToMyAuctions')}
+        </Button>
       </div>
 
       {/* 3. Loading State */}
@@ -149,11 +148,9 @@ export const EditAuctionPage: React.FC = () => {
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {t('edit.notFoundMessage')}
           </p>
-          <Link to={ROUTES.MY_AUCTIONS}>
-            <Button variant="accent" size="sm">
-              {t('edit.backToMyAuctions')}
-            </Button>
-          </Link>
+          <Button to={ROUTES.MY_AUCTIONS} variant="accent" size="sm">
+            {t('edit.backToMyAuctions')}
+          </Button>
         </Card>
       )}
 

@@ -5,13 +5,13 @@ export * from './types/auctions.types';
 export * from './schemas/createAuction.schema';
 export * from './schemas/updateAuction.schema';
 
-// Export Services & Mock Data
+// Export Services
 export { auctionsService } from './services/auctions.service';
-export { MOCK_AUCTIONS } from './services/auctions.mock';
 
 // Export Hooks
 export { useAuctions } from './hooks/useAuctions';
-export { useAuctionDetail, AUCTION_QUERY_KEYS } from './hooks/useAuctionDetail';
+export { useAuctionDetail } from './hooks/useAuctionDetail';
+export { usePublicProfile } from './hooks/usePublicProfile';
 export { useCreateAuction } from './hooks/useCreateAuction';
 export { useEditAuction, type UseEditAuctionReturn } from './hooks/useEditAuction';
 export { useCancelAuction, type UseCancelAuctionOptions } from './hooks/useCancelAuction';
@@ -32,6 +32,7 @@ export { AuctionStatusBadge, type AuctionStatusBadgeProps } from './components/s
 export { CategoryBadge, type CategoryBadgeProps } from './components/shared/CategoryBadge';
 export { CountdownTimer, type CountdownTimerProps } from './components/shared/CountdownTimer';
 export { PriceDisplay, type PriceDisplayProps } from './components/shared/PriceDisplay';
+export { AuctionDateTimePicker, type AuctionDateTimePickerProps } from './components/shared/AuctionDateTimePicker';
 
 // Export Browse Components
 export { CategoryPillNav, type CategoryPillNavProps } from './components/browse/CategoryPillNav';

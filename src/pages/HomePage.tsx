@@ -80,39 +80,36 @@ export const HomePage: React.FC = () => {
 
             {/* Clean, Harmonious Action Buttons */}
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-              <Link to={ROUTES.AUCTIONS}>
-                <Button
-                  variant="accent"
-                  size="lg"
-                  leftIcon={<Gavel className="w-4 h-4" />}
-                  className="shadow-md shadow-amber-500/20 text-sm font-bold px-6 h-11"
-                >
-                  <span>{t('landing.exploreLiveButton')}</span>
-                </Button>
-              </Link>
+              <Button
+                to={ROUTES.AUCTIONS}
+                variant="accent"
+                size="lg"
+                leftIcon={<Gavel className="w-4 h-4" />}
+                className="shadow-md shadow-amber-500/20 text-sm font-bold px-6 h-11"
+              >
+                <span>{t('landing.exploreLiveButton')}</span>
+              </Button>
 
-              <Link to={ROUTES.CREATE_AUCTION}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  leftIcon={<PlusCircle className="w-4 h-4 text-amber-500" />}
-                  className="border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-amber-500 dark:hover:border-amber-500 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-bold shadow-xs h-11 px-5"
-                >
-                  <span>{t('landing.createAuctionButton')}</span>
-                </Button>
-              </Link>
+              <Button
+                to={ROUTES.CREATE_AUCTION}
+                variant="outline"
+                size="lg"
+                leftIcon={<PlusCircle className="w-4 h-4 text-amber-500" />}
+                className="border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-amber-500 dark:hover:border-amber-500 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-bold shadow-xs h-11 px-5"
+              >
+                <span>{t('landing.createAuctionButton')}</span>
+              </Button>
 
               {isAuthenticated && (
-                <Link to={ROUTES.MY_AUCTIONS}>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    leftIcon={<Layers className="w-4 h-4 text-amber-500" />}
-                    className="border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-amber-500 dark:hover:border-amber-500 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-bold shadow-xs h-11 px-5"
-                  >
-                    <span>{t('landing.myAuctionsButton')}</span>
-                  </Button>
-                </Link>
+                <Button
+                  to={ROUTES.MY_AUCTIONS}
+                  variant="outline"
+                  size="lg"
+                  leftIcon={<Layers className="w-4 h-4 text-amber-500" />}
+                  className="border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-amber-500 dark:hover:border-amber-500 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-bold shadow-xs h-11 px-5"
+                >
+                  <span>{t('landing.myAuctionsButton')}</span>
+                </Button>
               )}
             </div>
           </div>
@@ -204,11 +201,9 @@ export const HomePage: React.FC = () => {
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {t('landing.noActiveAuctionsHint')}
             </p>
-            <Link to={ROUTES.CREATE_AUCTION}>
-              <Button variant="accent" size="sm" leftIcon={<PlusCircle className="w-4 h-4" />}>
-                {t('landing.createAuctionButton')}
-              </Button>
-            </Link>
+            <Button to={ROUTES.CREATE_AUCTION} variant="accent" size="sm" leftIcon={<PlusCircle className="w-4 h-4" />}>
+              {t('landing.createAuctionButton')}
+            </Button>
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

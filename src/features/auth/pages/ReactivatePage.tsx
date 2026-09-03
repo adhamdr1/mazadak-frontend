@@ -80,9 +80,9 @@ export const ReactivatePage: React.FC = () => {
                 </h3>
               </div>
 
-              <Link to={ROUTES.LOGIN} className="block pt-2">
+              <div className="pt-2">
                 <Button
-                  type="button"
+                  to={ROUTES.LOGIN}
                   variant="accent"
                   fullWidth
                   size="lg"
@@ -90,16 +90,16 @@ export const ReactivatePage: React.FC = () => {
                 >
                   {t('reactivate.goToLogin')}
                 </Button>
-              </Link>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
               <Alert variant="error">{error || t('errors.INVALID_OR_EXPIRED_TOKEN')}</Alert>
-              <Link to={ROUTES.LOGIN} className="block pt-2">
-                <Button variant="outline" fullWidth size="lg">
+              <div className="pt-2">
+                <Button to={ROUTES.LOGIN} variant="outline" fullWidth size="lg">
                   {t('reactivate.goToLogin')}
                 </Button>
-              </Link>
+              </div>
             </div>
           )}
         </div>
@@ -123,9 +123,9 @@ export const ReactivatePage: React.FC = () => {
             )}
           </div>
 
-          <Link to={ROUTES.LOGIN} className="block pt-2">
+          <div className="pt-2">
             <Button
-              type="button"
+              to={ROUTES.LOGIN}
               variant="accent"
               fullWidth
               size="lg"
@@ -133,7 +133,7 @@ export const ReactivatePage: React.FC = () => {
             >
               {t('reactivate.goToLogin')}
             </Button>
-          </Link>
+          </div>
         </div>
       ) : (
         <form onSubmit={handleRequestSubmit} className="space-y-4" noValidate>

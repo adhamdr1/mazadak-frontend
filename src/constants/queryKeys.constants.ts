@@ -4,9 +4,12 @@ export const QUERY_KEYS = {
   },
   AUCTIONS: {
     ALL: ['auctions'] as const,
-    DETAIL: (id: string) => ['auctions', id] as const,
+    DETAIL: (id: string) => ['auctions', 'detail', id] as const,
     MY_AUCTIONS: ['auctions', 'my'] as const,
     MY_WON: ['auctions', 'won'] as const,
+  },
+  USERS: {
+    PUBLIC_PROFILE: (userId: string) => ['users', 'public', userId] as const,
   },
   BIDS: {
     BY_AUCTION: (auctionId: string) => ['bids', auctionId] as const,

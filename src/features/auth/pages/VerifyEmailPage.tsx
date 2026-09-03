@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { AuthLayout } from '@/components/layout/AuthLayout';
@@ -34,11 +34,11 @@ export const VerifyEmailPage: React.FC = () => {
               <XCircle className="w-8 h-8" />
             </div>
             <Alert variant="error">{t('verifyEmail.errorMessage')}</Alert>
-            <Link to={ROUTES.LOGIN} className="block pt-2">
-              <Button variant="accent" fullWidth size="lg">
+            <div className="pt-2">
+              <Button to={ROUTES.LOGIN} variant="accent" fullWidth size="lg">
                 {t('verifyEmail.goToLogin')}
               </Button>
-            </Link>
+            </div>
           </div>
         ) : isLoading ? (
           <div className="py-8 space-y-4">
@@ -62,9 +62,9 @@ export const VerifyEmailPage: React.FC = () => {
               </p>
             </div>
 
-            <Link to={ROUTES.LOGIN} className="block pt-2">
+            <div className="pt-2">
               <Button
-                type="button"
+                to={ROUTES.LOGIN}
                 variant="accent"
                 fullWidth
                 size="lg"
@@ -72,7 +72,7 @@ export const VerifyEmailPage: React.FC = () => {
               >
                 {t('verifyEmail.goToLogin')}
               </Button>
-            </Link>
+            </div>
           </div>
         ) : isError ? (
           <div className="space-y-4">
@@ -80,11 +80,11 @@ export const VerifyEmailPage: React.FC = () => {
               <XCircle className="w-8 h-8" />
             </div>
             <Alert variant="error">{error || t('verifyEmail.errorMessage')}</Alert>
-            <Link to={ROUTES.LOGIN} className="block pt-2">
-              <Button variant="outline" fullWidth size="lg">
+            <div className="pt-2">
+              <Button to={ROUTES.LOGIN} variant="outline" fullWidth size="lg">
                 {t('verifyEmail.goToLogin')}
               </Button>
-            </Link>
+            </div>
           </div>
         ) : null}
       </div>

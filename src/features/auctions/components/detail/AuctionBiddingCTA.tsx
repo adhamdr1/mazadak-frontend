@@ -16,11 +16,11 @@ import {
 import { cn } from '@/utils/cn';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants/routes.constants';
+import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { formatPrice, formatDateTime } from '@/utils/formatters';
 import type { Auction, AuctionStatus } from '../../types/auctions.types';
 import { PriceDisplay } from '../shared/PriceDisplay';
 import { CountdownTimer } from '../shared/CountdownTimer';
-import { Button } from '@/components/common/Button';
 
 export interface AuctionBiddingCTAProps {
   auction: Auction;
@@ -31,6 +31,11 @@ export interface AuctionBiddingCTAProps {
   isCancelling?: boolean;
   className?: string;
 }
+
+const safeParseFloat = (val: string | null | undefined, fallback: number): number => {
+  const parsed = parseFloat(val ?? '');
+  return isNaN(parsed) ? fallback : parsed;
+};
 
 export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
   auction,
@@ -47,8 +52,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const minIncrement = parseFloat(auction.minimumBidIncrement || '1000');
-  const currentAmount = parseFloat(auction.currentPrice || auction.startingPrice || '0');
+  const minIncrement = safeParseFloat(auction.minimumBidIncrement, 1000);
+  const currentAmount = safeParseFloat(auction.currentPrice || auction.startingPrice, 0);
   const minNextBid = currentAmount + minIncrement;
 
   const [customBid, setCustomBid] = useState<string>('');
@@ -81,7 +86,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
 
   const handleTimerExpired = () => {
     // Automatically invalidate auction detail to transition to ACTIVE or ENDED without page refresh
-    queryClient.invalidateQueries({ queryKey: ['auctions', 'detail', auction._id] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUCTIONS.DETAIL(auction._id) });
   };
 
   // Synchronous, glitch-free target date and timer status resolution
@@ -188,14 +193,12 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
 
           {activeTimerStatus === 'PENDING' && (
             <div className="flex items-center gap-2.5 pt-1">
-              <Link to={ROUTES.EDIT_AUCTION(auction._id)} className="flex-1">
-                <button
-                  type="button"
-                  className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>{t('detail.editAuction')}</span>
-                </button>
+              <Link
+                to={ROUTES.EDIT_AUCTION(auction._id)}
+                className="flex flex-1 items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all cursor-pointer"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>{t('detail.editAuction')}</span>
               </Link>
 
               {onCancelAuction && (
@@ -203,7 +206,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
                   type="button"
                   onClick={onCancelAuction}
                   disabled={isCancelling}
-                  className="bg-white dark:bg-slate-900 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 font-bold text-xs py-2.5 px-3.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-1.5 bg-white dark:bg-slate-900 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 font-bold text-xs py-2.5 px-3.5 rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
                   <XCircle className="w-3.5 h-3.5" />
                   <span>{t('detail.cancelAuction')}</span>
@@ -217,14 +220,12 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
               <p className="text-[11px] text-amber-900 dark:text-amber-300 leading-relaxed font-medium">
                 {t('detail.sellerWinnerInstructions')}
               </p>
-              <Link to={ROUTES.MY_ESCROWS} className="block">
-                <button
-                  type="button"
-                  className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>{t('detail.sellerProceedToEscrow')}</span>
-                </button>
+              <Link
+                to={ROUTES.MY_ESCROWS}
+                className="flex items-center justify-center gap-2 w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all cursor-pointer"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>{t('detail.sellerProceedToEscrow')}</span>
               </Link>
             </div>
           )}
@@ -241,10 +242,11 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
           <p className="text-xs leading-relaxed text-emerald-800 dark:text-emerald-400">
             {t('detail.wonBannerMessage')}
           </p>
-          <Link to={ROUTES.MY_ESCROWS} className="block pt-1">
-            <Button variant="accent" size="sm" fullWidth className="text-xs font-bold">
-              {t('detail.proceedToEscrow')}
-            </Button>
+          <Link
+            to={ROUTES.MY_ESCROWS}
+            className="flex items-center justify-center w-full mt-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs py-2 px-3.5 rounded-xl shadow-md shadow-amber-500/20 text-center transition-all cursor-pointer"
+          >
+            <span>{t('detail.proceedToEscrow')}</span>
           </Link>
         </div>
       )}
@@ -343,14 +345,12 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                 {t('detail.loginToBidMessage')}
               </p>
-              <Link to={ROUTES.LOGIN} className="block">
-                <button
-                  type="button"
-                  className="w-full bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm py-3 px-5 rounded-2xl shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all flex items-center justify-center gap-2 cursor-pointer select-none"
-                >
-                  <LogIn className="w-4 h-4 stroke-[2.5]" />
-                  <span>{t('detail.loginToBidButton')}</span>
-                </button>
+              <Link
+                to={ROUTES.LOGIN}
+                className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm py-3 px-5 rounded-2xl shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer select-none"
+              >
+                <LogIn className="w-4 h-4 stroke-[2.5]" />
+                <span>{t('detail.loginToBidButton')}</span>
               </Link>
             </div>
           )}

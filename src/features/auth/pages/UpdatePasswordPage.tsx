@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { Lock, KeyRound, CheckCircle2, ArrowRight, ArrowLeft, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { Card } from '@/components/common/Card';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
@@ -78,17 +77,15 @@ export const UpdatePasswordPage: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-2 pt-3">
-                <Link to={ROUTES.HOME} className="block">
-                  <Button
-                    type="button"
-                    variant="accent"
-                    fullWidth
-                    size="md"
-                    rightIcon={isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-                  >
-                    {t('home.title')}
-                  </Button>
-                </Link>
+                <Button
+                  to={ROUTES.HOME}
+                  variant="accent"
+                  fullWidth
+                  size="md"
+                  rightIcon={isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+                >
+                  {t('home.title')}
+                </Button>
                 <Button
                   type="button"
                   variant="ghost"

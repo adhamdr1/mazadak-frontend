@@ -1,5 +1,4 @@
-import { apiClient } from '@/services/api/apiClient';
-import axios from 'axios';
+import { executeGraphQL } from '@/services/api/graphqlClient';
 import type {
   AuthResponse,
   RegisterResponse,
@@ -168,69 +167,6 @@ const CONFIRM_REACTIVATION_MUTATION = `
   }
 `;
 
-// Helper to execute GraphQL queries and parse errors reliably
-interface GraphQLResponse<T> {
-  data?: T;
-  errors?: Array<{
-    message: string;
-    extensions?: {
-      code?: string;
-      status?: number;
-      originalError?: {
-        message?: string | string[];
-        statusCode?: number;
-      };
-    };
-  }>;
-}
-
-function parseGraphQLError(errData: { message: string; extensions?: { code?: string; originalError?: { message?: string | string[] } } }): string {
-  const origMsg = errData?.extensions?.originalError?.message;
-  if (Array.isArray(origMsg) && origMsg.length > 0) {
-    return origMsg.join('. ');
-  }
-  if (typeof origMsg === 'string' && origMsg.trim().length > 0) {
-    return origMsg;
-  }
-  if (typeof errData?.message === 'string' && errData.message !== 'Bad Request Exception') {
-    return errData.message;
-  }
-  return errData?.extensions?.code || errData?.message || 'GENERIC_ERROR';
-}
-
-async function executeGraphQL<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
-  try {
-    const response = await apiClient.post<GraphQLResponse<T>>('', {
-      query,
-      variables,
-    });
-
-    if (response.data?.errors && response.data.errors.length > 0) {
-      const primaryError = response.data.errors[0];
-      const errorMsg = parseGraphQLError(primaryError);
-      throw new Error(errorMsg);
-    }
-
-    if (!response.data?.data) {
-      throw new Error('GENERIC_ERROR');
-    }
-
-    return response.data.data;
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      const graphqlErrors = err.response?.data?.errors;
-      if (graphqlErrors && Array.isArray(graphqlErrors) && graphqlErrors.length > 0) {
-        const primaryError = graphqlErrors[0];
-        const errorMsg = parseGraphQLError(primaryError);
-        throw new Error(errorMsg);
-      }
-    }
-    if (err instanceof Error) {
-      throw err;
-    }
-    throw new Error('GENERIC_ERROR');
-  }
-}
 
 function normalizeEgyptianPhone(phone: string): string {
   const cleaned = phone.replace(/\s+/g, '').replace(/^(\+?20)/, '0');

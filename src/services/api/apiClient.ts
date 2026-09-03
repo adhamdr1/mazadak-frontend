@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { env } from '@/config/env.config';
+import { authStorage } from '@/utils/storage.utils';
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -15,7 +16,7 @@ export const apiClient = axios.create({
 // Request Interceptor: Attach Bearer token if present
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('access_token');
+    const token = authStorage.getAccessToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -24,53 +25,58 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
-// Shared Silent Token Refresh Rotation Helper
-async function attemptTokenRefresh(): Promise<string | null> {
-  const refreshToken = localStorage.getItem('refresh_token');
-  if (!refreshToken) return null;
+// Shared Single-Flight Promise instance to prevent race condition during token rotation
+let refreshPromise: Promise<string | null> | null = null;
 
-  try {
-    const refreshRes = await axios.post(
-      env.apiUrl,
-      {
-        query: `
-          mutation RefreshToken($refreshToken: String!) {
-            refreshToken(refreshToken: $refreshToken) {
-              accessToken
-              refreshToken
-              user {
-                _id
-                email
-                firstName
-                lastName
-                role
+async function attemptTokenRefresh(): Promise<string | null> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    const refreshToken = authStorage.getRefreshToken();
+    if (!refreshToken) return null;
+
+    try {
+      const refreshRes = await axios.post(
+        env.apiUrl,
+        {
+          query: `
+            mutation RefreshToken($refreshToken: String!) {
+              refreshToken(refreshToken: $refreshToken) {
+                accessToken
+                refreshToken
+                user {
+                  _id
+                  email
+                  firstName
+                  lastName
+                  role
+                }
               }
             }
-          }
-        `,
-        variables: { refreshToken },
-      },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
+          `,
+          variables: { refreshToken },
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
 
-    const authData = refreshRes.data?.data?.refreshToken;
-    if (authData?.accessToken) {
-      localStorage.setItem('access_token', authData.accessToken);
-      localStorage.setItem('refresh_token', authData.refreshToken);
-      if (authData.user) {
-        localStorage.setItem('mazadak_user', JSON.stringify(authData.user));
+      const authData = refreshRes.data?.data?.refreshToken;
+      if (authData?.accessToken) {
+        authStorage.setAuthTokens(authData.accessToken, authData.refreshToken, authData.user);
+        return authData.accessToken;
       }
-      return authData.accessToken;
-    }
-  } catch {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('mazadak_user');
-    if (typeof window !== 'undefined') {
+      return null;
+    } catch {
+      authStorage.clearAuth();
       window.dispatchEvent(new CustomEvent('mazadak:auth_expired'));
+      return null;
+    } finally {
+      refreshPromise = null;
     }
-  }
-  return null;
+  })();
+
+  return refreshPromise;
 }
 
 // Response Interceptor: Handles both GraphQL 200 Auth errors and HTTP 401 errors

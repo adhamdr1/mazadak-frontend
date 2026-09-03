@@ -287,7 +287,8 @@
     "endTimeAfterStart": "End time must be after start time",
     "minDurationOneHour": "Auction duration must be at least 1 hour between start and end times",
     "imagesRequired": "Please upload at least one image",
-    "imagesMax": "Maximum 10 images allowed"
+    "imagesMax": "Maximum 10 images allowed",
+    "imageUrlInvalid": "Each image must be a valid uploaded URL"
   },
   "errors": {
     "GENERIC_ERROR": "An error occurred while loading auction details, please try again",
@@ -302,7 +303,9 @@
     "IMAGE_SIZE_EXCEEDS_LIMIT": "Image file size exceeds maximum limit (5MB)",
     "UNAUTHENTICATED": "Session expired or please log in first to continue",
     "UNAUTHORIZED": "Session expired or please log in first to continue",
-    "UPLOAD_FAILED": "Failed to upload image, please check your connection and try again"
+    "UPLOAD_FAILED": "Failed to upload image, please check your connection and try again",
+    "FAILED_TO_UPLOAD_IMAGE": "Failed to upload image to server, please try again",
+    "Each image must be a valid URL": "Each image must be a valid uploaded URL"
   },
   "landing": {
     "heroBadge": "Live & Secure Auction Platform",

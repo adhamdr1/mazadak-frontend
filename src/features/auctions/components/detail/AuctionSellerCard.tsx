@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import {
   UserCheck,
   Star,
@@ -9,7 +8,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { toLocalizedDigits } from '@/utils/formatters';
-import { auctionsService } from '../../services/auctions.service';
+import { usePublicProfile } from '../../hooks/usePublicProfile';
 
 export interface AuctionSellerCardProps {
   sellerId: string;
@@ -35,13 +34,8 @@ export const AuctionSellerCard: React.FC<AuctionSellerCardProps> = ({
   const { t, i18n } = useTranslation('auctions');
   const isRTL = i18n.language?.startsWith('ar');
 
-  // Query real public profile from backend
-  const { data: profile } = useQuery({
-    queryKey: ['publicProfile', sellerId],
-    queryFn: () => auctionsService.getPublicProfile(sellerId),
-    enabled: Boolean(sellerId) && !sellerName,
-    staleTime: 60 * 1000,
-  });
+  // Query real public profile via architectural custom hook
+  const { data: profile } = usePublicProfile(sellerName ? undefined : sellerId);
 
   const realName = sellerName || (profile ? `${profile.firstName} ${profile.lastName}` : null);
   const displayName = realName || t('detail.defaultSellerName');

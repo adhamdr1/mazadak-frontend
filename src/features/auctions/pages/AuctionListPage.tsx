@@ -32,6 +32,10 @@ export const AuctionListPage: React.FC = () => {
     actions,
   } = useAuctions(12);
 
+  const handleStatusExpire = React.useCallback(() => {
+    actions.refetch();
+  }, [actions]);
+
   return (
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
       {/* Minimalist, Elegant Hero Section */}
@@ -104,7 +108,7 @@ export const AuctionListPage: React.FC = () => {
           isLoading={isLoading}
           viewMode={viewMode}
           onResetFilters={actions.resetFilters}
-          onStatusExpire={() => actions.refetch()}
+          onStatusExpire={handleStatusExpire}
         />
       </section>
 

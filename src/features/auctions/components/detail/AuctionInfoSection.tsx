@@ -26,19 +26,15 @@ export const AuctionInfoSection: React.FC<AuctionInfoSectionProps> = ({
   const [copiedId, setCopiedId] = useState(false);
 
   const handleShare = () => {
-    if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2500);
-    }
+    navigator.clipboard.writeText(window.location.href);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2500);
   };
 
   const handleCopyId = () => {
-    if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(auction._id);
-      setCopiedId(true);
-      setTimeout(() => setCopiedId(false), 2000);
-    }
+    navigator.clipboard.writeText(auction._id);
+    setCopiedId(true);
+    setTimeout(() => setCopiedId(false), 2000);
   };
 
   const formattedId =

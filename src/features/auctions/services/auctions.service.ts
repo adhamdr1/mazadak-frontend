@@ -4,7 +4,7 @@
  */
 
 import axios from 'axios';
-import { apiClient } from '@/services/api/apiClient';
+import { executeGraphQL } from '@/services/api/graphqlClient';
 import { compressImage, compressImageToFile } from '@/utils/imageCompression';
 import type {
   Auction,
@@ -139,44 +139,6 @@ const UPLOAD_IMAGE_MUTATION = `
   }
 `;
 
-// Helper to execute GraphQL queries/mutations with standard error extraction
-async function executeGraphQL<T>(
-  query: string,
-  variables: Record<string, unknown> = {}
-): Promise<T> {
-  const response = await apiClient.post<{
-    data?: T;
-    errors?: Array<{
-      message: string;
-      extensions?: {
-        code?: string;
-        originalError?: { message?: string | string[] };
-      };
-    }>;
-  }>('', {
-    query,
-    variables,
-  });
-
-  if (response.data.errors && response.data.errors.length > 0) {
-    const primaryError = response.data.errors[0];
-    const origMsg = primaryError.extensions?.originalError?.message;
-    if (Array.isArray(origMsg) && origMsg.length > 0) {
-      throw new Error(origMsg[0]);
-    }
-    if (typeof origMsg === 'string' && origMsg.trim().length > 0) {
-      throw new Error(origMsg);
-    }
-    const errorCode = primaryError.extensions?.code || primaryError.message;
-    throw new Error(errorCode);
-  }
-
-  if (!response.data.data) {
-    throw new Error('GENERIC_ERROR');
-  }
-
-  return response.data.data;
-}
 
 // ----------------------------------------------------
 // Public API Methods
@@ -231,6 +193,45 @@ export const auctionsService = {
       filter: filter || null,
     });
     return data.myWonAuctions;
+  },
+
+  /**
+   * Fetch consolidated auction statistics in a single unified GraphQL query (1 network request)
+   */
+  getMyAuctionsStats: async (): Promise<{
+    totalCreated: number;
+    activeCreated: number;
+    pendingCreated: number;
+    totalWon: number;
+  }> => {
+    const data = await executeGraphQL<{
+      allCreated: { total: number };
+      activeCreated: { total: number };
+      pendingCreated: { total: number };
+      allWon: { total: number };
+    }>(`
+      query MyAuctionsStats {
+        allCreated: myAuctions(input: { page: 1, limit: 1 }) {
+          total
+        }
+        activeCreated: myAuctions(input: { page: 1, limit: 1 }, filter: { status: ACTIVE }) {
+          total
+        }
+        pendingCreated: myAuctions(input: { page: 1, limit: 1 }, filter: { status: PENDING }) {
+          total
+        }
+        allWon: myWonAuctions(input: { page: 1, limit: 1 }) {
+          total
+        }
+      }
+    `);
+
+    return {
+      totalCreated: data.allCreated?.total ?? 0,
+      activeCreated: data.activeCreated?.total ?? 0,
+      pendingCreated: data.pendingCreated?.total ?? 0,
+      totalWon: data.allWon?.total ?? 0,
+    };
   },
 
   /**
@@ -315,11 +316,11 @@ export const auctionsService = {
     // 2. Fallback: Compress image to crisp lightweight payload (~100KB) and send via Backend GraphQL
     const compressedBase64 = await compressImage(file, 1000, 1000, 0.75);
     const res = await auctionsService.uploadImage(compressedBase64, folder);
-    if (res.url) {
+    if (res?.url) {
       return res.url;
     }
 
-    return compressedBase64;
+    throw new Error('UPLOAD_FAILED');
   },
 
   /**
@@ -344,7 +345,7 @@ export const auctionsService = {
           const formData = new FormData();
           formData.append('file', file);
           formData.append('api_key', sig.apiKey);
-          formData.append('timestamp', String(sig.timestamp));
+          formData.append('timestamp', String(Math.floor(sig.timestamp)));
           formData.append('signature', sig.signature);
           if (sig.folder) formData.append('folder', sig.folder);
 
@@ -361,16 +362,16 @@ export const auctionsService = {
         }
       }
 
-      // 3. Fallback: Fast client-side compression + Backend mutation with graceful fallback
+      // 3. Fallback: Fast client-side compression + Backend mutation
       try {
         const compressedBase64 = await compressImage(file, 1000, 1000, 0.75);
         const res = await auctionsService.uploadImage(compressedBase64, folder);
-        if (res.url) {
+        if (res?.url) {
           return res.url;
         }
-        return compressedBase64;
-      } catch {
-        return await compressImage(file, 800, 800, 0.70);
+        throw new Error('UPLOAD_FAILED');
+      } catch (err: unknown) {
+        throw err instanceof Error ? err : new Error('UPLOAD_FAILED');
       }
     });
 
@@ -384,8 +385,6 @@ export const auctionsService = {
     auctionId: string,
     callback: (payload: AuctionStatusChangedPayload) => void
   ): (() => void) => {
-    if (typeof window === 'undefined') return () => {};
-
     const handleCustomStatusChange = (event: Event) => {
       const customEv = event as CustomEvent<AuctionStatusChangedPayload>;
       if (customEv.detail && customEv.detail.auction._id === auctionId) {
@@ -398,46 +397,5 @@ export const auctionsService = {
     return () => {
       window.removeEventListener('mazadak:auction_status_changed', handleCustomStatusChange);
     };
-  },
-
-  /**
-   * Fetch public user profile with real name, avatar, and rating statistics
-   */
-  getPublicProfile: async (userId: string) => {
-    const data = await executeGraphQL<{
-      publicProfile: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        city?: string;
-        memberSince: string;
-        ratingStats?: {
-          averageRating: number;
-          totalReviews: number;
-        };
-        activeAuctionsCount: number;
-        completedAuctionsCount: number;
-      };
-    }>(
-      `
-        query PublicProfile($userId: ID!) {
-          publicProfile(userId: $userId) {
-            id
-            firstName
-            lastName
-            city
-            memberSince
-            ratingStats {
-              averageRating
-              totalReviews
-            }
-            activeAuctionsCount
-            completedAuctionsCount
-          }
-        }
-      `,
-      { userId }
-    );
-    return data.publicProfile;
   },
 };

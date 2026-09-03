@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { type UseFormReturn } from 'react-hook-form';
 import {
@@ -33,7 +32,7 @@ import type { Auction, AuctionCategory } from '../../types/auctions.types';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { AutoResizeTextarea } from '@/components/common/AutoResizeTextarea';
-import { AuctionDateTimePicker } from '@/components/common/AuctionDateTimePicker';
+import { AuctionDateTimePicker } from '../shared/AuctionDateTimePicker';
 import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 import { ROUTES } from '@/constants/routes.constants';
@@ -460,11 +459,9 @@ export const EditAuctionForm: React.FC<EditAuctionFormProps> = ({
       {/* Form Action Buttons */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Link to={ROUTES.AUCTION_DETAIL(auction._id)}>
-            <Button variant="ghost" size="md">
-              {t('edit.cancel')}
-            </Button>
-          </Link>
+          <Button to={ROUTES.AUCTION_DETAIL(auction._id)} variant="ghost" size="md">
+            {t('edit.cancel')}
+          </Button>
 
           {onCancelAuction && (
             <Button

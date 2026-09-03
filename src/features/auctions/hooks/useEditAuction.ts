@@ -87,8 +87,8 @@ export function useEditAuction(auction: Auction | undefined) {
     }
   }, [auction, reset]);
 
-  const watchedValues = watch();
-  const images = watchedValues.images || [];
+  // Targeted watch on images only to prevent full page re-render on every keystroke
+  const images = watch('images') || [];
 
   // Image Management Actions
   const handleImageFiles = useCallback(
@@ -96,7 +96,7 @@ export function useEditAuction(auction: Auction | undefined) {
       const fileArray = Array.from(files);
       if (fileArray.length === 0) return;
 
-      const currentImages = watchedValues.images || [];
+      const currentImages = form.getValues('images') || [];
       const remainingSlots = 10 - currentImages.length;
 
       if (remainingSlots <= 0) {
@@ -136,30 +136,30 @@ export function useEditAuction(auction: Auction | undefined) {
         setIsUploading(false);
       }
     },
-    [watchedValues.images, setValue, clearErrors, t]
+    [form, setValue, clearErrors, t]
   );
 
   const handleRemoveImage = useCallback(
     (indexToRemove: number) => {
-      const currentImages = watchedValues.images || [];
+      const currentImages = form.getValues('images') || [];
       const updated = currentImages.filter((_, idx) => idx !== indexToRemove);
       setValue('images', updated, { shouldValidate: true, shouldDirty: true });
       if (updated.length === 0) {
         setError('images', { message: 'validation.imagesRequired' });
       }
     },
-    [watchedValues.images, setValue, setError]
+    [form, setValue, setError]
   );
 
   const handleSetCover = useCallback(
     (indexToMakeCover: number) => {
-      const currentImages = [...(watchedValues.images || [])];
+      const currentImages = [...(form.getValues('images') || [])];
       if (indexToMakeCover === 0 || indexToMakeCover >= currentImages.length) return;
       const [chosenCover] = currentImages.splice(indexToMakeCover, 1);
       currentImages.unshift(chosenCover);
       setValue('images', currentImages, { shouldValidate: true, shouldDirty: true });
     },
-    [watchedValues.images, setValue]
+    [form, setValue]
   );
 
   // Mutation
@@ -226,7 +226,7 @@ export function useEditAuction(auction: Auction | undefined) {
     isUploading,
     uploadError,
     images,
-    watchedValues,
+    watchedValues: form.getValues(),
     setValue,
     handleImageFiles,
     handleRemoveImage,

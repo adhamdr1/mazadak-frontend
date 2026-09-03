@@ -48,11 +48,11 @@ export const ResetPasswordPage: React.FC = () => {
       {!token || !email ? (
         <div className="text-center space-y-4">
           <Alert variant="error">{t('errors.INVALID_OR_EXPIRED_TOKEN')}</Alert>
-          <Link to={ROUTES.FORGOT_PASSWORD} className="block pt-2">
-            <Button variant="accent" fullWidth size="lg">
+          <div className="pt-2">
+            <Button to={ROUTES.FORGOT_PASSWORD} variant="accent" fullWidth size="lg">
               {t('forgotPassword.title')}
             </Button>
-          </Link>
+          </div>
         </div>
       ) : isSuccess ? (
         <div className="text-center space-y-5">
@@ -69,9 +69,9 @@ export const ResetPasswordPage: React.FC = () => {
             </p>
           </div>
 
-          <Link to={ROUTES.LOGIN} className="block pt-2">
+          <div className="pt-2">
             <Button
-              type="button"
+              to={ROUTES.LOGIN}
               variant="accent"
               fullWidth
               size="lg"
@@ -79,7 +79,7 @@ export const ResetPasswordPage: React.FC = () => {
             >
               {t('resetPassword.goToLogin')}
             </Button>
-          </Link>
+          </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>

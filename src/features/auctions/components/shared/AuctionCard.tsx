@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ImageOff } from 'lucide-react';
 import { cn } from '@/utils/cn';
@@ -28,14 +28,22 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
   className,
 }) => {
   const { t, i18n } = useTranslation('auctions');
+  const navigate = useNavigate();
   const isRTL = i18n.language?.startsWith('ar');
   const isListView = viewMode === 'list';
   const [imgError, setImgError] = useState(false);
 
+  const [localStatus, setLocalStatus] = useState<AuctionStatus>(auction.status);
+
+  // Synchronize local status with server updates/props
+  useEffect(() => {
+    setLocalStatus(auction.status);
+  }, [auction.status]);
+
   // Compute effective dynamic status (prevent active badge when time expired)
   const effectiveStatus = useMemo<AuctionStatus>(() => {
-    if (auction.status === 'ENDED' || auction.status === 'CANCELLED') {
-      return auction.status;
+    if (localStatus === 'ENDED' || localStatus === 'CANCELLED') {
+      return localStatus;
     }
     const nowMs = Date.now();
     const endMs = new Date(auction.endTime).getTime();
@@ -47,7 +55,17 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
       return 'PENDING';
     }
     return 'ACTIVE';
-  }, [auction.status, auction.startTime, auction.endTime]);
+  }, [localStatus, auction.startTime, auction.endTime]);
+
+  // Immediate seamless status transition on timer expiration (zero lag)
+  const handleCountdownEnd = useCallback(() => {
+    if (effectiveStatus === 'PENDING') {
+      setLocalStatus('ACTIVE');
+    } else if (effectiveStatus === 'ACTIVE') {
+      setLocalStatus('ENDED');
+    }
+    onStatusExpire?.(auction._id);
+  }, [effectiveStatus, auction._id, onStatusExpire]);
 
   // Reset image error state whenever auction images change
   useEffect(() => {
@@ -61,10 +79,19 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
 
   const detailUrl = ROUTES.AUCTION_DETAIL(auction._id);
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, [role="button"], input, select, textarea')) {
+      return;
+    }
+    navigate(detailUrl);
+  };
+
   return (
     <div
+      onClick={handleCardClick}
       className={cn(
-        'group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 transition-all duration-300 overflow-hidden flex flex-col',
+        'group relative rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer',
         'shadow-sm hover:shadow-2xl hover:border-amber-500/70 hover:-translate-y-1',
         'dark:hover:border-amber-500/80 dark:hover:shadow-[0_12px_36px_rgba(245,158,11,0.22)] dark:hover:ring-1 dark:hover:ring-amber-500/40',
         isListView ? 'md:flex-row md:items-stretch' : 'w-full',
@@ -108,7 +135,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
             targetDate={effectiveStatus === 'PENDING' ? auction.startTime : auction.endTime}
             status={effectiveStatus}
             size="sm"
-            onEnd={() => onStatusExpire?.(auction._id)}
+            onEnd={handleCountdownEnd}
           />
           {auction.images && auction.images.length > 1 && (
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/95 text-slate-800 border border-slate-200 shadow-sm backdrop-blur-md dark:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700/80 shrink-0">

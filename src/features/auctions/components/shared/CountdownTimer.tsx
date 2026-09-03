@@ -89,6 +89,11 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const target = useMemo(() => new Date(targetDate), [targetDate]);
   const [time, setTime] = useState<TimeRemaining>(() => calculateTimeRemaining(target));
 
+  const onEndRef = React.useRef(onEnd);
+  useEffect(() => {
+    onEndRef.current = onEnd;
+  });
+
   // Keep timer state strictly in sync with targetDate prop changes
   useEffect(() => {
     const immediate = calculateTimeRemaining(target);
@@ -105,12 +110,12 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
 
       if (remaining.isExpired) {
         clearInterval(interval);
-        onEnd?.();
+        onEndRef.current?.();
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [target, onEnd]);
+  }, [target]);
 
   const sizeStyles = {
     sm: 'text-[11px] px-2.5 py-1 gap-1.5 font-bold',

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Home, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/common/Button';
@@ -32,11 +31,11 @@ export const UnauthorizedPage: React.FC = () => {
             </p>
           </div>
 
-          <Link to={ROUTES.HOME} className="block pt-2">
-            <Button variant="accent" fullWidth size="lg" leftIcon={<Home className="w-4 h-4" />}>
+          <div className="pt-2">
+            <Button to={ROUTES.HOME} variant="accent" fullWidth size="lg" leftIcon={<Home className="w-4 h-4" />}>
               {t('unauthorized.backHome')}
             </Button>
-          </Link>
+          </div>
         </Card>
       </main>
 

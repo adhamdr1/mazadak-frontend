@@ -1,62 +1,56 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AuthContext, type AuthContextType } from './auth.context';
 import { authService } from '@/features/auth/services/auth.service';
+import { authStorage } from '@/utils/storage.utils';
 import type { User, AuthResponse } from '@/features/auth/types/auth.types';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(() => {
-    try {
-      const stored = localStorage.getItem('mazadak_user');
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
+    return authStorage.getUser<User>();
   });
 
   const [accessToken, setAccessToken] = useState<string | null>(() => {
-    return localStorage.getItem('access_token');
+    return authStorage.getAccessToken();
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Initialize and verify session on load
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    const storedUser = localStorage.getItem('mazadak_user');
+    const token = authStorage.getAccessToken();
+    const storedUser = authStorage.getUser<User>();
 
     if (token && storedUser) {
-      try {
-        setUserState(JSON.parse(storedUser));
-        setAccessToken(token);
-      } catch {
-        localStorage.removeItem('mazadak_user');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-      }
+      setUserState(storedUser);
+      setAccessToken(token);
+    } else {
+      authStorage.clearAuth();
+      setUserState(null);
+      setAccessToken(null);
     }
     setIsLoading(false);
   }, []);
 
-  const setAuth = useCallback((response: AuthResponse) => {
-    localStorage.setItem('access_token', response.accessToken);
-    localStorage.setItem('refresh_token', response.refreshToken);
-    localStorage.setItem('mazadak_user', JSON.stringify(response.user));
-
+  const setAuth = useCallback((response: AuthResponse, rememberMe = false) => {
+    authStorage.setAuth(response, rememberMe);
     setAccessToken(response.accessToken);
     setUserState(response.user);
   }, []);
 
   const setUser = useCallback((newUser: User | null) => {
     if (newUser) {
-      localStorage.setItem('mazadak_user', JSON.stringify(newUser));
+      const isLocal = !!localStorage.getItem('access_token');
+      const storage = isLocal ? localStorage : sessionStorage;
+      storage.setItem('mazadak_user', JSON.stringify(newUser));
     } else {
       localStorage.removeItem('mazadak_user');
+      sessionStorage.removeItem('mazadak_user');
     }
     setUserState(newUser);
   }, []);
 
   const logout = useCallback(async () => {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = authStorage.getRefreshToken();
     try {
       if (refreshToken) {
         await authService.logout(refreshToken);
@@ -64,10 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       // Ignore network errors on logout
     } finally {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('mazadak_user');
-
+      authStorage.clearAuth();
       setAccessToken(null);
       setUserState(null);
     }

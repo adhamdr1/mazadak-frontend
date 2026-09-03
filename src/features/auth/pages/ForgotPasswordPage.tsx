@@ -56,9 +56,9 @@ export const ForgotPasswordPage: React.FC = () => {
             )}
           </div>
 
-          <Link to={ROUTES.LOGIN} className="block pt-2">
+          <div className="pt-2">
             <Button
-              type="button"
+              to={ROUTES.LOGIN}
               variant="accent"
               fullWidth
               size="lg"
@@ -66,7 +66,7 @@ export const ForgotPasswordPage: React.FC = () => {
             >
               {t('forgotPassword.backToLogin')}
             </Button>
-          </Link>
+          </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>

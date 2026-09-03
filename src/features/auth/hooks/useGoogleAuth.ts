@@ -25,8 +25,11 @@ export function useGoogleAuth() {
       const parsed = parseAppError(err);
 
       if (parsed.code === 'USER_NOT_FOUND_REQUIRE_REGISTRATION') {
-        // Redirect to dedicated Google registration page with token
-        navigate(`${ROUTES.GOOGLE_REGISTER}?provider=google&token=${encodeURIComponent(idToken)}`);
+        // Redirect to dedicated Google registration page with token in memory state
+        navigate(ROUTES.GOOGLE_REGISTER, {
+          state: { idToken, provider: 'google' },
+          replace: true,
+        });
       } else {
         setError(getLocalizedErrorMessage(err, t, 'auth'));
       }

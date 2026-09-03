@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Lock,
@@ -112,26 +111,26 @@ export const AuctionLockedBanner: React.FC<AuctionLockedBannerProps> = ({
 
           {/* Action CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full max-w-md">
-            <Link to={ROUTES.AUCTION_DETAIL(auction._id)} className="w-full sm:w-auto flex-1">
-              <Button
-                variant="accent"
-                size="md"
-                fullWidth
-                rightIcon={<ExternalLink className="w-4 h-4" />}
-              >
-                {t('edit.viewAuction')}
-              </Button>
-            </Link>
-            <Link to={ROUTES.MY_AUCTIONS} className="w-full sm:w-auto flex-1">
-              <Button
-                variant="outline"
-                size="md"
-                fullWidth
-                leftIcon={<ArrowIcon className="w-4 h-4" />}
-              >
-                {t('edit.myAuctions')}
-              </Button>
-            </Link>
+            <Button
+              to={ROUTES.AUCTION_DETAIL(auction._id)}
+              variant="accent"
+              size="md"
+              fullWidth
+              className="w-full sm:w-auto flex-1"
+              rightIcon={<ExternalLink className="w-4 h-4" />}
+            >
+              {t('edit.viewAuction')}
+            </Button>
+            <Button
+              to={ROUTES.MY_AUCTIONS}
+              variant="outline"
+              size="md"
+              fullWidth
+              className="w-full sm:w-auto flex-1"
+              leftIcon={<ArrowIcon className="w-4 h-4" />}
+            >
+              {t('edit.myAuctions')}
+            </Button>
           </div>
         </div>
       </Card>
