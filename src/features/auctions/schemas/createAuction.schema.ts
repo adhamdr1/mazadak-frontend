@@ -78,7 +78,7 @@ export const createAuctionSchema = z
       ),
 
     images: z
-      .array(z.string())
+      .array(z.string().url('validation.imageUrlInvalid'))
       .min(1, 'validation.imagesRequired')
       .max(10, 'validation.imagesMax'),
   })

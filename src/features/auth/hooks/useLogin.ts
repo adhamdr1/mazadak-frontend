@@ -23,8 +23,8 @@ export function useLogin() {
         email: formData.email,
         password: formData.password,
       }),
-    onSuccess: (data) => {
-      setAuth(data);
+    onSuccess: (data, variables) => {
+      setAuth(data, variables.rememberMe);
       const redirectPath = (location.state as { from?: { pathname: string } })?.from?.pathname || ROUTES.HOME;
       navigate(redirectPath, { replace: true });
     },

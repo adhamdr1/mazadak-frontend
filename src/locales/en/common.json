@@ -54,6 +54,12 @@
     "message": "You do not have sufficient permissions to access this page.",
     "backHome": "Back to Home"
   },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "We apologize for this temporary issue. You can try refreshing the page or return to the homepage to continue.",
+    "retry": "Try Again",
+    "home": "Home"
+  },
   "home": {
     "title": "Authentication & Identity Module is Ready",
     "subtitle": "All auth screens and components are built with 100% backend contract fidelity, Zod schemas, bilingual i18n, Dark Mode, and responsive design.",

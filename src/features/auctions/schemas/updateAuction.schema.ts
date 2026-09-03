@@ -28,7 +28,7 @@ export const updateAuctionSchema = z
       .min(1, 'validation.endTimeRequired'),
 
     images: z
-      .array(z.string())
+      .array(z.string().url('validation.imageUrlInvalid'))
       .min(1, 'validation.imagesRequired')
       .max(10, 'validation.imagesMax'),
   })

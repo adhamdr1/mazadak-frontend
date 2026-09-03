@@ -32,7 +32,7 @@ import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 import { LocalizedNumberInput } from '@/components/common/LocalizedNumberInput';
 import { AutoResizeTextarea } from '@/components/common/AutoResizeTextarea';
-import { AuctionDateTimePicker } from '@/components/common/AuctionDateTimePicker';
+import { AuctionDateTimePicker } from '../shared/AuctionDateTimePicker';
 
 export interface Step1DetailsPricingProps {
   form: UseFormReturn<CreateAuctionSchemaType>;

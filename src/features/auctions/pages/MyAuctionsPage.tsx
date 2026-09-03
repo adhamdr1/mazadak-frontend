@@ -117,16 +117,15 @@ export const MyAuctionsPage: React.FC = () => {
           </p>
         </div>
 
-        <Link to={ROUTES.CREATE_AUCTION}>
-          <Button
-            variant="accent"
-            size="md"
-            leftIcon={<PlusCircle className="w-4 h-4" />}
-            className="shadow-sm shadow-amber-500/20 w-full sm:w-auto font-bold"
-          >
-            {t('myAuctions.createNewButton')}
-          </Button>
-        </Link>
+        <Button
+          to={ROUTES.CREATE_AUCTION}
+          variant="accent"
+          size="md"
+          leftIcon={<PlusCircle className="w-4 h-4" />}
+          className="shadow-sm shadow-amber-500/20 w-full sm:w-auto font-bold"
+        >
+          {t('myAuctions.createNewButton')}
+        </Button>
       </div>
 
       {/* 3. Quick Metrics Overview */}
@@ -197,25 +196,23 @@ export const MyAuctionsPage: React.FC = () => {
                   {t('myAuctions.clearFilters')}
                 </Button>
               ) : activeTab === 'created' ? (
-                <Link to={ROUTES.CREATE_AUCTION}>
-                  <Button
-                    variant="accent"
-                    size="sm"
-                    leftIcon={<PlusCircle className="w-4 h-4" />}
-                  >
-                    {t('myAuctions.createNewButton')}
-                  </Button>
-                </Link>
+                <Button
+                  to={ROUTES.CREATE_AUCTION}
+                  variant="accent"
+                  size="sm"
+                  leftIcon={<PlusCircle className="w-4 h-4" />}
+                >
+                  {t('myAuctions.createNewButton')}
+                </Button>
               ) : (
-                <Link to={ROUTES.AUCTIONS}>
-                  <Button
-                    variant="accent"
-                    size="sm"
-                    leftIcon={<Gavel className="w-4 h-4" />}
-                  >
-                    {t('myAuctions.browseAuctionsButton')}
-                  </Button>
-                </Link>
+                <Button
+                  to={ROUTES.AUCTIONS}
+                  variant="accent"
+                  size="sm"
+                  leftIcon={<Gavel className="w-4 h-4" />}
+                >
+                  {t('myAuctions.browseAuctionsButton')}
+                </Button>
               )}
             </div>
           </div>

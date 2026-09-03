@@ -97,17 +97,15 @@ export const VerifyNoticePage: React.FC = () => {
             </Button>
           )}
 
-          <Link to={ROUTES.LOGIN} className="block">
-            <Button
-              type="button"
-              variant="accent"
-              fullWidth
-              size="lg"
-              rightIcon={isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-            >
-              {t('verifyNotice.backToLogin')}
-            </Button>
-          </Link>
+          <Button
+            to={ROUTES.LOGIN}
+            variant="accent"
+            fullWidth
+            size="lg"
+            rightIcon={isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+          >
+            {t('verifyNotice.backToLogin')}
+          </Button>
         </div>
       </div>
     </AuthLayout>

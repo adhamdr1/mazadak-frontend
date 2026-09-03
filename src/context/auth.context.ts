@@ -6,7 +6,7 @@ export interface AuthContextType {
   accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setAuth: (response: AuthResponse) => void;
+  setAuth: (response: AuthResponse, rememberMe?: boolean) => void;
   setUser: (user: User | null) => void;
   logout: () => Promise<void>;
 }

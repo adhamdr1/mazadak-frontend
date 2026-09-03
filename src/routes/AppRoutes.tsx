@@ -32,48 +32,48 @@ export const AppRoutes: React.FC = () => {
     <>
       <ScrollToTop />
       <Routes>
-      {/* 1. Main Platform Shell (With Global Responsive Navbar & Footer) */}
-      <Route element={<AppLayout />}>
-        {/* Public Landing & Marketplace Routes */}
-        <Route path={ROUTES.HOME} element={<HomePage />} />
-        <Route path={ROUTES.AUCTIONS} element={<AuctionListPage />} />
-        <Route path={ROUTES.AUCTION_DETAIL()} element={<AuctionDetailPage />} />
+        {/* 1. Main Platform Shell (With Global Responsive Navbar & Footer) */}
+        <Route element={<AppLayout />}>
+          {/* Public Landing & Marketplace Routes */}
+          <Route path={ROUTES.HOME} element={<HomePage />} />
+          <Route path={ROUTES.AUCTIONS} element={<AuctionListPage />} />
+          <Route path={ROUTES.AUCTION_DETAIL()} element={<AuctionDetailPage />} />
 
-        {/* Authenticated / Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path={ROUTES.CREATE_AUCTION} element={<CreateAuctionPage />} />
-          <Route path={ROUTES.EDIT_AUCTION()} element={<EditAuctionPage />} />
-          <Route path={ROUTES.MY_AUCTIONS} element={<MyAuctionsPage />} />
-          <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
+          {/* Authenticated / Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path={ROUTES.CREATE_AUCTION} element={<CreateAuctionPage />} />
+            <Route path={ROUTES.EDIT_AUCTION()} element={<EditAuctionPage />} />
+            <Route path={ROUTES.MY_AUCTIONS} element={<MyAuctionsPage />} />
+            <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
+          </Route>
         </Route>
-      </Route>
 
-      {/* 2. Guest Only Auth Routes (Login / Register / Google Completion) */}
-      <Route element={<GuestRoute />}>
-        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-        <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-        <Route path={ROUTES.GOOGLE_REGISTER} element={<GoogleRegisterPage />} />
-      </Route>
+        {/* 2. Guest Only Auth Routes (Login / Register / Google Completion) */}
+        <Route element={<GuestRoute />}>
+          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+          <Route path={ROUTES.GOOGLE_REGISTER} element={<GoogleRegisterPage />} />
+        </Route>
 
-      {/* 3. Public Email Verification & Recovery Routes */}
-      <Route path={ROUTES.VERIFY_NOTICE} element={<VerifyNoticePage />} />
-      <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
-      <Route path={ROUTES.CONFIRM_EMAIL} element={<VerifyEmailPage />} />
-      <Route path={ROUTES.CONFIRM_EMAIL_ALT} element={<VerifyEmailPage />} />
+        {/* 3. Public Email Verification & Recovery Routes */}
+        <Route path={ROUTES.VERIFY_NOTICE} element={<VerifyNoticePage />} />
+        <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
+        <Route path={ROUTES.CONFIRM_EMAIL} element={<VerifyEmailPage />} />
+        <Route path={ROUTES.CONFIRM_EMAIL_ALT} element={<VerifyEmailPage />} />
 
-      <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
-      <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
-      <Route path={ROUTES.RESET_PASSWORD_ALT} element={<ResetPasswordPage />} />
+        <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+        <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+        <Route path={ROUTES.RESET_PASSWORD_ALT} element={<ResetPasswordPage />} />
 
-      <Route path={ROUTES.REACTIVATE} element={<ReactivatePage />} />
-      <Route path={ROUTES.CONFIRM_REACTIVATION} element={<ReactivatePage />} />
-      <Route path={ROUTES.CONFIRM_REACTIVATION_ALT} element={<ReactivatePage />} />
+        <Route path={ROUTES.REACTIVATE} element={<ReactivatePage />} />
+        <Route path={ROUTES.CONFIRM_REACTIVATION} element={<ReactivatePage />} />
+        <Route path={ROUTES.CONFIRM_REACTIVATION_ALT} element={<ReactivatePage />} />
 
-      {/* 4. Error Fallback Routes */}
-      <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  </>
+        {/* 4. Error Fallback Routes */}
+        <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
   );
 };
 

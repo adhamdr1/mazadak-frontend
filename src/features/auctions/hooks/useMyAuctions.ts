@@ -1,7 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { auctionsService } from '../services/auctions.service';
+import { getLocalizedErrorMessage } from '@/utils/errorHandler';
 import type {
   AuctionCategory,
   AuctionStatus,
@@ -14,6 +16,7 @@ export type MyAuctionsTab = 'created' | 'won';
 export type FilterStatus = 'ALL' | AuctionStatus;
 
 export const useMyAuctions = () => {
+  const { t } = useTranslation('auctions');
   const [searchParams, setSearchParams] = useSearchParams();
 
   // URL-persisted state
@@ -69,47 +72,22 @@ export const useMyAuctions = () => {
     refetchOnMount: true,
   });
 
-  // Background queries for stats indicators with 30s caching
-  const { data: allCreatedData } = useQuery({
-    queryKey: ['my-auctions', 'stats', 'created'],
-    queryFn: async () => auctionsService.getMyAuctions({ page: 1, limit: 1 }),
-    staleTime: 30 * 1000,
-  });
-
-  const { data: activeCreatedData } = useQuery({
-    queryKey: ['my-auctions', 'stats', 'active'],
-    queryFn: async () =>
-      auctionsService.getMyAuctions(
-        { page: 1, limit: 1 },
-        { status: 'ACTIVE' as AuctionStatus }
-      ),
-    staleTime: 30 * 1000,
-  });
-
-  const { data: pendingCreatedData } = useQuery({
-    queryKey: ['my-auctions', 'stats', 'pending'],
-    queryFn: async () =>
-      auctionsService.getMyAuctions(
-        { page: 1, limit: 1 },
-        { status: 'PENDING' as AuctionStatus }
-      ),
-    staleTime: 30 * 1000,
-  });
-
-  const { data: allWonData } = useQuery({
-    queryKey: ['my-auctions', 'stats', 'won'],
-    queryFn: async () => auctionsService.getMyWonAuctions({ page: 1, limit: 1 }),
-    staleTime: 30 * 1000,
+  // Unified single-flight query for all 4 stats with 5-minute caching (1 network request)
+  const { data: statsData } = useQuery({
+    queryKey: ['my-auctions', 'stats'],
+    queryFn: () => auctionsService.getMyAuctionsStats(),
+    staleTime: 5 * 60 * 1000, // 5 minutes fresh cache
+    refetchOnWindowFocus: false,
   });
 
   const stats = useMemo(
     () => ({
-      totalCreated: allCreatedData?.total ?? 0,
-      activeCreated: activeCreatedData?.total ?? 0,
-      pendingCreated: pendingCreatedData?.total ?? 0,
-      totalWon: allWonData?.total ?? 0,
+      totalCreated: statsData?.totalCreated ?? 0,
+      activeCreated: statsData?.activeCreated ?? 0,
+      pendingCreated: statsData?.pendingCreated ?? 0,
+      totalWon: statsData?.totalWon ?? 0,
     }),
-    [allCreatedData, activeCreatedData, pendingCreatedData, allWonData]
+    [statsData]
   );
 
   const handleTabChange = useCallback(
@@ -137,9 +115,7 @@ export const useMyAuctions = () => {
         },
         { replace: true }
       );
-      if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     [setSearchParams]
   );
@@ -179,7 +155,7 @@ export const useMyAuctions = () => {
     hasNextPage: auctionsPage?.hasNextPage || false,
     isLoading,
     isFetching,
-    error: error ? (error as Error).message : null,
+    error: getLocalizedErrorMessage(error, t, 'auctions'),
     stats,
     setTab: handleTabChange,
     setStatus: handleStatusChange,

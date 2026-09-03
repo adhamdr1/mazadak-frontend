@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import { useAuctionDetail } from '../hooks/useAuctionDetail';
@@ -74,11 +74,9 @@ export const AuctionDetailPage: React.FC = () => {
               {error || t('detail.notFoundMessage')}
             </p>
           </div>
-          <Link to={ROUTES.AUCTIONS}>
-            <Button variant="accent" size="sm">
-              {t('detail.backToAuctions')}
-            </Button>
-          </Link>
+          <Button to={ROUTES.AUCTIONS} variant="accent" size="sm">
+            {t('detail.backToAuctions')}
+          </Button>
         </div>
       )}
 

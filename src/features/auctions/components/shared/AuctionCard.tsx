@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ImageOff } from 'lucide-react';
@@ -33,10 +33,17 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
   const isListView = viewMode === 'list';
   const [imgError, setImgError] = useState(false);
 
+  const [localStatus, setLocalStatus] = useState<AuctionStatus>(auction.status);
+
+  // Synchronize local status with server updates/props
+  useEffect(() => {
+    setLocalStatus(auction.status);
+  }, [auction.status]);
+
   // Compute effective dynamic status (prevent active badge when time expired)
   const effectiveStatus = useMemo<AuctionStatus>(() => {
-    if (auction.status === 'ENDED' || auction.status === 'CANCELLED') {
-      return auction.status;
+    if (localStatus === 'ENDED' || localStatus === 'CANCELLED') {
+      return localStatus;
     }
     const nowMs = Date.now();
     const endMs = new Date(auction.endTime).getTime();
@@ -48,7 +55,17 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
       return 'PENDING';
     }
     return 'ACTIVE';
-  }, [auction.status, auction.startTime, auction.endTime]);
+  }, [localStatus, auction.startTime, auction.endTime]);
+
+  // Immediate seamless status transition on timer expiration (zero lag)
+  const handleCountdownEnd = useCallback(() => {
+    if (effectiveStatus === 'PENDING') {
+      setLocalStatus('ACTIVE');
+    } else if (effectiveStatus === 'ACTIVE') {
+      setLocalStatus('ENDED');
+    }
+    onStatusExpire?.(auction._id);
+  }, [effectiveStatus, auction._id, onStatusExpire]);
 
   // Reset image error state whenever auction images change
   useEffect(() => {
@@ -118,7 +135,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
             targetDate={effectiveStatus === 'PENDING' ? auction.startTime : auction.endTime}
             status={effectiveStatus}
             size="sm"
-            onEnd={() => onStatusExpire?.(auction._id)}
+            onEnd={handleCountdownEnd}
           />
           {auction.images && auction.images.length > 1 && (
             <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/95 text-slate-800 border border-slate-200 shadow-sm backdrop-blur-md dark:bg-slate-900/90 dark:text-slate-200 dark:border-slate-700/80 shrink-0">

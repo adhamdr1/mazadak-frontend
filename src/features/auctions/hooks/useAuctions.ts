@@ -121,9 +121,7 @@ export function useAuctions(initialLimit = 12) {
   const setPage = useCallback(
     (newPage: number) => {
       updateParams({ page: newPage.toString() });
-      if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     [updateParams]
   );

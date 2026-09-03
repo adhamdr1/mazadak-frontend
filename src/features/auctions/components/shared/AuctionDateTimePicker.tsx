@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { toLocalizedDigits } from '@/utils/formatters';
-import { CustomDateTimePickerModal } from './CustomDateTimePickerModal';
+import { CustomDateTimePickerModal } from '@/components/common/CustomDateTimePickerModal';
 
 export interface AuctionDateTimePickerProps {
   id: string;

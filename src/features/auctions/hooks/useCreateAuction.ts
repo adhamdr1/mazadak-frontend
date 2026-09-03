@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +14,29 @@ import { getLocalizedErrorMessage } from '@/utils/errorHandler';
 import { ROUTES } from '@/constants/routes.constants';
 
 export type CreateAuctionStep = 1 | 2;
+
+/**
+ * Pure helper to calculate initial default start and end times
+ * Start: now + 30 min rounded up to the nearest 30m slot
+ * End: exactly 1 hour after start
+ */
+function getDefaultDates() {
+  const now = new Date();
+  const slotMs = 30 * 60 * 1000;
+  const startMs = now.getTime() + 30 * 60 * 1000;
+  const remainder = startMs % slotMs;
+  const start = new Date(startMs + (remainder > 0 ? slotMs - remainder : 0));
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const toLocalISOString = (d: Date) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+  return {
+    startTime: toLocalISOString(start),
+    endTime: toLocalISOString(end),
+  };
+}
 
 export function useCreateAuction() {
   const navigate = useNavigate();
@@ -45,28 +68,8 @@ export function useCreateAuction() {
     };
   }, []);
 
-  // Initialize default start and end times (Start: now + 30 min rounded to 30m slot, End: start + 1 hour)
-  const getDefaultDates = () => {
-    const now = new Date();
-    const slotMs = 30 * 60 * 1000;
-    const startMs = now.getTime() + 30 * 60 * 1000;
-    const remainder = startMs % slotMs;
-    const start = new Date(startMs + (remainder > 0 ? slotMs - remainder : 0));
-    // Default end: Exactly 1 hour after start
-    const end = new Date(start.getTime() + 60 * 60 * 1000);
-
-    const toLocalISOString = (d: Date) => {
-      const pad = (n: number) => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    };
-
-    return {
-      startTime: toLocalISOString(start),
-      endTime: toLocalISOString(end),
-    };
-  };
-
-  const dates = getDefaultDates();
+  // Lazy memoized initial dates for defaultValues (calculated once on mount)
+  const initialDates = useMemo(() => getDefaultDates(), []);
 
   const form = useForm<CreateAuctionSchemaType>({
     resolver: zodResolver(createAuctionSchema),
@@ -77,8 +80,8 @@ export function useCreateAuction() {
       description: '',
       startingPrice: 500,
       minimumBidIncrement: 50,
-      startTime: dates.startTime,
-      endTime: dates.endTime,
+      startTime: initialDates.startTime,
+      endTime: initialDates.endTime,
       images: [],
     },
   });
@@ -93,8 +96,8 @@ export function useCreateAuction() {
     formState: { errors, isValid },
   } = form;
 
-  const watchedValues = watch();
-  const images = watchedValues.images || [];
+  // Targeted watch on images only to prevent full page re-render on every keystroke
+  const images = watch('images') || [];
 
   // Step 1 Validation & Navigation
   const goToStep2 = async () => {
@@ -110,17 +113,13 @@ export function useCreateAuction() {
 
     if (isStep1Valid) {
       setStep(2);
-      if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const goToStep1 = () => {
     setStep(1);
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Image Upload Handlers with High-Speed Compression & Backend Upload Mutation
@@ -215,7 +214,7 @@ export function useCreateAuction() {
     setStep,
     goToStep1,
     goToStep2,
-    watchedValues,
+    watchedValues: form.getValues(),
     images,
     isUploading,
     uploadError,
