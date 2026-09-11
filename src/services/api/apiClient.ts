@@ -61,11 +61,23 @@ async function attemptTokenRefresh(): Promise<string | null> {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
+      // 1. If the GraphQL response contains errors (e.g. Refresh token expired or revoked)
+      if (refreshRes.data?.errors && refreshRes.data.errors.length > 0) {
+        authStorage.clearAuth();
+        window.dispatchEvent(new CustomEvent('mazadak:auth_expired'));
+        return null;
+      }
+
+      // 2. If valid authData with new accessToken is returned
       const authData = refreshRes.data?.data?.refreshToken;
       if (authData?.accessToken) {
         authStorage.setAuthTokens(authData.accessToken, authData.refreshToken, authData.user);
         return authData.accessToken;
       }
+
+      // 3. If null/undefined payload returned without explicit errors
+      authStorage.clearAuth();
+      window.dispatchEvent(new CustomEvent('mazadak:auth_expired'));
       return null;
     } catch {
       authStorage.clearAuth();

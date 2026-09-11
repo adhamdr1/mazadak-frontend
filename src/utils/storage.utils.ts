@@ -71,6 +71,23 @@ export const authStorage = {
   },
 
   /**
+   * Update cached authenticated user profile in the active storage type.
+   */
+  setUser(user: unknown): void {
+    const isLocal = !!localStorage.getItem('access_token') || !!localStorage.getItem('refresh_token');
+    const target = isLocal ? localStorage : sessionStorage;
+    target.setItem('mazadak_user', JSON.stringify(user));
+  },
+
+  /**
+   * Remove cached user profile from all storages.
+   */
+  clearUser(): void {
+    localStorage.removeItem('mazadak_user');
+    sessionStorage.removeItem('mazadak_user');
+  },
+
+  /**
    * Clear all auth credentials and cached user profiles from both storages.
    */
   clearAuth(): void {

@@ -39,12 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setUser = useCallback((newUser: User | null) => {
     if (newUser) {
-      const isLocal = !!localStorage.getItem('access_token');
-      const storage = isLocal ? localStorage : sessionStorage;
-      storage.setItem('mazadak_user', JSON.stringify(newUser));
+      authStorage.setUser(newUser);
     } else {
-      localStorage.removeItem('mazadak_user');
-      sessionStorage.removeItem('mazadak_user');
+      authStorage.clearUser();
     }
     setUserState(newUser);
   }, []);
