@@ -182,14 +182,14 @@ export function useEditAuction(auction: Auction | undefined) {
       };
 
       // Only send startTime if changed from original to avoid AUCTION_START_TIME_TOO_SOON on nearing auctions
-      const originalStartMs = auction.startTime ? new Date(auction.startTime).getTime() : 0;
+      const originalStartMs = auction?.startTime ? new Date(auction.startTime).getTime() : 0;
       const newStartMs = data.startTime ? new Date(data.startTime).getTime() : 0;
       if (newStartMs && Math.abs(newStartMs - originalStartMs) > 1000) {
         payload.startTime = new Date(data.startTime).toISOString();
       }
 
       // Only send endTime if changed from original
-      const originalEndMs = auction.endTime ? new Date(auction.endTime).getTime() : 0;
+      const originalEndMs = auction?.endTime ? new Date(auction.endTime).getTime() : 0;
       const newEndMs = data.endTime ? new Date(data.endTime).getTime() : 0;
       if (newEndMs && Math.abs(newEndMs - originalEndMs) > 1000) {
         payload.endTime = new Date(data.endTime).toISOString();

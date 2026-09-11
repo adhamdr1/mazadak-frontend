@@ -28,7 +28,6 @@ export interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ className }) => {
   const { t } = useTranslation('common');
-  const { t: tAuctions } = useTranslation('auctions');
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
@@ -68,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
       ? [
           {
             to: ROUTES.MY_AUCTIONS,
-            label: tAuctions('myAuctions.title'),
+            label: t('nav.myAuctions'),
             icon: Layers,
             isActive: location.pathname === ROUTES.MY_AUCTIONS,
           },
@@ -121,7 +120,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                 leftIcon={<PlusCircle className="w-4 h-4" />}
                 className="shadow-sm shadow-amber-500/20 text-xs font-bold"
               >
-                {tAuctions('myAuctions.createNewButton')}
+                {t('nav.createAuction')}
               </Button>
             </Link>
 
@@ -288,7 +287,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   )}
                 >
                   <PlusCircle className="w-4 h-4" />
-                  <span>{tAuctions('myAuctions.createNewButton')}</span>
+                  <span>{t('nav.createAuction')}</span>
                 </Link>
 
                 {/* 4. مزاداتي */}
@@ -304,7 +303,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                     )}
                   >
                     <Layers className="w-4 h-4" />
-                    <span>{tAuctions('myAuctions.title')}</span>
+                    <span>{t('nav.myAuctions')}</span>
                   </Link>
                 )}
 

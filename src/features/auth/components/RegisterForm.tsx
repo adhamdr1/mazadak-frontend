@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { User as UserIcon, Mail, Lock, Phone, MapPin, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { Input } from '@/components/common/Input';
-import { DateOfBirthPicker } from '@/components/common/DateOfBirthPicker';
+import { DateOfBirthPicker } from './DateOfBirthPicker';
 import { Button } from '@/components/common/Button';
 import { Alert } from '@/components/common/Alert';
 import { AuthDivider } from './AuthDivider';

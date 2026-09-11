@@ -30,7 +30,9 @@
     "register": "Register",
     "logout": "Logout",
     "home": "Home",
-    "auctions": "Auctions"
+    "auctions": "Auctions",
+    "myAuctions": "My Auctions",
+    "createAuction": "Create Auction"
   },
   "rightsReserved": "All rights reserved.",
   "footerCopyright": "Mazadak Platform. All rights reserved.",
@@ -61,18 +63,11 @@
     "home": "Home"
   },
   "home": {
-    "title": "Authentication & Identity Module is Ready",
-    "subtitle": "All auth screens and components are built with 100% backend contract fidelity, Zod schemas, bilingual i18n, Dark Mode, and responsive design.",
-    "allPagesTitle": "Completed Auth Module Screens (7 Screens)",
-    "loginLink": "Sign In",
-    "registerLink": "Create Account",
-    "forgotPasswordLink": "Forgot Password",
-    "reactivateLink": "Reactivate Account",
-    "verifyNoticeLink": "Verification Notice",
-    "verifyEmailLink": "Verify Email",
-    "resetPasswordLink": "Reset Password",
-    "updatePasswordLink": "Change Password",
-    "notFoundLink": "404 Page"
+    "title": "Welcome to Mazadak",
+    "subtitle": "The Premier Live & Secure Bidding Platform in the Arab World",
+    "cta": "Start Bidding Now",
+    "featuredAuctions": "Featured Auctions",
+    "updatePasswordLink": "Change Password"
   },
   "errors": {
     "BAD_REQUEST": "Invalid request — please check your inputs",

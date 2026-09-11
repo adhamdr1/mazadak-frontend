@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Flame, Hourglass, CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { toLocalizedDigits } from '@/utils/formatters';
+import { useCountdown } from '@/hooks/useCountdown';
 import type { AuctionStatus } from '../../types/auctions.types';
 
 export interface CountdownTimerProps {
@@ -13,49 +14,6 @@ export interface CountdownTimerProps {
   showLabel?: boolean;
   onEnd?: () => void;
   className?: string;
-}
-
-interface TimeRemaining {
-  totalMs: number;
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-  isUrgent: boolean; // < 1 minute
-  isNearEnd: boolean; // < 1 hour
-  isExpired: boolean;
-}
-
-function calculateTimeRemaining(target: Date): TimeRemaining {
-  const totalMs = target.getTime() - Date.now();
-  if (totalMs <= 0) {
-    return {
-      totalMs: 0,
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      isUrgent: false,
-      isNearEnd: false,
-      isExpired: true,
-    };
-  }
-
-  const seconds = Math.floor((totalMs / 1000) % 60);
-  const minutes = Math.floor((totalMs / 1000 / 60) % 60);
-  const hours = Math.floor((totalMs / (1000 * 60 * 60)) % 24);
-  const days = Math.floor(totalMs / (1000 * 60 * 60 * 24));
-
-  return {
-    totalMs,
-    days,
-    hours,
-    minutes,
-    seconds,
-    isUrgent: totalMs < 60 * 1000,
-    isNearEnd: totalMs < 60 * 60 * 1000,
-    isExpired: false,
-  };
 }
 
 /**
@@ -86,36 +44,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   const { t, i18n } = useTranslation('auctions');
   const isRTL = i18n.language?.startsWith('ar');
 
-  const target = useMemo(() => new Date(targetDate), [targetDate]);
-  const [time, setTime] = useState<TimeRemaining>(() => calculateTimeRemaining(target));
-
-  const onEndRef = React.useRef(onEnd);
-  useEffect(() => {
-    onEndRef.current = onEnd;
-  });
-
-  // Keep timer state strictly in sync with targetDate prop changes
-  useEffect(() => {
-    const immediate = calculateTimeRemaining(target);
-    setTime(immediate);
-
-    // If already expired at mount, do NOT trigger onEnd to prevent infinite refetch loops
-    if (immediate.isExpired) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      const remaining = calculateTimeRemaining(target);
-      setTime(remaining);
-
-      if (remaining.isExpired) {
-        clearInterval(interval);
-        onEndRef.current?.();
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [target]);
+  const time = useCountdown(targetDate, { onEnd, urgentThresholdSeconds: 60 });
 
   const sizeStyles = {
     sm: 'text-[11px] px-2.5 py-1 gap-1.5 font-bold',

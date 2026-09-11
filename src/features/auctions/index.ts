@@ -11,7 +11,6 @@ export { auctionsService } from './services/auctions.service';
 // Export Hooks
 export { useAuctions } from './hooks/useAuctions';
 export { useAuctionDetail } from './hooks/useAuctionDetail';
-export { usePublicProfile } from './hooks/usePublicProfile';
 export { useCreateAuction } from './hooks/useCreateAuction';
 export { useEditAuction, type UseEditAuctionReturn } from './hooks/useEditAuction';
 export { useCancelAuction, type UseCancelAuctionOptions } from './hooks/useCancelAuction';
