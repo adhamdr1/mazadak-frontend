@@ -25,8 +25,8 @@
 |:---:|:---|:---|:---:|:---|
 | 1️⃣ | **Foundation** (Setup + AppShell + Routing + Theme + i18n) | `feature/foundation-setup` | ✅ **مكتمل 100%** | — |
 | 2️⃣ | **Auth Module** (Login, Register, Google Auth, Verify, Reset, Reactivate) | `feature/auth-module` | ✅ **مكتمل 100%** | القسم 1 |
-| 3️⃣ | **Auctions Module** (Browse, Detail, Create Wizard, Edit, My Auctions) | `feature/auctions-module` | 🚀 **المرحلة القادمة** | القسم 3 |
-| 4️⃣ | **Bids Module** (Live Bidding Box, Auto-bid Modal, My Bids) | `feature/bids-module` | ⏳ قيد الانتظار | القسم 4 |
+| 3️⃣ | **Auctions Module** (Browse, Detail, Create Wizard, Edit, My Auctions, WebSocket) | `feature/auctions-module` | ✅ **مكتمل 100%** | القسم 3 |
+| 4️⃣ | **Bids Module** (Live Bidding Box, Auto-bid Modal, My Bids) | `feature/bids-module` | 🚀 **المرحلة القادمة** | القسم 4 |
 | 5️⃣ | **Wallet Module** (Balance, Deposit REST, Withdraw, Transactions) | `feature/wallet-module` | ⏳ قيد الانتظار | القسم 5 + 6 |
 | 6️⃣ | **Escrow Module** (Escrow Details, Disputes, My Escrows) | `feature/escrow-module` | ⏳ قيد الانتظار | القسم 7 |
 | 7️⃣ | **Chat Module** (Auction Chat Drawer, Direct Messages Inbox) | `feature/chat-module` | ⏳ قيد الانتظار | القسم 9 + 11.4 |
