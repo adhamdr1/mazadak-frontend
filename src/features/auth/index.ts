@@ -14,6 +14,7 @@ export { LoginForm } from './components/LoginForm';
 export { RegisterForm } from './components/RegisterForm';
 export { GoogleAuthButton } from './components/GoogleAuthButton';
 export { AuthDivider } from './components/AuthDivider';
+export { DateOfBirthPicker } from './components/DateOfBirthPicker';
 
 // Export Hooks
 export { useLogin } from './hooks/useLogin';

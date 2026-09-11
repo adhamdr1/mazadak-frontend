@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { toLocalizedDigits } from '@/utils/formatters';
-import { usePublicProfile } from '../../hooks/usePublicProfile';
+import { usePublicProfile } from '@/features/users';
 
 export interface AuctionSellerCardProps {
   sellerId: string;

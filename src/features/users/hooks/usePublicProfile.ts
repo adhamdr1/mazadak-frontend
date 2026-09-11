@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
-import { usersService } from '@/features/users';
+import { usersService } from '../services/users.service';
 
 export function usePublicProfile(sellerId?: string) {
   return useQuery({

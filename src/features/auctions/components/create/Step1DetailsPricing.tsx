@@ -30,7 +30,7 @@ import type { CreateAuctionSchemaType } from '../../schemas/createAuction.schema
 import type { AuctionCategory } from '../../types/auctions.types';
 import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
-import { LocalizedNumberInput } from '@/components/common/LocalizedNumberInput';
+import { LocalizedNumberInput } from '../shared/LocalizedNumberInput';
 import { AutoResizeTextarea } from '@/components/common/AutoResizeTextarea';
 import { AuctionDateTimePicker } from '../shared/AuctionDateTimePicker';
 
