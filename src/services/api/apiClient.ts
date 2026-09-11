@@ -35,7 +35,11 @@ async function attemptTokenRefresh(): Promise<string | null> {
 
   refreshPromise = (async () => {
     const refreshToken = authStorage.getRefreshToken();
-    if (!refreshToken) return null;
+    if (!refreshToken) {
+      authStorage.clearAuth();
+      window.dispatchEvent(new CustomEvent('mazadak:auth_expired'));
+      return null;
+    }
 
     try {
       const refreshRes = await axios.post(
