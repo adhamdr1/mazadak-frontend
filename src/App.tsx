@@ -5,6 +5,7 @@ import { AppRoutes } from '@/routes/AppRoutes';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ToastProvider } from '@/components/feedback/ToastProvider';
 import { ToastContainer } from '@/components/feedback/ToastContainer';
+import { SocketProvider } from '@/context/SocketContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,19 +20,21 @@ const queryClient = new QueryClient({
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
-        >
-          <ErrorBoundary>
-            <AppRoutes />
-            <ToastContainer />
-          </ErrorBoundary>
-        </BrowserRouter>
-      </ToastProvider>
+      <SocketProvider>
+        <ToastProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
+            <ErrorBoundary>
+              <AppRoutes />
+              <ToastContainer />
+            </ErrorBoundary>
+          </BrowserRouter>
+        </ToastProvider>
+      </SocketProvider>
     </QueryClientProvider>
   );
 };

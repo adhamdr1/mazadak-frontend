@@ -5,6 +5,8 @@
 
 import axios from 'axios';
 import { executeGraphQL } from '@/services/api/graphqlClient';
+import { subscribeToSubscription } from '@/services/websocket/socketClient';
+import { authStorage } from '@/utils/storage.utils';
 import { compressImage, compressImageToFile } from '@/utils/imageCompression';
 import type {
   Auction,
@@ -379,12 +381,41 @@ export const auctionsService = {
   },
 
   /**
-   * Subscribe to live auction status changes
+   * Subscribe to live auction status changes via WebSocket (GraphQL Subscriptions)
    */
   subscribeToStatusChanges: (
     auctionId: string,
     callback: (payload: AuctionStatusChangedPayload) => void
   ): (() => void) => {
+    // 1. GraphQL WebSocket Subscription
+    const unsubscribeWs = subscribeToSubscription<{ auctionStatusChanged: AuctionStatusChangedPayload }>(
+      {
+        query: `
+          ${AUCTION_FIELDS_FRAGMENT}
+          subscription AuctionStatusChanged($auctionId: ID!) {
+            auctionStatusChanged(auctionId: $auctionId) {
+              auction {
+                ...AuctionFields
+              }
+            }
+          }
+        `,
+        variables: { auctionId },
+      },
+      {
+        next: (data) => {
+          if (data.auctionStatusChanged?.auction) {
+            callback(data.auctionStatusChanged);
+          }
+        },
+        error: (err) => {
+          console.warn(`WebSocket subscription error for auction ${auctionId}:`, err);
+        },
+      },
+      authStorage.getAccessToken()
+    );
+
+    // 2. Local Custom Event listener for in-app instant optimistic updates
     const handleCustomStatusChange = (event: Event) => {
       const customEv = event as CustomEvent<AuctionStatusChangedPayload>;
       if (customEv.detail && customEv.detail.auction._id === auctionId) {
@@ -395,6 +426,7 @@ export const auctionsService = {
     window.addEventListener('mazadak:auction_status_changed', handleCustomStatusChange);
 
     return () => {
+      unsubscribeWs();
       window.removeEventListener('mazadak:auction_status_changed', handleCustomStatusChange);
     };
   },
