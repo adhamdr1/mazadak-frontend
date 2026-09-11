@@ -32,9 +32,9 @@ export interface AuctionBiddingCTAProps {
   className?: string;
 }
 
-const safeParseFloat = (val: string | null | undefined, fallback: number): number => {
-  const parsed = parseFloat(val ?? '');
-  return isNaN(parsed) ? fallback : parsed;
+const toInt = (val: string | null | undefined, fallback: number): number => {
+  const parsed = Math.round(parseFloat(val ?? '') * 100);
+  return isNaN(parsed) ? fallback * 100 : parsed;
 };
 
 export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
@@ -52,9 +52,11 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const minIncrement = safeParseFloat(auction.minimumBidIncrement, 1000);
-  const currentAmount = safeParseFloat(auction.currentPrice || auction.startingPrice, 0);
-  const minNextBid = currentAmount + minIncrement;
+  const minIncrementInt = toInt(auction.minimumBidIncrement, 1000);
+  const currentAmountInt = toInt(auction.currentPrice || auction.startingPrice, 0);
+  const minNextBidInt = currentAmountInt + minIncrementInt;
+  const minNextBid = minNextBidInt / 100;
+  const minIncrement = minIncrementInt / 100;
 
   const [customBid, setCustomBid] = useState<string>('');
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
@@ -68,7 +70,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
 
   const handlePresetClick = (amount: number) => {
     setSelectedPreset(amount);
-    setCustomBid((currentAmount + amount).toString());
+    const totalInt = currentAmountInt + Math.round(amount * 100);
+    setCustomBid((totalInt / 100).toString());
   };
 
   const handleCustomBidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
