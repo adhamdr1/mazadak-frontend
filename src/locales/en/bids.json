@@ -1,0 +1,94 @@
+{
+  "pageTitle": "My Bids",
+  "sections": {
+    "biddingBox": "Place a Bid",
+    "bidHistory": "Bid History",
+    "myBids": "My Bids"
+  },
+  "form": {
+    "labels": {
+      "bidAmount": "Bid Amount",
+      "maxAmount": "Maximum Limit",
+      "quickIncrements": "Quick Increments",
+      "customAmount": "Custom Amount"
+    },
+    "placeholders": {
+      "customBid": "Enter custom amount",
+      "maxAmount": "Maximum Auto-Bid Limit"
+    },
+    "buttons": {
+      "placeBid": "Place Bid Now",
+      "placingBid": "Placing Bid...",
+      "setAutoBid": "Auto-Bid",
+      "cancelAutoBid": "Cancel Auto-Bid",
+      "leadingBidder": "You are Highest Bidder",
+      "loginToBid": "Login to Bid",
+      "depositFunds": "Deposit Funds"
+    }
+  },
+  "status": {
+    "WINNING": "Leading",
+    "OUTBID": "Outbid",
+    "ACTIVE": "Active",
+    "EXHAUSTED": "Exhausted",
+    "CANCELLED": "Cancelled",
+    "ALL": "All"
+  },
+  "autoBid": {
+    "modalTitle": "Auto-Bid Setup",
+    "modalDescription": "The system will automatically place bids on your behalf with the minimum increment whenever you are outbid, up to your maximum limit.",
+    "currentMax": "Current Maximum Limit",
+    "activeStatus": "Active — Max: {{maxAmount}}",
+    "exhaustedStatus": "Maximum Limit Reached",
+    "cancelledStatus": "Auto-Bid Cancelled",
+    "setupButton": "Activate Auto-Bid",
+    "cancelButton": "Cancel Auto-Bid",
+    "updating": "Saving...",
+    "cancelling": "Cancelling...",
+    "confirmCancel": "Are you sure you want to cancel auto-bid for this auction?"
+  },
+  "bidHistory": {
+    "title": "Live Bid History",
+    "subtitle": "Real-time stream of all placed bids",
+    "empty": "No bids placed yet — be the first to bid!",
+    "loadMore": "Load More Bids",
+    "anonymousPrefix": "Bidder",
+    "you": "You",
+    "latest": "Latest",
+    "totalBids": "{{count}} bid",
+    "totalBids_plural": "{{count}} bids"
+  },
+  "validation": {
+    "minBid": "Amount must be at least {{min}}",
+    "invalidNumber": "Please enter a valid number",
+    "required": "This field is required",
+    "maxBidRequired": "Maximum limit is required",
+    "maxBidTooLow": "Maximum limit must exceed current price by at least one minimum increment"
+  },
+  "errors": {
+    "INSUFFICIENT_FUNDS": "Not enough balance in your wallet to place this bid",
+    "ALREADY_HIGHEST_BIDDER": "You are already the highest bidder for this auction!",
+    "CANNOT_BID_OWN_AUCTION": "You cannot place a bid on your own auction",
+    "AUCTION_NOT_ACTIVE": "This auction is not currently active for bidding",
+    "HIGH_BID_VOLUME": "High bidding volume on this auction. Please try again in a moment.",
+    "AUTO_BID_EXISTS": "You already have an active auto-bid configuration for this auction",
+    "CANNOT_AUTO_BID_OWN": "You cannot set an auto-bid on your own auction",
+    "AUCTION_NOT_FOUND": "Auction not found",
+    "BID_TOO_LOW": "Bid amount is below the minimum required increment"
+  },
+  "messages": {
+    "bidPlaced": "Your bid has been placed successfully!",
+    "autoBidSet": "Auto-bid configured successfully!",
+    "autoBidCancelled": "Auto-bid cancelled successfully",
+    "leadingNotice": "You are currently the leading bidder for this auction",
+    "outbidNotice": "You have been outbid on this auction"
+  },
+  "actions": {
+    "depositNow": "Deposit Now",
+    "goToAuction": "Go to Auction",
+    "viewHistory": "View Full History"
+  },
+  "currency": {
+    "symbol": "EGP"
+  }
+}

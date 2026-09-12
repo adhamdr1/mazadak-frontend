@@ -37,10 +37,12 @@
   "rightsReserved": "All rights reserved.",
   "footerCopyright": "Mazadak Platform. All rights reserved.",
   "footer": {
-    "escrowBadge": "Escrow Protection",
+    "escrowBadge": "Escrow Protection System",
     "liveBiddingBadge": "Live Real-Time Bidding",
     "quickLinksTitle": "Quick Links",
     "accountLinksTitle": "Account & Auth",
+    "updatePassword": "Change Password",
+    "forgotPassword": "Forgot Password",
     "craftedWith": "Crafted with",
     "forCommunity": "for modern bidding enthusiasts"
   },

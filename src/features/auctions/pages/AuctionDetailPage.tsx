@@ -29,6 +29,7 @@ export const AuctionDetailPage: React.FC = () => {
     error,
     isSeller,
     isWinner,
+    hasBids,
     refetch,
   } = useAuctionDetail(id);
 
@@ -116,6 +117,7 @@ export const AuctionDetailPage: React.FC = () => {
                 effectiveStatus={effectiveStatus || auction.status}
                 isSeller={isSeller}
                 isWinner={isWinner}
+                hasBids={hasBids}
                 onCancelAuction={
                   (effectiveStatus || auction.status) === 'PENDING' && isSeller
                     ? handleOpenCancelModal

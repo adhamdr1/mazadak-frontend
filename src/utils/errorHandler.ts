@@ -166,13 +166,90 @@ export function parseAppError(error: unknown): AppErrorDetails {
 }
 
 /**
+ * Resolves standard server error phrases to their canonical translation keys.
+ * This guarantees multi-lingual support even when NestJS returns English strings.
+ */
+export function resolveCanonicalErrorCode(raw: string): string | null {
+  if (!raw || typeof raw !== 'string') return null;
+  const lower = raw.toLowerCase();
+
+  // Bids Module
+  if (lower.includes('already the highest bidder') || lower.includes('already_highest_bidder')) {
+    return 'ALREADY_HIGHEST_BIDDER';
+  }
+  if (lower.includes('cannot place a bid on your own') || lower.includes('cannot bid on your own') || lower.includes('cannot_bid_own_auction')) {
+    return 'CANNOT_BID_OWN_AUCTION';
+  }
+  if (lower.includes('not currently active') || lower.includes('auction_not_active')) {
+    return 'AUCTION_NOT_ACTIVE';
+  }
+  if (lower.includes('insufficient') || lower.includes('not enough balance') || lower.includes('insufficient_funds')) {
+    return 'INSUFFICIENT_FUNDS';
+  }
+  if (lower.includes('high bidding volume') || lower.includes('high_bid_volume')) {
+    return 'HIGH_BID_VOLUME';
+  }
+  if (lower.includes('must be greater than') || lower.includes('must be at least') || lower.includes('below the minimum') || lower.includes('bid too low') || lower.includes('bid_too_low')) {
+    return 'BID_TOO_LOW';
+  }
+  if (lower.includes('already have an active auto-bid') || lower.includes('auto_bid_exists')) {
+    return 'AUTO_BID_EXISTS';
+  }
+  if (lower.includes('cannot set an auto-bid') || lower.includes('auto-bid cannot') || lower.includes('cannot_auto_bid_own')) {
+    return 'CANNOT_AUTO_BID_OWN';
+  }
+  if (lower.includes('network error') || lower.includes('failed to fetch') || lower.includes('offline') || lower.includes('network_error')) {
+    return 'NETWORK_ERROR';
+  }
+
+  // Auctions Module
+  if (lower.includes('auction not found') || lower.includes('auction_not_found')) {
+    return 'AUCTION_NOT_FOUND';
+  }
+  if (lower.includes('not pending') || lower.includes('cannot be edited') || lower.includes('auction_not_pending')) {
+    return 'AUCTION_NOT_PENDING';
+  }
+  if (lower.includes('cannot be cancelled') || lower.includes('auction_invalid_state')) {
+    return 'AUCTION_INVALID_STATE';
+  }
+  if (lower.includes('forbidden') || lower.includes('auction_forbidden')) {
+    return 'AUCTION_FORBIDDEN';
+  }
+
+  // Auth Module
+  if (lower.includes('invalid credentials') || lower.includes('invalid_credentials')) {
+    return 'INVALID_CREDENTIALS';
+  }
+  if (lower.includes('email already exists') || lower.includes('email_already_exists')) {
+    return 'EMAIL_ALREADY_EXISTS';
+  }
+  if (lower.includes('phone') && (lower.includes('already exists') || lower.includes('phone_already_exists'))) {
+    return 'PHONE_ALREADY_EXISTS';
+  }
+  if (lower.includes('invalid') && lower.includes('token')) {
+    return 'INVALID_TOKEN';
+  }
+  if (lower.includes('not verified') || lower.includes('email_not_verified')) {
+    return 'EMAIL_NOT_VERIFIED';
+  }
+  if (lower.includes('deactivated') || lower.includes('account_deactivated')) {
+    return 'ACCOUNT_DEACTIVATED';
+  }
+  if (lower.includes('banned') || lower.includes('account_banned')) {
+    return 'ACCOUNT_BANNED';
+  }
+
+  return null;
+}
+
+/**
  * Formats and localizes any error cleanly.
  * Resolution priority:
- * 1. `[namespace]:errors.[code]`
- * 2. `[namespace]:errors.[message]`
- * 3. `common:errors.[code]`
- * 4. `common:errors.[message]`
- * 5. Return clean human-readable server message directly (never obscure error from user)
+ * 1. Semantic canonical mapping -> `[namespace]:errors.[canonicalCode]`
+ * 2. `[namespace]:errors.[code]`
+ * 3. `[namespace]:errors.[message]`
+ * 4. `common:errors.[canonicalCode | code | message]`
+ * 5. Return clean human-readable server message directly
  */
 export function getLocalizedErrorMessage(
   error: unknown,
@@ -183,6 +260,19 @@ export function getLocalizedErrorMessage(
 
   const parsed = parseAppError(error);
   if (!parsed.message && !parsed.code) return null;
+
+  // 0. Check semantic canonical mapping from message or code
+  const canonicalCode =
+    resolveCanonicalErrorCode(parsed.message) || resolveCanonicalErrorCode(parsed.code);
+
+  if (canonicalCode) {
+    if (i18n.exists(`${namespace}:errors.${canonicalCode}`)) {
+      return translateFn(`errors.${canonicalCode}`);
+    }
+    if (i18n.exists(`common:errors.${canonicalCode}`)) {
+      return i18n.t(`common:errors.${canonicalCode}`);
+    }
+  }
 
   // 1. Check namespace by code
   if (parsed.code && i18n.exists(`${namespace}:errors.${parsed.code}`)) {
@@ -204,7 +294,7 @@ export function getLocalizedErrorMessage(
     return i18n.t(`common:errors.${parsed.message}`);
   }
 
-  // 5. If message contains common keywords, provide sensible translations or return parsed message
+  // 5. If message contains common keywords, provide sensible translations
   if (parsed.message === 'NETWORK_ERROR') {
     return i18n.t('common:errors.NETWORK_ERROR');
   }

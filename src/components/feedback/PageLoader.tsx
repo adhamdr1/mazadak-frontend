@@ -14,7 +14,7 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
   fullScreen = false,
 }) => {
   const { t } = useTranslation('common');
-  const loadingText = message || t('common.loading', 'جاري التحميل...');
+  const loadingText = message || t('loading', 'جاري التحميل...');
 
   return (
     <div

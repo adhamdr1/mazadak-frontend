@@ -73,7 +73,7 @@ export const Footer: React.FC = () => {
                   </li>
                   <li>
                     <Link to={ROUTES.UPDATE_PASSWORD} className="hover:text-amber-500 transition-colors">
-                      {t('home.updatePasswordLink')}
+                      {t('footer.updatePassword')}
                     </Link>
                   </li>
                 </>
@@ -91,7 +91,7 @@ export const Footer: React.FC = () => {
                   </li>
                   <li>
                     <Link to={ROUTES.FORGOT_PASSWORD} className="hover:text-amber-500 transition-colors">
-                      {t('home.forgotPasswordLink')}
+                      {t('footer.forgotPassword')}
                     </Link>
                   </li>
                 </>

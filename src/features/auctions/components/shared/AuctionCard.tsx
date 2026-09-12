@@ -166,6 +166,12 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
               label={
                 effectiveStatus === 'PENDING'
                   ? t('card.startingPrice')
+                  : effectiveStatus === 'ENDED'
+                  ? (auction.winnerId ||
+                    (auction.currentPrice &&
+                      parseFloat(auction.currentPrice) > parseFloat(auction.startingPrice))
+                      ? t('card.finalPrice')
+                      : t('card.startingPrice'))
                   : t('card.currentBid')
               }
               size="md"
