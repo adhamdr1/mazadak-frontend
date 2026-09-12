@@ -12,6 +12,7 @@ import { AuctionSellerCard } from '../components/detail/AuctionSellerCard';
 import { AuctionBiddingCTA } from '../components/detail/AuctionBiddingCTA';
 import { AuctionDetailSkeleton } from '../components/detail/AuctionDetailSkeleton';
 import { CancelAuctionModal } from '../components/shared/CancelAuctionModal';
+import { AutoBidModal } from '@/features/bids/components/AutoBidModal';
 import { Button } from '@/components/common/Button';
 import { ROUTES } from '@/constants/routes.constants';
 
@@ -20,6 +21,7 @@ export const AuctionDetailPage: React.FC = () => {
   const { t } = useTranslation('auctions');
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isAutoBidModalOpen, setIsAutoBidModalOpen] = useState(false);
 
   const {
     auction,
@@ -123,6 +125,11 @@ export const AuctionDetailPage: React.FC = () => {
                     ? handleOpenCancelModal
                     : undefined
                 }
+                onOpenAutoBid={
+                  (effectiveStatus || auction.status) === 'ACTIVE' && !isSeller
+                    ? () => setIsAutoBidModalOpen(true)
+                    : undefined
+                }
                 isCancelling={isCancelling}
               />
 
@@ -151,6 +158,13 @@ export const AuctionDetailPage: React.FC = () => {
             error={cancelError}
             onClose={handleCloseCancelModal}
             onConfirm={cancel}
+          />
+
+          {/* Auto-Bid Configuration Modal */}
+          <AutoBidModal
+            isOpen={isAutoBidModalOpen}
+            auction={auction}
+            onClose={() => setIsAutoBidModalOpen(false)}
           />
         </>
       )}

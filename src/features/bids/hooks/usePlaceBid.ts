@@ -28,7 +28,7 @@ export const usePlaceBid = (options?: UsePlaceBidOptions) => {
       // 1. Toast success notification
       toast.success(t('messages.bidPlaced'));
 
-      // 2. Invalidate cache for auction details, bids history, and user's bids
+      // 2. Invalidate cache for auction details, bids history, user's bids, and wallet
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.AUCTIONS.DETAIL(variables.auctionId),
       });
@@ -37,6 +37,9 @@ export const usePlaceBid = (options?: UsePlaceBidOptions) => {
       });
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.BIDS.MY_BIDS,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.WALLET.MY_WALLET,
       });
 
       options?.onSuccess?.(bid);

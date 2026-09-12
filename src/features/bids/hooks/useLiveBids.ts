@@ -78,6 +78,10 @@ export const useLiveBids = (auctionId: string, options?: UseLiveBidsOptions) => 
             }
           );
 
+          // Automatically re-sync Wallet balance and Auto-bid state in Real-Time!
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BIDS.MY_AUTO_BID(auctionId) });
+
           options?.onBidAdded?.(payload);
         },
         error: (err) => {

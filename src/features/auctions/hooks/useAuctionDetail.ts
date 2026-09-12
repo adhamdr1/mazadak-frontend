@@ -32,6 +32,9 @@ export function useAuctionDetail(id?: string) {
           winnerId: payload.auction.winnerId ?? old.winnerId,
         };
       });
+      // Re-sync wallet when auction ends/finalizes or status updates
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BIDS.MY_AUTO_BID(id) });
     });
 
     return () => {
@@ -54,6 +57,9 @@ export function useAuctionDetail(id?: string) {
             winnerId: payload.leadingBidderId ?? old.winnerId,
           };
         });
+        // Re-sync wallet and auto-bid on live bids
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BIDS.MY_AUTO_BID(id) });
       },
       error: (err) => {
         console.warn('WebSocket bidAdded subscription error in useAuctionDetail:', err);

@@ -78,3 +78,13 @@ export interface SetAutoBidInput {
 export interface CancelAutoBidInput {
   auctionId: string;
 }
+
+export interface UserWallet {
+  _id: string;
+  userId: string;
+  balance: string;
+  heldBalance: string;
+  availableBalance: string;
+  createdAt: string;
+  updatedAt: string;
+}

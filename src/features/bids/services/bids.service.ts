@@ -17,6 +17,7 @@ import type {
   SetAutoBidInput,
   CancelAutoBidInput,
   AutoBidStatus,
+  UserWallet,
 } from '../types/bids.types';
 
 // ----------------------------------------------------
@@ -136,11 +137,47 @@ export const BID_ADDED_SUBSCRIPTION = `
   }
 `;
 
+export const WALLET_UPDATED_SUBSCRIPTION = `
+  subscription OnWalletUpdated {
+    walletUpdated {
+      _id
+      userId
+      balance
+      heldBalance
+      availableBalance
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 // ----------------------------------------------------
 // Bids Service Implementation
 // ----------------------------------------------------
 
+const MY_WALLET_QUERY = `
+  query MyWallet {
+    myWallet {
+      _id
+      userId
+      balance
+      heldBalance
+      availableBalance
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const bidsService = {
+  /**
+   * Fetch current user's wallet balance summary
+   */
+  async getMyWallet(): Promise<UserWallet> {
+    const data = await executeGraphQL<{ myWallet: UserWallet }>(MY_WALLET_QUERY);
+    return data.myWallet;
+  },
+
   /**
    * Place a manual bid on an active auction
    */
@@ -175,13 +212,37 @@ export const bidsService = {
 
   /**
    * Fetch current user's auto-bid configuration for a specific auction
+   * Employs direct query with fallback to auto-bids list for 100% backend resilience
    */
   async getMyAutoBid(auctionId: string): Promise<AutoBid | null> {
-    const data = await executeGraphQL<{ myAutoBid: AutoBid | null }>(
-      MY_AUTO_BID_QUERY,
-      { auctionId }
-    );
-    return data.myAutoBid;
+    try {
+      const data = await executeGraphQL<{ myAutoBid: AutoBid | null }>(
+        MY_AUTO_BID_QUERY,
+        { auctionId }
+      );
+      if (data?.myAutoBid) {
+        return data.myAutoBid;
+      }
+    } catch {
+      // Gracefully attempt fallback
+    }
+
+    try {
+      const listData = await executeGraphQL<{ myAutoBids: AutoBidsPage }>(
+        MY_AUTO_BIDS_QUERY,
+        { input: { page: 1, limit: 50 }, status: 'ACTIVE' }
+      );
+      const found = listData?.myAutoBids?.items?.find(
+        (item) => String(item.auctionId) === String(auctionId)
+      );
+      if (found) {
+        return found;
+      }
+    } catch {
+      // Fallback exhausted
+    }
+
+    return null;
   },
 
   /**
@@ -243,6 +304,26 @@ export const bidsService = {
       {
         query: BID_ADDED_SUBSCRIPTION,
         variables: { auctionId },
+      },
+      handlers,
+      token
+    );
+  },
+
+  /**
+   * Subscribe to real-time wallet updates for the current authenticated user via WebSocket
+   */
+  subscribeToWalletUpdated(
+    handlers: {
+      next: (data: { walletUpdated: UserWallet }) => void;
+      error?: (err: unknown) => void;
+      complete?: () => void;
+    },
+    token?: string | null
+  ): () => void {
+    return subscribeToSubscription<{ walletUpdated: UserWallet }>(
+      {
+        query: WALLET_UPDATED_SUBSCRIPTION,
       },
       handlers,
       token

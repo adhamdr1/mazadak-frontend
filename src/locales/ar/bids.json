@@ -35,13 +35,26 @@
     "ALL": "الكل"
   },
   "autoBid": {
-    "modalTitle": "إعداد المزايدة التلقائية (Auto-Bid)",
+    "modalTitle": "إعداد المزايدة التلقائية",
     "modalDescription": "سيقوم النظام بالمزايدة نيابة عنك بأقل زيادة ممكنة كلما تم تجاوزك، حتى الوصول للسقف الأقصى.",
+    "walletSummary": {
+      "title": "رصيد محفظتك",
+      "available": "المتاح للمزايدة",
+      "held": "محجوز في مزايدات نشطة",
+      "total": "الإجمالي",
+      "insufficientNotice": "الحد الأقصى المطلوب ({{amount}}) يتجاوز رصيدك المتاح ({{available}}). لديك {{held}} محجوزة في مزايدات أخرى.",
+      "deltaReassurance": "سيتم حجز {{delta}} إضافية فقط من رصيدك المتاح (لديك {{held}} محجوزة مسبقاً لهذا المزاد).",
+      "depositRequired": "تحتاج لشحن {{deficit}} إضافية لتفعيل هذا السقف",
+      "depositButton": "شحن المحفظة الآن"
+    },
     "currentMax": "السقف الأقصى الحالي",
+    "minAllowedCeilingLabel": "الحد الأدنى للسقف المطلوب",
     "activeStatus": "نشطة — السقف: {{maxAmount}}",
     "exhaustedStatus": "تم بلوغ السقف الأقصى",
+    "previousExhaustedNotice": "تم بلوغ سقف المزايدة السابق ({{amount}}). أدخل حداً أعلى جديداً لمواصلة المنافسة التلقائية.",
     "cancelledStatus": "تم إلغاء المزايدة التلقائية",
     "setupButton": "تفعيل المزايدة التلقائية",
+    "editCeiling": "تعديل السقف الأقصى",
     "cancelButton": "إلغاء التفعيل",
     "updating": "جاري الحفظ...",
     "cancelling": "جاري الإلغاء...",

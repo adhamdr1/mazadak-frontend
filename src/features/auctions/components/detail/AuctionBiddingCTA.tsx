@@ -57,12 +57,10 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
     );
 
   const handleTimerExpired = () => {
-    // Automatically invalidate auction detail to transition to ACTIVE or ENDED without page refresh
+    // Visual timer expiration: Real-time status changes and wallet captures are handled
+    // purely event-driven by WebSocket subscriptions (auctionStatusChanged & walletUpdated).
     queryClient.invalidateQueries({
       queryKey: QUERY_KEYS.AUCTIONS.DETAIL(auction._id),
-    });
-    queryClient.invalidateQueries({
-      queryKey: QUERY_KEYS.BIDS.BY_AUCTION(auction._id),
     });
   };
 
