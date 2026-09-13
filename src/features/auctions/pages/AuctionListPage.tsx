@@ -6,10 +6,12 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuctions } from '../hooks/useAuctions';
+import { useAuctionCreatedSubscription } from '../hooks/useAuctionCreatedSubscription';
 import { CategoryPillNav } from '../components/browse/CategoryPillNav';
 import { AuctionFilterBar } from '../components/browse/AuctionFilterBar';
 import { AuctionSortDropdown } from '../components/browse/AuctionSortDropdown';
 import { AuctionGrid } from '../components/browse/AuctionGrid';
+import { NewAuctionsBanner } from '../components/browse/NewAuctionsBanner';
 import { Button } from '@/components/common/Button';
 import { Alert } from '@/components/common/Alert';
 import { toLocalizedDigits } from '@/utils/formatters';
@@ -31,6 +33,15 @@ export const AuctionListPage: React.FC = () => {
     filters,
     actions,
   } = useAuctions(12);
+
+  const { newAuctionsCount, refreshFeed, dismiss } = useAuctionCreatedSubscription();
+
+  const handleRefreshFeed = React.useCallback(() => {
+    // 1. Reset page to 1 and clear filters so new auctions appear at the very top
+    actions.resetFilters();
+    // 2. Refresh TanStack query cache and reset counter
+    refreshFeed();
+  }, [actions, refreshFeed]);
 
   const handleStatusExpire = React.useCallback(() => {
     actions.refetch();
@@ -100,6 +111,13 @@ export const AuctionListPage: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Real-time Floating New Auctions Action Banner */}
+      <NewAuctionsBanner
+        count={newAuctionsCount}
+        onRefresh={handleRefreshFeed}
+        onDismiss={dismiss}
+      />
 
       {/* Auctions Grid / List View */}
       <section aria-label="Auction Catalog">

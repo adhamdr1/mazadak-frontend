@@ -15,6 +15,7 @@ export { useCreateAuction } from './hooks/useCreateAuction';
 export { useEditAuction, type UseEditAuctionReturn } from './hooks/useEditAuction';
 export { useCancelAuction, type UseCancelAuctionOptions } from './hooks/useCancelAuction';
 export { useMyAuctions, type MyAuctionsTab, type FilterStatus } from './hooks/useMyAuctions';
+export { useAuctionCreatedSubscription, type UseAuctionCreatedSubscriptionOptions } from './hooks/useAuctionCreatedSubscription';
 
 // Export Pages
 export { AuctionListPage } from './pages/AuctionListPage';
@@ -39,6 +40,7 @@ export { AuctionFilterBar, type AuctionFilterBarProps } from './components/brows
 export { AuctionSortDropdown, type AuctionSortDropdownProps } from './components/browse/AuctionSortDropdown';
 export { AuctionGrid, type AuctionGridProps } from './components/browse/AuctionGrid';
 export { AuctionEmptyState, type AuctionEmptyStateProps } from './components/browse/AuctionEmptyState';
+export { NewAuctionsBanner, type NewAuctionsBannerProps } from './components/browse/NewAuctionsBanner';
 
 // Export Detail Components
 export { AuctionImageGallery, type AuctionImageGalleryProps } from './components/detail/AuctionImageGallery';

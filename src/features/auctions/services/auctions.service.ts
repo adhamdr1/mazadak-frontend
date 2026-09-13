@@ -430,4 +430,51 @@ export const auctionsService = {
       window.removeEventListener('mazadak:auction_status_changed', handleCustomStatusChange);
     };
   },
+
+  /**
+   * Subscribe to global live auction creation events via WebSocket (GraphQL Subscriptions)
+   */
+  subscribeToAuctionCreated: (
+    callback: (auction: Auction) => void
+  ): (() => void) => {
+    // 1. GraphQL WebSocket Subscription
+    const unsubscribeWs = subscribeToSubscription<{ auctionCreated: Auction }>(
+      {
+        query: `
+          ${AUCTION_FIELDS_FRAGMENT}
+          subscription AuctionCreated {
+            auctionCreated {
+              ...AuctionFields
+            }
+          }
+        `,
+      },
+      {
+        next: (data) => {
+          if (data.auctionCreated) {
+            callback(data.auctionCreated);
+          }
+        },
+        error: (err) => {
+          console.warn('WebSocket subscription error for auctionCreated:', err);
+        },
+      },
+      authStorage.getAccessToken()
+    );
+
+    // 2. Local Custom Event listener for in-app instant updates across tabs/actions
+    const handleCustomAuctionCreated = (event: Event) => {
+      const customEv = event as CustomEvent<Auction>;
+      if (customEv.detail) {
+        callback(customEv.detail);
+      }
+    };
+
+    window.addEventListener('mazadak:auction_created', handleCustomAuctionCreated);
+
+    return () => {
+      unsubscribeWs();
+      window.removeEventListener('mazadak:auction_created', handleCustomAuctionCreated);
+    };
+  },
 };

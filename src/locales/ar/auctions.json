@@ -94,6 +94,15 @@
     "prevPage": "السابق",
     "nextPage": "التالي"
   },
+  "feed": {
+    "newAuctionToast": "🏷️ مزاد جديد متاح: {{title}}",
+    "newAuctionOne": "يوجد مزاد جديد متاح",
+    "newAuctionTwo": "يوجد مزادان جديدان متاحان",
+    "newAuctionFew": "يوجد {{count}} مزادات جديدة متاحة",
+    "newAuctionMany": "يوجد {{count}} مزاداً جديداً متاحاً",
+    "clickToRefresh": "اضغط للتحديث",
+    "dismiss": "إغلاق"
+  },
   "detail": {
     "backToAuctions": "العودة لقائمة المزادات",
     "sellerNotice": "أنت صاحب هذا المزاد (البائع)",
