@@ -61,15 +61,24 @@
     "confirmCancel": "هل أنت متأكد من رغبتك في إلغاء المزايدة التلقائية لهذا المزاد؟"
   },
   "bidHistory": {
-    "title": "سجل المزايدات الحية",
-    "subtitle": "تحديث لحظي لجميع العروض المقدمة",
+    "title": "سجل المزايدات",
+    "subtitle": "تحديث لحظي",
+    "live": "مباشر",
     "empty": "لا توجد مزايدات بعد — كن أول المزايدين!",
-    "loadMore": "تحميل المزيد من المزايدات",
-    "anonymousPrefix": "مزايد",
+    "pendingEmpty": "المزاد في مرحلة الانتظار — سيبدأ قبول المزايدات عند انطلاق المزاد",
+    "endedEmpty": "انتهى هذا المزاد دون تقديم أي مزايدات",
+    "loadMore": "عرض المزيد من المزايدات",
+    "showLess": "عرض أحدث المزايدات فقط",
+    "anonymousPrefix": "مشارك",
     "you": "أنت",
     "latest": "الأحدث",
-    "totalBids": "{{count}} مزايدة",
-    "totalBids_plural": "{{count}} مزايدات"
+    "loadingHistory": "جاري تحميل سجل المزايدات...",
+    "totalBids": "مزايدة واحدة",
+    "totalBidsOne": "مزايدة واحدة",
+    "totalBidsTwo": "مزايدتان",
+    "totalBidsFew": "{{count}} مزايدات",
+    "totalBidsMany": "{{count}} مزايدة",
+    "totalBids_plural": "{{count}} مزايدة"
   },
   "validation": {
     "minBid": "المبلغ يجب أن يكون على الأقل {{min}}",

@@ -13,8 +13,10 @@ import { AuctionBiddingCTA } from '../components/detail/AuctionBiddingCTA';
 import { AuctionDetailSkeleton } from '../components/detail/AuctionDetailSkeleton';
 import { CancelAuctionModal } from '../components/shared/CancelAuctionModal';
 import { AutoBidModal } from '@/features/bids/components/AutoBidModal';
+import { AuctionBidHistory } from '@/features/bids/components/AuctionBidHistory';
 import { Button } from '@/components/common/Button';
 import { ROUTES } from '@/constants/routes.constants';
+
 
 export const AuctionDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -88,7 +90,7 @@ export const AuctionDetailPage: React.FC = () => {
         <>
           {/* Main 2-Column Responsive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            {/* Left Column (Desktop 7/8 cols): Gallery, Specs & Description */}
+            {/* Left Column (Desktop 7/8 cols): Gallery, Specs, Description & Desktop Seller Profile */}
             <div className="lg:col-span-7 xl:col-span-8 space-y-6">
               {/* 1. Media Image Gallery Showcase */}
               <section aria-label="Auction Media Gallery">
@@ -105,15 +107,27 @@ export const AuctionDetailPage: React.FC = () => {
                 <AuctionInfoSection auction={auction} />
               </section>
 
-              {/* 3. Product Description */}
+              {/* 3. Product Description (Directly under Specs!) */}
               <section aria-label="Product Description">
                 <AuctionDescription description={auction.description} />
               </section>
+
+              {/* 4. Verified Seller Profile Card — strictly visible under Description on Desktop (Full Screen) */}
+              {!isSeller && auction.sellerId && (
+                <div className="hidden lg:block">
+                  <section aria-label="Seller Information">
+                    <AuctionSellerCard
+                      sellerId={auction.sellerId}
+                      canContact={isWinner}
+                    />
+                  </section>
+                </div>
+              )}
             </div>
 
-            {/* Right Column (Desktop 5/4 cols): Sticky Sidebar with Price, Timer, Bidding Controls & Seller Card */}
+            {/* Right Column (Desktop 5/4 cols): Sticky Sidebar with Price, Live Bids & Mobile Seller Profile */}
             <div className="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-24 self-start">
-              {/* Action Box: Price, Timer, Bidding Controls or Seller Controls */}
+              {/* 1. Action Box: Price, Timer, Bidding Controls or Seller Controls */}
               <AuctionBiddingCTA
                 auction={auction}
                 effectiveStatus={effectiveStatus || auction.status}
@@ -133,17 +147,30 @@ export const AuctionDetailPage: React.FC = () => {
                 isCancelling={isCancelling}
               />
 
-              {/* Verified Seller Profile Card — strictly visible for bidders/visitors, NOT the seller themselves */}
+              {/* 2. Live Bid History Stream: directly under Price & Bidding Box */}
+              <AuctionBidHistory
+                auctionId={auction._id}
+                auctionStatus={effectiveStatus || auction.status}
+              />
+
+              {/* 3. Verified Seller Profile Card — strictly visible under Bid History on Mobile / Split-Screen */}
               {!isSeller && auction.sellerId && (
-                <section aria-label="Seller Information">
-                  <AuctionSellerCard
-                    sellerId={auction.sellerId}
-                    canContact={isWinner}
-                  />
-                </section>
+                <div className="block lg:hidden">
+                  <section aria-label="Seller Information">
+                    <AuctionSellerCard
+                      sellerId={auction.sellerId}
+                      canContact={isWinner}
+                    />
+                  </section>
+                </div>
               )}
             </div>
           </div>
+
+
+
+
+
 
           {/* Dedicated Bottom Section: Auction Terms & Platform Rules */}
           <section aria-label="Auction Terms">

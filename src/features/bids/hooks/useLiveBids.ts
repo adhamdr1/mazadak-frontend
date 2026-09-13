@@ -19,7 +19,7 @@ export const useLiveBids = (auctionId: string, options?: UseLiveBidsOptions) => 
 
   // 1. Initial query to fetch the latest leading bid on page load & refresh
   const initialBidsQuery = useQuery({
-    queryKey: QUERY_KEYS.BIDS.BY_AUCTION(auctionId),
+    queryKey: [...QUERY_KEYS.BIDS.BY_AUCTION(auctionId), 'leading-bid'],
     queryFn: () =>
       auctionId
         ? bidsService.getAuctionBids(auctionId, { page: 1, limit: 1 })
@@ -58,10 +58,10 @@ export const useLiveBids = (auctionId: string, options?: UseLiveBidsOptions) => 
             }
           );
 
-          // Synchronously update bids list query cache
-          queryClient.setQueryData(
-            QUERY_KEYS.BIDS.BY_AUCTION(auctionId),
-            (oldBids: BidsPage | undefined) => {
+          // Synchronously update bids list query cache for any query on this auction
+          queryClient.setQueriesData<BidsPage>(
+            { queryKey: QUERY_KEYS.BIDS.BY_AUCTION(auctionId) },
+            (oldBids) => {
               if (!oldBids) {
                 return {
                   items: [payload.bid],
@@ -70,13 +70,19 @@ export const useLiveBids = (auctionId: string, options?: UseLiveBidsOptions) => 
                   hasNextPage: false,
                 };
               }
+              const filtered = oldBids.items.filter((b) => b._id !== payload.bid._id);
+              const updatedPrevious = filtered.map((b) => ({
+                ...b,
+                status: 'OUTBID' as const,
+              }));
               return {
                 ...oldBids,
-                items: [payload.bid, ...oldBids.items.filter((b) => b._id !== payload.bid._id)],
+                items: [payload.bid, ...updatedPrevious],
                 total: payload.bidCount,
               };
             }
           );
+
 
           // Automatically re-sync Wallet balance and Auto-bid state in Real-Time!
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });

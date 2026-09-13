@@ -61,14 +61,19 @@
     "confirmCancel": "Are you sure you want to cancel auto-bid for this auction?"
   },
   "bidHistory": {
-    "title": "Live Bid History",
-    "subtitle": "Real-time stream of all placed bids",
+    "title": "Bid History",
+    "subtitle": "Real-time stream",
+    "live": "Live",
     "empty": "No bids placed yet — be the first to bid!",
-    "loadMore": "Load More Bids",
-    "anonymousPrefix": "Bidder",
+    "pendingEmpty": "Auction is pending — bids will be accepted once the auction starts",
+    "endedEmpty": "This auction concluded with no bids placed",
+    "loadMore": "Show More Bids",
+    "showLess": "Show Recent Bids Only",
+    "anonymousPrefix": "Participant",
     "you": "You",
     "latest": "Latest",
-    "totalBids": "{{count}} bid",
+    "loadingHistory": "Loading bid history...",
+    "totalBids": "1 bid",
     "totalBids_plural": "{{count}} bids"
   },
   "validation": {
