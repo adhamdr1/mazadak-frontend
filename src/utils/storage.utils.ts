@@ -6,17 +6,32 @@
 
 export const authStorage = {
   /**
-   * Retrieve active access token from persistent or session storage
+   * Retrieve active access token from persistent or session storage.
+   * Seamlessly auto-migrates existing session tokens to localStorage so opening links in new tabs works.
    */
   getAccessToken(): string | null {
-    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    const localToken = localStorage.getItem('access_token');
+    if (localToken) return localToken;
+
+    const sessionToken = sessionStorage.getItem('access_token');
+    if (sessionToken) {
+      localStorage.setItem('access_token', sessionToken);
+      const sessionRefresh = sessionStorage.getItem('refresh_token');
+      if (sessionRefresh) localStorage.setItem('refresh_token', sessionRefresh);
+      const sessionUser = sessionStorage.getItem('mazadak_user');
+      if (sessionUser) localStorage.setItem('mazadak_user', sessionUser);
+      return sessionToken;
+    }
+    return null;
   },
 
   /**
    * Retrieve active refresh token from persistent or session storage
    */
   getRefreshToken(): string | null {
-    return localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
+    const localRefresh = localStorage.getItem('refresh_token');
+    if (localRefresh) return localRefresh;
+    return sessionStorage.getItem('refresh_token');
   },
 
   /**
@@ -34,16 +49,16 @@ export const authStorage = {
 
   /**
    * Store authentication payload.
-   * If rememberMe is true: saves to localStorage (persists across browser restarts).
-   * If rememberMe is false: saves to sessionStorage (destroyed upon closing tab/browser).
-   * Cleans the alternative storage to prevent split-brain state.
+   * Defaults to localStorage to enable cross-tab browsing (open in new tab)
+   * and persistent session across browser restarts.
    */
   setAuth(
     tokens: { accessToken: string; refreshToken: string; user?: unknown },
-    rememberMe = false
+    rememberMe = true
   ): void {
-    const targetStorage = rememberMe ? localStorage : sessionStorage;
-    const cleanStorage = rememberMe ? sessionStorage : localStorage;
+    const isRemembered = rememberMe !== false;
+    const targetStorage = isRemembered ? localStorage : sessionStorage;
+    const cleanStorage = isRemembered ? sessionStorage : localStorage;
 
     cleanStorage.removeItem('access_token');
     cleanStorage.removeItem('refresh_token');

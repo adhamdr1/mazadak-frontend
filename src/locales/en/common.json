@@ -32,19 +32,21 @@
     "home": "Home",
     "auctions": "Auctions",
     "myAuctions": "My Auctions",
+    "myBids": "My Bids",
     "createAuction": "Create Auction"
   },
   "rightsReserved": "All rights reserved.",
   "footerCopyright": "Mazadak Platform. All rights reserved.",
   "footer": {
-    "escrowBadge": "Escrow Protection System",
-    "liveBiddingBadge": "Live Real-Time Bidding",
-    "quickLinksTitle": "Quick Links",
-    "accountLinksTitle": "Account & Auth",
+    "auctionsTitle": "Auctions",
+    "accountTitle": "Account",
+    "trustTitle": "Trust & Security",
+    "escrowBadge": "100% Secure Escrow & Mediation",
+    "trustEscrow": "Full buyer protection & escrow hold until delivery",
+    "trustPayments": "Encrypted & secure financial transactions",
+    "trustFairPlay": "Real-time transparent live bidding",
     "updatePassword": "Change Password",
-    "forgotPassword": "Forgot Password",
-    "craftedWith": "Crafted with",
-    "forCommunity": "for modern bidding enthusiasts"
+    "forgotPassword": "Forgot Password"
   },
   "notFound": {
     "code": "404",

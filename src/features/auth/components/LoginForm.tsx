@@ -46,7 +46,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     defaultValues: {
       email: '',
       password: '',
-      rememberMe: false,
+      rememberMe: true,
     },
   });
 

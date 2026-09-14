@@ -289,6 +289,47 @@ export const bidsService = {
   },
 
   /**
+   * Fetch consolidated user bidding statistics in a single unified GraphQL query
+   */
+  async getMyBidsStats(): Promise<{
+    totalBids: number;
+    winningBids: number;
+    outbidBids: number;
+  }> {
+    try {
+      const data = await executeGraphQL<{
+        allBids: { total: number };
+        winningBids: { total: number };
+        outbidBids: { total: number };
+      }>(`
+        query MyBidsStats {
+          allBids: myBids(input: { page: 1, limit: 1 }) {
+            total
+          }
+          winningBids: myBids(input: { page: 1, limit: 1 }, filter: { status: WINNING }) {
+            total
+          }
+          outbidBids: myBids(input: { page: 1, limit: 1 }, filter: { status: OUTBID }) {
+            total
+          }
+        }
+      `);
+
+      return {
+        totalBids: data?.allBids?.total ?? 0,
+        winningBids: data?.winningBids?.total ?? 0,
+        outbidBids: data?.outbidBids?.total ?? 0,
+      };
+    } catch {
+      return {
+        totalBids: 0,
+        winningBids: 0,
+        outbidBids: 0,
+      };
+    }
+  },
+
+  /**
    * Subscribe to real-time bid updates for an auction via WebSocket
    */
   subscribeToBidAdded(

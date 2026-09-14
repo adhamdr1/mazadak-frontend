@@ -1,18 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { useCreateAuction } from '../hooks/useCreateAuction';
 import { CreateAuctionStepper } from '../components/create/CreateAuctionStepper';
 import { Step1DetailsPricing } from '../components/create/Step1DetailsPricing';
 import { Step2MediaPreview } from '../components/create/Step2MediaPreview';
-import { ROUTES } from '@/constants/routes.constants';
 
 export const CreateAuctionPage: React.FC = () => {
-  const { t, i18n } = useTranslation('auctions');
-  const { t: tCommon } = useTranslation('common');
-  const isRTL = i18n.language?.startsWith('ar');
-  const ChevronIcon = isRTL ? ChevronLeft : ChevronRight;
+  const { t } = useTranslation('auctions');
 
   const {
     form,
@@ -35,27 +29,13 @@ export const CreateAuctionPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-      {/* Breadcrumb Navigation */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-        <Link to={ROUTES.HOME} className="hover:text-amber-500 transition-colors">
-          {tCommon('nav.home')}
-        </Link>
-        <ChevronIcon className="w-3 h-3 text-slate-400" />
-        <Link to={ROUTES.AUCTIONS} className="hover:text-amber-500 transition-colors">
-          {t('title')}
-        </Link>
-        <ChevronIcon className="w-3 h-3 text-slate-400" />
-        <span className="text-amber-500 font-bold">
-          {t('create.title')}
-        </span>
-      </nav>
 
-      {/* Page Title & Subtitle */}
-      <div className="space-y-1">
+      {/* Page Title & Subtitle (Centered) */}
+      <div className="space-y-1.5 text-center max-w-xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
           {t('create.title')}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
           {t('create.subtitle')}
         </p>
       </div>

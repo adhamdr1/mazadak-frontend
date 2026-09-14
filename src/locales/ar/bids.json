@@ -27,8 +27,8 @@
     }
   },
   "status": {
-    "WINNING": "المتصدر",
-    "OUTBID": "تم تجاوزك",
+    "WINNING": "متصدر",
+    "OUTBID": "مزايدة سابقة",
     "ACTIVE": "نشطة",
     "EXHAUSTED": "نُفِّذ السقف",
     "CANCELLED": "ملغاة",
@@ -104,6 +104,58 @@
     "autoBidCancelled": "تم إلغاء المزايدة التلقائية بنجاح",
     "leadingNotice": "أنت المتصدر حالياً في هذا المزاد",
     "outbidNotice": "تم تجاوز مزايدتك في هذا المزاد"
+  },
+  "myBids": {
+    "title": "مزايداتي",
+    "subtitle": "تابع جميع مزايداتك وحالتها اللحظية في المزادات النشطة والمنتهية",
+    "stats": {
+      "totalBids": "إجمالي المزايدات",
+      "winningBids": "مزايدات متصدرة",
+      "outbidBids": "مزايدات سابقة",
+      "activeAuctions": "مزادات نشطة"
+    },
+    "filters": {
+      "all": "الكل",
+      "winning": "المتصدرة",
+      "outbid": "مزايدات سابقة",
+      "sortBy": "ترتيب حسب",
+      "sortNewest": "الأحدث أولاً",
+      "sortOldest": "الأقدم أولاً",
+      "sortHighest": "الأعلى قيمة",
+      "sortLowest": "الأقل قيمة"
+    },
+    "card": {
+      "myBid": "مزايدتي",
+      "currentPrice": "السعر الحالي",
+      "startingPrice": "سعر البدء",
+      "placedAt": "وقت المزايدة",
+      "bidAgain": "زايد الآن",
+      "viewAuction": "عرض المزاد",
+      "viewResult": "تفاصيل المزاد",
+      "viewDetails": "تفاصيل المزاد",
+      "auctionEnded": "انتهى المزاد",
+      "auctionPending": "في الانتظار",
+      "auctionActive": "مزاد نشط",
+      "auctionCancelled": "ملغى",
+      "auctionUnavailable": "المزاد غير متاح",
+      "leadingBidder": "أنت المتصدر حالياً",
+      "outbidNotice": "مزايدة سابقة"
+    },
+    "empty": {
+      "allTitle": "لا توجد مزايدات بعد",
+      "allDesc": "لم تقم بالمزايدة على أي مزاد بعد. تصفح المزادات المتاحة وابدأ المزايدة الآن!",
+      "winningTitle": "لا توجد مزايدات متصدرة",
+      "winningDesc": "ليس لديك مزايدات في صدارة السباق حالياً.",
+      "outbidTitle": "لا توجد مزايدات سابقة",
+      "outbidDesc": "رائع! جميع مزايداتك ما زالت في صدارة المنافسة.",
+      "browseButton": "استكشف المزادات الآن",
+      "clearFilters": "إعادة ضبط الفلاتر"
+    },
+    "pagination": {
+      "showingResults": "عرض {{current}} من أصل {{total}} مزايدة",
+      "prev": "السابق",
+      "next": "التالي"
+    }
   },
   "actions": {
     "depositNow": "شحن المحفظة الآن",

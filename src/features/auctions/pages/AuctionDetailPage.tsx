@@ -188,11 +188,13 @@ export const AuctionDetailPage: React.FC = () => {
           />
 
           {/* Auto-Bid Configuration Modal */}
-          <AutoBidModal
-            isOpen={isAutoBidModalOpen}
-            auction={auction}
-            onClose={() => setIsAutoBidModalOpen(false)}
-          />
+          {isAutoBidModalOpen && (
+            <AutoBidModal
+              isOpen={isAutoBidModalOpen}
+              auction={auction}
+              onClose={() => setIsAutoBidModalOpen(false)}
+            />
+          )}
         </>
       )}
     </div>

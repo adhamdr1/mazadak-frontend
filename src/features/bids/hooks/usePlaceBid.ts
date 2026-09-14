@@ -42,6 +42,18 @@ export const usePlaceBid = (options?: UsePlaceBidOptions) => {
         queryKey: QUERY_KEYS.WALLET.MY_WALLET,
       });
 
+      // 3. Broadcast to other open browser tabs (e.g. /my-bids page) for instant cross-tab sync
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const channel = new BroadcastChannel('mazadak_bids_channel');
+          channel.postMessage({ type: 'BID_PLACED', auctionId: variables.auctionId });
+          channel.close();
+        }
+        localStorage.setItem('mazadak_bids_sync', Date.now().toString());
+      } catch {
+        // Fallback gracefully if not supported
+      }
+
       options?.onSuccess?.(bid);
     },
     onError: (err: unknown) => {

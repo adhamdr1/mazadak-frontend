@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   PlusCircle,
-  Home,
   ChevronRight,
   ChevronLeft,
   Gavel,
   PackageOpen,
-  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
@@ -24,7 +21,6 @@ import { toLocalizedDigits } from '@/utils/formatters';
 
 export const MyAuctionsPage: React.FC = () => {
   const { t, i18n } = useTranslation(['auctions', 'common']);
-  const { t: tCommon } = useTranslation('common');
   const isRTL = i18n.language?.startsWith('ar');
   const ChevronIcon = isRTL ? ChevronLeft : ChevronRight;
 
@@ -85,30 +81,9 @@ export const MyAuctionsPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-      {/* 1. Breadcrumb Indicator */}
-      <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
-        <Link
-          to={ROUTES.HOME}
-          className="hover:text-amber-500 transition-colors flex items-center gap-1"
-        >
-          <Home className="w-3.5 h-3.5" />
-          <span>{tCommon('nav.home')}</span>
-        </Link>
-        <ChevronIcon className="w-3 h-3 text-slate-400" />
-        <Link to={ROUTES.AUCTIONS} className="hover:text-amber-500 transition-colors">
-          {tCommon('nav.auctions')}
-        </Link>
-        <ChevronIcon className="w-3 h-3 text-slate-400" />
-        <span className="text-amber-500 font-bold">{t('myAuctions.title')}</span>
-      </div>
-
-      {/* 2. Page Title & Subtitle */}
+      {/* 1. Page Title & Subtitle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-            <Layers className="w-3.5 h-3.5" />
-            <span>{t('myAuctions.title')}</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
             {t('myAuctions.title')}
           </h1>

@@ -28,7 +28,7 @@
   },
   "status": {
     "WINNING": "Leading",
-    "OUTBID": "Outbid",
+    "OUTBID": "Previous Bid",
     "ACTIVE": "Active",
     "EXHAUSTED": "Exhausted",
     "CANCELLED": "Cancelled",
@@ -100,6 +100,58 @@
     "autoBidCancelled": "Auto-bid cancelled successfully",
     "leadingNotice": "You are currently the leading bidder for this auction",
     "outbidNotice": "You have been outbid on this auction"
+  },
+  "myBids": {
+    "title": "My Bids",
+    "subtitle": "Track all your bids and their real-time status across active and ended auctions",
+    "stats": {
+      "totalBids": "Total Bids",
+      "winningBids": "Leading Bids",
+      "outbidBids": "Previous Bids",
+      "activeAuctions": "Active Contests"
+    },
+    "filters": {
+      "all": "All",
+      "winning": "Leading",
+      "outbid": "Previous Bids",
+      "sortBy": "Sort by",
+      "sortNewest": "Newest First",
+      "sortOldest": "Oldest First",
+      "sortHighest": "Highest Amount",
+      "sortLowest": "Lowest Amount"
+    },
+    "card": {
+      "myBid": "My Bid",
+      "currentPrice": "Current Price",
+      "startingPrice": "Starting Price",
+      "placedAt": "Bid Placed",
+      "bidAgain": "Bid Now",
+      "viewAuction": "View Auction",
+      "viewResult": "Auction Details",
+      "viewDetails": "Auction Details",
+      "auctionEnded": "Ended",
+      "auctionPending": "Pending",
+      "auctionActive": "Active",
+      "auctionCancelled": "Cancelled",
+      "auctionUnavailable": "Auction Unavailable",
+      "leadingBidder": "You are leading",
+      "outbidNotice": "Previous Bid"
+    },
+    "empty": {
+      "allTitle": "No Bids Placed Yet",
+      "allDesc": "You have not placed bids on any auction yet. Explore active auctions and start bidding now!",
+      "winningTitle": "No Leading Bids",
+      "winningDesc": "You currently have no bids leading the race.",
+      "outbidTitle": "No Previous Bids",
+      "outbidDesc": "Awesome! All your bids are currently leading the contest.",
+      "browseButton": "Explore Auctions",
+      "clearFilters": "Reset Filters"
+    },
+    "pagination": {
+      "showingResults": "Showing {{current}} of {{total}} bids",
+      "prev": "Previous",
+      "next": "Next"
+    }
   },
   "actions": {
     "depositNow": "Deposit Now",
