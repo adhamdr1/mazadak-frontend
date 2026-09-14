@@ -1,0 +1,168 @@
+{
+  "pageTitle": "مزايداتي",
+  "sections": {
+    "biddingBox": "تقديم مزايدة",
+    "bidHistory": "سجل المزايدات",
+    "myBids": "مزايداتي"
+  },
+  "form": {
+    "labels": {
+      "bidAmount": "مبلغ المزايدة",
+      "maxAmount": "السقف الأقصى",
+      "quickIncrements": "زيادات سريعة",
+      "customAmount": "مبلغ مخصص"
+    },
+    "placeholders": {
+      "customBid": "أدخل مبلغاً مخصصاً",
+      "maxAmount": "الحد الأقصى للمزايدة التلقائية"
+    },
+    "buttons": {
+      "placeBid": "مزايدة الآن",
+      "placingBid": "جاري تقديم المزايدة...",
+      "setAutoBid": "مزايدة تلقائية",
+      "cancelAutoBid": "إلغاء المزايدة التلقائية",
+      "leadingBidder": "أنت المتصدر حالياً",
+      "loginToBid": "تسجيل الدخول للمزايدة",
+      "depositFunds": "شحن المحفظة"
+    }
+  },
+  "status": {
+    "WINNING": "متصدر",
+    "OUTBID": "مزايدة سابقة",
+    "ACTIVE": "نشطة",
+    "EXHAUSTED": "نُفِّذ السقف",
+    "CANCELLED": "ملغاة",
+    "ALL": "الكل"
+  },
+  "autoBid": {
+    "modalTitle": "إعداد المزايدة التلقائية",
+    "modalDescription": "سيقوم النظام بالمزايدة نيابة عنك بأقل زيادة ممكنة كلما تم تجاوزك، حتى الوصول للسقف الأقصى.",
+    "walletSummary": {
+      "title": "رصيد محفظتك",
+      "available": "المتاح للمزايدة",
+      "held": "محجوز في مزايدات نشطة",
+      "total": "الإجمالي",
+      "insufficientNotice": "الحد الأقصى المطلوب ({{amount}}) يتجاوز رصيدك المتاح ({{available}}). لديك {{held}} محجوزة في مزايدات أخرى.",
+      "deltaReassurance": "سيتم حجز {{delta}} إضافية فقط من رصيدك المتاح (لديك {{held}} محجوزة مسبقاً لهذا المزاد).",
+      "depositRequired": "تحتاج لشحن {{deficit}} إضافية لتفعيل هذا السقف",
+      "depositButton": "شحن المحفظة الآن"
+    },
+    "currentMax": "السقف الأقصى الحالي",
+    "minAllowedCeilingLabel": "الحد الأدنى للسقف المطلوب",
+    "activeStatus": "نشطة — السقف: {{maxAmount}}",
+    "exhaustedStatus": "تم بلوغ السقف الأقصى",
+    "previousExhaustedNotice": "تم بلوغ سقف المزايدة السابق ({{amount}}). أدخل حداً أعلى جديداً لمواصلة المنافسة التلقائية.",
+    "cancelledStatus": "تم إلغاء المزايدة التلقائية",
+    "setupButton": "تفعيل المزايدة التلقائية",
+    "editCeiling": "تعديل السقف الأقصى",
+    "cancelButton": "إلغاء التفعيل",
+    "updating": "جاري الحفظ...",
+    "cancelling": "جاري الإلغاء...",
+    "confirmCancel": "هل أنت متأكد من رغبتك في إلغاء المزايدة التلقائية لهذا المزاد؟"
+  },
+  "bidHistory": {
+    "title": "سجل المزايدات",
+    "subtitle": "تحديث لحظي",
+    "live": "مباشر",
+    "empty": "لا توجد مزايدات بعد — كن أول المزايدين!",
+    "pendingEmpty": "المزاد في مرحلة الانتظار — سيبدأ قبول المزايدات عند انطلاق المزاد",
+    "endedEmpty": "انتهى هذا المزاد دون تقديم أي مزايدات",
+    "loadMore": "عرض المزيد من المزايدات",
+    "showLess": "عرض أحدث المزايدات فقط",
+    "anonymousPrefix": "مشارك",
+    "you": "أنت",
+    "latest": "الأحدث",
+    "loadingHistory": "جاري تحميل سجل المزايدات...",
+    "totalBids": "مزايدة واحدة",
+    "totalBidsOne": "مزايدة واحدة",
+    "totalBidsTwo": "مزايدتان",
+    "totalBidsFew": "{{count}} مزايدات",
+    "totalBidsMany": "{{count}} مزايدة",
+    "totalBids_plural": "{{count}} مزايدة"
+  },
+  "validation": {
+    "minBid": "المبلغ يجب أن يكون على الأقل {{min}}",
+    "invalidNumber": "يرجى إدخال رقم صحيح",
+    "required": "هذا الحقل مطلوب",
+    "maxBidRequired": "السقف الأقصى مطلوب",
+    "maxBidTooLow": "السقف يجب أن يتجاوز السعر الحالي مع خطوة زيادة واحدة على الأقل"
+  },
+  "errors": {
+    "INSUFFICIENT_FUNDS": "رصيدك في المحفظة غير كافٍ لتغطية هذه المزايدة",
+    "ALREADY_HIGHEST_BIDDER": "أنت المزايد الأعلى حالياً بالفعل على هذا المزاد!",
+    "CANNOT_BID_OWN_AUCTION": "لا يمكنك المزايدة على مزادك الخاص",
+    "AUCTION_NOT_ACTIVE": "هذا المزاد غير نشط حالياً للمزايدة",
+    "HIGH_BID_VOLUME": "ضغط مرتفع على المزاد — يرجى إعادة المحاولة بعد لحظات",
+    "AUTO_BID_EXISTS": "لديك مزايدة تلقائية نشطة بالفعل على هذا المزاد",
+    "CANNOT_AUTO_BID_OWN": "لا يمكنك ضبط مزايدة تلقائية على مزادك الخاص",
+    "AUCTION_NOT_FOUND": "المزاد غير موجود",
+    "BID_TOO_LOW": "مبلغ المزايدة أقل من الحد الأدنى المطلوب"
+  },
+  "messages": {
+    "bidPlaced": "تم تقديم مزايدتك بنجاح!",
+    "autoBidSet": "تم تفعيل المزايدة التلقائية بنجاح!",
+    "autoBidCancelled": "تم إلغاء المزايدة التلقائية بنجاح",
+    "leadingNotice": "أنت المتصدر حالياً في هذا المزاد",
+    "outbidNotice": "تم تجاوز مزايدتك في هذا المزاد"
+  },
+  "myBids": {
+    "title": "مزايداتي",
+    "subtitle": "تابع جميع مزايداتك وحالتها اللحظية في المزادات النشطة والمنتهية",
+    "stats": {
+      "totalBids": "إجمالي المزايدات",
+      "winningBids": "مزايدات متصدرة",
+      "outbidBids": "مزايدات سابقة",
+      "activeAuctions": "مزادات نشطة"
+    },
+    "filters": {
+      "all": "الكل",
+      "winning": "المتصدرة",
+      "outbid": "مزايدات سابقة",
+      "sortBy": "ترتيب حسب",
+      "sortNewest": "الأحدث أولاً",
+      "sortOldest": "الأقدم أولاً",
+      "sortHighest": "الأعلى قيمة",
+      "sortLowest": "الأقل قيمة"
+    },
+    "card": {
+      "myBid": "مزايدتي",
+      "currentPrice": "السعر الحالي",
+      "startingPrice": "سعر البدء",
+      "placedAt": "وقت المزايدة",
+      "bidAgain": "زايد الآن",
+      "viewAuction": "عرض المزاد",
+      "viewResult": "تفاصيل المزاد",
+      "viewDetails": "تفاصيل المزاد",
+      "auctionEnded": "انتهى المزاد",
+      "auctionPending": "في الانتظار",
+      "auctionActive": "مزاد نشط",
+      "auctionCancelled": "ملغى",
+      "auctionUnavailable": "المزاد غير متاح",
+      "leadingBidder": "أنت المتصدر حالياً",
+      "outbidNotice": "مزايدة سابقة"
+    },
+    "empty": {
+      "allTitle": "لا توجد مزايدات بعد",
+      "allDesc": "لم تقم بالمزايدة على أي مزاد بعد. تصفح المزادات المتاحة وابدأ المزايدة الآن!",
+      "winningTitle": "لا توجد مزايدات متصدرة",
+      "winningDesc": "ليس لديك مزايدات في صدارة السباق حالياً.",
+      "outbidTitle": "لا توجد مزايدات سابقة",
+      "outbidDesc": "رائع! جميع مزايداتك ما زالت في صدارة المنافسة.",
+      "browseButton": "استكشف المزادات الآن",
+      "clearFilters": "إعادة ضبط الفلاتر"
+    },
+    "pagination": {
+      "showingResults": "عرض {{current}} من أصل {{total}} مزايدة",
+      "prev": "السابق",
+      "next": "التالي"
+    }
+  },
+  "actions": {
+    "depositNow": "شحن المحفظة الآن",
+    "goToAuction": "الذهاب للمزاد",
+    "viewHistory": "عرض السجل الكامل"
+  },
+  "currency": {
+    "symbol": "ج.م"
+  }
+}

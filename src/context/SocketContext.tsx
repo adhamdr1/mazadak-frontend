@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Client, SubscribePayload } from 'graphql-ws';
+import { useQueryClient } from '@tanstack/react-query';
 import { SocketContext, type SocketContextType } from './socket.context';
 import {
   getSocketClient,
@@ -7,9 +8,12 @@ import {
   subscribeToSubscription,
 } from '@/services/websocket/socketClient';
 import { useAuth } from '@/hooks/useAuth';
+import { bidsService } from '@/features/bids/services/bids.service';
+import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { accessToken } = useAuth();
+  const { accessToken, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
   const [client, setClient] = useState<Client | null>(() => getSocketClient(accessToken));
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -37,6 +41,29 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       disposeError();
     };
   }, [accessToken]);
+
+  // Synchronize live wallet updates in real time globally across the app
+  useEffect(() => {
+    if (!isAuthenticated || !accessToken) return;
+
+    const unsubscribe = bidsService.subscribeToWalletUpdated(
+      {
+        next: (data) => {
+          if (data?.walletUpdated) {
+            queryClient.setQueryData(QUERY_KEYS.WALLET.MY_WALLET, data.walletUpdated);
+          }
+        },
+        error: (err) => {
+          console.warn('WebSocket walletUpdated subscription error:', err);
+        },
+      },
+      accessToken
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [isAuthenticated, accessToken, queryClient]);
 
   // Clean up when auth expires
   useEffect(() => {

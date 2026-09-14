@@ -1,5 +1,6 @@
 import { createClient, type Client, type SubscribePayload } from 'graphql-ws';
 import { env } from '@/config/env.config';
+import { authStorage } from '@/utils/storage.utils';
 
 let wsClient: Client | null = null;
 let currentToken: string | null = null;
@@ -13,12 +14,13 @@ export interface SocketClientOptions {
 
 /**
  * Creates or retrieves the singleton GraphQL WebSocket client.
- * Recreates the client if the authentication token changes.
+ * Recreates the client only if the authentication token actually changes (e.g. login/logout).
  */
 export function getSocketClient(accessToken?: string | null): Client {
-  const token = accessToken ?? null;
+  // If accessToken is undefined, fallback to currently stored token rather than null
+  const token = accessToken !== undefined ? (accessToken ?? null) : authStorage.getAccessToken();
 
-  // Re-instantiate if token changed or client not created yet
+  // Re-instantiate only if token changed or client not created yet
   if (!wsClient || currentToken !== token) {
     if (wsClient) {
       try {
@@ -33,10 +35,11 @@ export function getSocketClient(accessToken?: string | null): Client {
     wsClient = createClient({
       url: env.wsUrl,
       connectionParams: () => {
-        if (!currentToken) return {};
+        const activeToken = currentToken ?? authStorage.getAccessToken();
+        if (!activeToken) return {};
         return {
-          authorization: `Bearer ${currentToken}`,
-          Authorization: `Bearer ${currentToken}`,
+          authorization: `Bearer ${activeToken}`,
+          Authorization: `Bearer ${activeToken}`,
         };
       },
       shouldRetry: () => true,

@@ -5,9 +5,11 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import arCommon from '@/locales/ar/common.json';
 import arAuth from '@/locales/ar/auth.json';
 import arAuctions from '@/locales/ar/auctions.json';
+import arBids from '@/locales/ar/bids.json';
 import enCommon from '@/locales/en/common.json';
 import enAuth from '@/locales/en/auth.json';
 import enAuctions from '@/locales/en/auctions.json';
+import enBids from '@/locales/en/bids.json';
 
 export const defaultNS = 'common';
 export const resources = {
@@ -15,11 +17,13 @@ export const resources = {
     common: arCommon,
     auth: arAuth,
     auctions: arAuctions,
+    bids: arBids,
   },
   en: {
     common: enCommon,
     auth: enAuth,
     auctions: enAuctions,
+    bids: enBids,
   },
 } as const;
 

@@ -1,0 +1,164 @@
+{
+  "pageTitle": "My Bids",
+  "sections": {
+    "biddingBox": "Place a Bid",
+    "bidHistory": "Bid History",
+    "myBids": "My Bids"
+  },
+  "form": {
+    "labels": {
+      "bidAmount": "Bid Amount",
+      "maxAmount": "Maximum Limit",
+      "quickIncrements": "Quick Increments",
+      "customAmount": "Custom Amount"
+    },
+    "placeholders": {
+      "customBid": "Enter custom amount",
+      "maxAmount": "Maximum Auto-Bid Limit"
+    },
+    "buttons": {
+      "placeBid": "Place Bid Now",
+      "placingBid": "Placing Bid...",
+      "setAutoBid": "Auto-Bid",
+      "cancelAutoBid": "Cancel Auto-Bid",
+      "leadingBidder": "You are Highest Bidder",
+      "loginToBid": "Login to Bid",
+      "depositFunds": "Deposit Funds"
+    }
+  },
+  "status": {
+    "WINNING": "Leading",
+    "OUTBID": "Previous Bid",
+    "ACTIVE": "Active",
+    "EXHAUSTED": "Exhausted",
+    "CANCELLED": "Cancelled",
+    "ALL": "All"
+  },
+  "autoBid": {
+    "modalTitle": "Auto-Bid Setup",
+    "modalDescription": "The system will automatically place bids on your behalf with the minimum increment whenever you are outbid, up to your maximum limit.",
+    "walletSummary": {
+      "title": "Your Wallet Balance",
+      "available": "Available for Bidding",
+      "held": "Held in Active Bids",
+      "total": "Total",
+      "insufficientNotice": "Requested ceiling ({{amount}}) exceeds your available balance ({{available}}). You have {{held}} held in other active bids.",
+      "deltaReassurance": "Only {{delta}} will be deducted from your available balance ({{held}} is already held for this auction).",
+      "depositRequired": "You need to deposit {{deficit}} more to activate this ceiling",
+      "depositButton": "Deposit Funds Now"
+    },
+    "currentMax": "Current Maximum Limit",
+    "minAllowedCeilingLabel": "Minimum Required Ceiling",
+    "activeStatus": "Active — Max: {{maxAmount}}",
+    "exhaustedStatus": "Maximum Limit Reached",
+    "previousExhaustedNotice": "Your previous ceiling of {{amount}} was reached. Enter a higher limit to continue auto-bidding.",
+    "cancelledStatus": "Auto-Bid Cancelled",
+    "setupButton": "Activate Auto-Bid",
+    "editCeiling": "Edit Ceiling Limit",
+    "cancelButton": "Cancel Auto-Bid",
+    "updating": "Saving...",
+    "cancelling": "Cancelling...",
+    "confirmCancel": "Are you sure you want to cancel auto-bid for this auction?"
+  },
+  "bidHistory": {
+    "title": "Bid History",
+    "subtitle": "Real-time stream",
+    "live": "Live",
+    "empty": "No bids placed yet — be the first to bid!",
+    "pendingEmpty": "Auction is pending — bids will be accepted once the auction starts",
+    "endedEmpty": "This auction concluded with no bids placed",
+    "loadMore": "Show More Bids",
+    "showLess": "Show Recent Bids Only",
+    "anonymousPrefix": "Participant",
+    "you": "You",
+    "latest": "Latest",
+    "loadingHistory": "Loading bid history...",
+    "totalBids": "1 bid",
+    "totalBids_plural": "{{count}} bids"
+  },
+  "validation": {
+    "minBid": "Amount must be at least {{min}}",
+    "invalidNumber": "Please enter a valid number",
+    "required": "This field is required",
+    "maxBidRequired": "Maximum limit is required",
+    "maxBidTooLow": "Maximum limit must exceed current price by at least one minimum increment"
+  },
+  "errors": {
+    "INSUFFICIENT_FUNDS": "Not enough balance in your wallet to place this bid",
+    "ALREADY_HIGHEST_BIDDER": "You are already the highest bidder for this auction!",
+    "CANNOT_BID_OWN_AUCTION": "You cannot place a bid on your own auction",
+    "AUCTION_NOT_ACTIVE": "This auction is not currently active for bidding",
+    "HIGH_BID_VOLUME": "High bidding volume on this auction. Please try again in a moment.",
+    "AUTO_BID_EXISTS": "You already have an active auto-bid configuration for this auction",
+    "CANNOT_AUTO_BID_OWN": "You cannot set an auto-bid on your own auction",
+    "AUCTION_NOT_FOUND": "Auction not found",
+    "BID_TOO_LOW": "Bid amount is below the minimum required increment"
+  },
+  "messages": {
+    "bidPlaced": "Your bid has been placed successfully!",
+    "autoBidSet": "Auto-bid configured successfully!",
+    "autoBidCancelled": "Auto-bid cancelled successfully",
+    "leadingNotice": "You are currently the leading bidder for this auction",
+    "outbidNotice": "You have been outbid on this auction"
+  },
+  "myBids": {
+    "title": "My Bids",
+    "subtitle": "Track all your bids and their real-time status across active and ended auctions",
+    "stats": {
+      "totalBids": "Total Bids",
+      "winningBids": "Leading Bids",
+      "outbidBids": "Previous Bids",
+      "activeAuctions": "Active Contests"
+    },
+    "filters": {
+      "all": "All",
+      "winning": "Leading",
+      "outbid": "Previous Bids",
+      "sortBy": "Sort by",
+      "sortNewest": "Newest First",
+      "sortOldest": "Oldest First",
+      "sortHighest": "Highest Amount",
+      "sortLowest": "Lowest Amount"
+    },
+    "card": {
+      "myBid": "My Bid",
+      "currentPrice": "Current Price",
+      "startingPrice": "Starting Price",
+      "placedAt": "Bid Placed",
+      "bidAgain": "Bid Now",
+      "viewAuction": "View Auction",
+      "viewResult": "Auction Details",
+      "viewDetails": "Auction Details",
+      "auctionEnded": "Ended",
+      "auctionPending": "Pending",
+      "auctionActive": "Active",
+      "auctionCancelled": "Cancelled",
+      "auctionUnavailable": "Auction Unavailable",
+      "leadingBidder": "You are leading",
+      "outbidNotice": "Previous Bid"
+    },
+    "empty": {
+      "allTitle": "No Bids Placed Yet",
+      "allDesc": "You have not placed bids on any auction yet. Explore active auctions and start bidding now!",
+      "winningTitle": "No Leading Bids",
+      "winningDesc": "You currently have no bids leading the race.",
+      "outbidTitle": "No Previous Bids",
+      "outbidDesc": "Awesome! All your bids are currently leading the contest.",
+      "browseButton": "Explore Auctions",
+      "clearFilters": "Reset Filters"
+    },
+    "pagination": {
+      "showingResults": "Showing {{current}} of {{total}} bids",
+      "prev": "Previous",
+      "next": "Next"
+    }
+  },
+  "actions": {
+    "depositNow": "Deposit Now",
+    "goToAuction": "Go to Auction",
+    "viewHistory": "View Full History"
+  },
+  "currency": {
+    "symbol": "EGP"
+  }
+}

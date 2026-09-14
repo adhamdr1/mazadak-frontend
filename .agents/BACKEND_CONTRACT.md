@@ -1067,7 +1067,21 @@ subscription {
 
 ---
 
-### 11.4 رسائل الشات (messageSent / messageUpdated)
+### 11.4 تحديث المحفظة اللحظي (walletUpdated) — محمي
+
+```graphql
+subscription {
+  walletUpdated {
+    _id  userId  balance  heldBalance  availableBalance  createdAt  updatedAt
+  }
+}
+```
+
+> يُستخدم لمزامنة رصيد المحفظة المتاح والمحجوز لحظياً فور أي عملية مزايدة أو سحب أو إيداع.
+
+---
+
+### 11.5 رسائل الشات (messageSent / messageUpdated)
 
 ```graphql
 subscription {

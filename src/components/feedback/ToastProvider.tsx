@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ToastContext,
   type ToastContextType,
@@ -10,6 +11,18 @@ import {
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const idCounter = useRef(0);
+  const { i18n } = useTranslation();
+
+  // Clear stale toasts on language switch to prevent lingering foreign-language notifications
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setToasts([]);
+    };
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
 
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));

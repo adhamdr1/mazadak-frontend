@@ -64,9 +64,15 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     </div>
   );
 
+  const handleClick = () => {
+    if (to === ROUTES.HOME && window.location.pathname === ROUTES.HOME) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   if (to) {
     return (
-      <Link to={to} className="inline-flex items-center focus:outline-none">
+      <Link to={to} onClick={handleClick} className="inline-flex items-center focus:outline-none">
         {content}
       </Link>
     );

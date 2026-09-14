@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const setAuth = useCallback((response: AuthResponse, rememberMe = false) => {
+  const setAuth = useCallback((response: AuthResponse, rememberMe = true) => {
     authStorage.setAuth(response, rememberMe);
     setAccessToken(response.accessToken);
     setUserState(response.user);
@@ -59,6 +59,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAccessToken(null);
       setUserState(null);
     }
+  }, []);
+
+  // Listen for storage events across tabs (instant login/logout sync)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'access_token' || e.key === 'mazadak_user') {
+        const token = authStorage.getAccessToken();
+        const storedUser = authStorage.getUser<User>();
+        if (token && storedUser) {
+          setAccessToken(token);
+          setUserState(storedUser);
+        } else {
+          setAccessToken(null);
+          setUserState(null);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Listen for unauthorized broadcast events from apiClient interceptor

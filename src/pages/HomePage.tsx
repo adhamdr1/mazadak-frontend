@@ -20,7 +20,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
-import { useAuctions } from '@/features/auctions/hooks/useAuctions';
+import {
+  useAuctions,
+  useAuctionCreatedSubscription,
+  NewAuctionsBanner,
+} from '@/features/auctions';
 import { AuctionCard } from '@/features/auctions/components/shared/AuctionCard';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants/routes.constants';
@@ -48,9 +52,17 @@ export const HomePage: React.FC = () => {
 
   // Fetch featured active & upcoming auctions for the homepage showcase
   const { auctions, isLoading } = useAuctions(6);
+  const { newAuctionsCount, refreshFeed, dismiss } = useAuctionCreatedSubscription();
 
   return (
     <div className="space-y-12 sm:space-y-16 py-6 sm:py-10">
+      {/* Real-time Floating New Auctions Banner */}
+      <NewAuctionsBanner
+        count={newAuctionsCount}
+        onRefresh={refreshFeed}
+        onDismiss={dismiss}
+      />
+
       {/* 1. Hero Showcase Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-amber-500/[0.08] via-slate-50 to-white dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950 p-8 sm:p-14 lg:p-16 shadow-xl dark:shadow-2xl border border-slate-200/90 dark:border-slate-800 transition-colors duration-200">
