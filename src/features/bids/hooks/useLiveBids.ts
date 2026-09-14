@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSocket } from '@/hooks/useSocket';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +16,10 @@ export const useLiveBids = (auctionId: string, options?: UseLiveBidsOptions) => 
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [latestBid, setLatestBid] = useState<BidAddedPayload | null>(null);
+  const optionsRef = useRef(options);
+  useEffect(() => {
+    optionsRef.current = options;
+  });
 
   // 1. Initial query to fetch the latest leading bid on page load & refresh
   const initialBidsQuery = useQuery({
@@ -88,7 +92,7 @@ export const useLiveBids = (auctionId: string, options?: UseLiveBidsOptions) => 
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BIDS.MY_AUTO_BID(auctionId) });
 
-          options?.onBidAdded?.(payload);
+          optionsRef.current?.onBidAdded?.(payload);
         },
         error: (err) => {
           console.warn('WebSocket bidAdded subscription error:', err);
@@ -100,7 +104,7 @@ export const useLiveBids = (auctionId: string, options?: UseLiveBidsOptions) => 
     return () => {
       unsubscribe();
     };
-  }, [auctionId, subscribe, queryClient, options]);
+  }, [auctionId, subscribe, queryClient]);
 
   // Determine leading bidder ID from real-time WS payload OR initial query's latest bid
   const leadingBidderId =
