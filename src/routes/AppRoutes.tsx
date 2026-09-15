@@ -32,7 +32,10 @@ const MyAuctionsPage = lazy(() => import('@/features/auctions/pages/MyAuctionsPa
 // 3. Bids Module Pages
 const MyBidsPage = lazy(() => import('@/features/bids/pages/MyBidsPage').then(m => ({ default: m.MyBidsPage })));
 
-// 4. General Platform Pages
+// 4. Wallet Module Pages
+const WalletPage = lazy(() => import('@/features/wallet/pages/WalletPage').then(m => ({ default: m.WalletPage })));
+
+// 5. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
@@ -56,6 +59,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.EDIT_AUCTION()} element={<EditAuctionPage />} />
               <Route path={ROUTES.MY_AUCTIONS} element={<MyAuctionsPage />} />
               <Route path={ROUTES.MY_BIDS} element={<MyBidsPage />} />
+              <Route path={ROUTES.WALLET} element={<WalletPage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>
           </Route>

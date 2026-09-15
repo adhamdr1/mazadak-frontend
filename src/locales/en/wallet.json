@@ -1,0 +1,46 @@
+{
+  "pageTitle": "My Wallet",
+  "pageSubtitle": "Manage your balances, track deposits, withdrawals, and transaction history",
+  "balance": {
+    "sectionTitle": "Balance Overview",
+    "total": "Total Balance",
+    "totalTooltip": "The total funds in your account including available and held balances",
+    "available": "Available Balance",
+    "availableTooltip": "Free funds ready to be used for placing new bids or withdrawing",
+    "held": "Held Balance",
+    "heldTooltip": "Funds temporarily locked for active bids or ongoing escrow transactions",
+    "currency": "EGP"
+  },
+  "actions": {
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "transactions": "Transaction History",
+    "statement": "Transaction History",
+    "refresh": "Refresh Data"
+  },
+  "transactionTypes": {
+    "DEPOSIT": "Deposit",
+    "WITHDRAW": "Withdrawal",
+    "HOLD": "Bid Hold",
+    "RELEASE": "Hold Released",
+    "CAPTURE": "Auction Settlement",
+    "REFUND": "Refund"
+  },
+  "recentTransactions": {
+    "title": "Recent Transactions",
+    "viewAll": "View All",
+    "emptyTitle": "No Recent Transactions",
+    "emptyDescription": "You haven't made any financial transactions yet. Deposits and bids will appear here.",
+    "depositButton": "Deposit Now"
+  },
+  "notifications": {
+    "depositSuccessTitle": "Deposit Successful!",
+    "depositSuccessDesc": "Your payment has been confirmed and funds have been added to your wallet.",
+    "depositFailedTitle": "Payment Failed",
+    "depositFailedDesc": "The payment was not completed or was cancelled by the payment gateway."
+  },
+  "errors": {
+    "loadFailed": "Failed to load wallet data. Please try again.",
+    "retry": "Retry"
+  }
+}

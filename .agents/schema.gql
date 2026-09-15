@@ -905,10 +905,11 @@ input ReplyReviewInput {
 }
 
 type Subscription {
+  walletUpdated: Wallet!
   notificationAdded: InAppNotification!
+  auctionCreated: Auction!
   auctionStatusChanged(auctionId: ID!): AuctionStatusChangedPayload!
   bidAdded(auctionId: ID!): BidAddedPayload!
-  walletUpdated: Wallet!
   messageSent(auctionId: ID!): ChatMessage!
   messageUpdated(auctionId: ID!): ChatMessage!
   chatReadStatusUpdated(auctionId: ID!): ChatReadStateUpdatedPayload!
