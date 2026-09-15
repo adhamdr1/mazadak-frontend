@@ -34,6 +34,7 @@ const MyBidsPage = lazy(() => import('@/features/bids/pages/MyBidsPage').then(m 
 
 // 4. Wallet Module Pages
 const WalletPage = lazy(() => import('@/features/wallet/pages/WalletPage').then(m => ({ default: m.WalletPage })));
+const DepositPage = lazy(() => import('@/features/wallet/pages/DepositPage').then(m => ({ default: m.DepositPage })));
 
 // 5. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -60,6 +61,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.MY_AUCTIONS} element={<MyAuctionsPage />} />
               <Route path={ROUTES.MY_BIDS} element={<MyBidsPage />} />
               <Route path={ROUTES.WALLET} element={<WalletPage />} />
+              <Route path={ROUTES.WALLET_DEPOSIT} element={<DepositPage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>
           </Route>

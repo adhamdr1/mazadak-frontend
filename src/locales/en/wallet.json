@@ -26,6 +26,14 @@
     "CAPTURE": "Auction Settlement",
     "REFUND": "Refund"
   },
+  "transactionStatuses": {
+    "SUCCESS": "Completed",
+    "PENDING": "Pending",
+    "PROCESSING": "Processing",
+    "FAILED": "Failed",
+    "CANCELLED": "Cancelled",
+    "EXPIRED": "Expired"
+  },
   "recentTransactions": {
     "title": "Recent Transactions",
     "viewAll": "View All",
@@ -41,6 +49,41 @@
   },
   "errors": {
     "loadFailed": "Failed to load wallet data. Please try again.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "PAYMENT_CREATION_FAILED": "Unable to initiate payment at this time. Please try again later.",
+    "INVALID_PAYMENT_PROVIDER": "The selected payment method is currently unavailable.",
+    "INSUFFICIENT_FUNDS": "Your available balance is insufficient for this operation.",
+    "INVALID_AMOUNT": "The entered amount is invalid."
+  },
+  "deposit": {
+    "pageTitle": "Deposit Funds",
+    "pageSubtitle": "Choose your deposit amount to fund your wallet instantly via Paymob",
+    "backToWallet": "Back to Wallet",
+    "amountLabel": "Deposit Amount",
+    "quickPresetsLabel": "Quick Presets",
+    "minMaxNotice": "Minimum: 10 EGP • Maximum: 100,000 EGP",
+    "summaryAmount": "Deposit Amount",
+    "summaryTotal": "Total Payable",
+    "submitButton": "Proceed with Paymob",
+    "processing": "Setting up payment session...",
+    "redirecting": "Redirecting securely to Paymob...",
+    "gatewayTitle": "Unified Payment Gateway",
+    "gatewaySubtitle": "Officially powered and regulated by the Central Bank of Egypt via Paymob",
+    "instantDeposit": "Instant",
+    "securityNote1": "256-bit bank-grade encryption meeting global PCI-DSS standards",
+    "securityNote2": "You will be redirected to an encrypted checkout page; card details are never stored",
+    "errorNoUrl": "Failed to obtain payment redirect URL from gateway",
+    "errorGeneric": "Unable to initiate payment session. Please try again.",
+    "methods": {
+      "cards": "Bank Cards",
+      "wallets": "Mobile Wallets",
+      "instapay": "InstaPay"
+    }
+  },
+  "validation": {
+    "amountRequired": "Please enter an amount to deposit",
+    "amountInvalid": "Please enter a valid number",
+    "depositMin": "Minimum deposit amount is {{min}} EGP",
+    "depositMax": "Maximum deposit amount is {{max}} EGP"
   }
 }

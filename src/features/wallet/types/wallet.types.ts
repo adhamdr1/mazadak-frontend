@@ -26,3 +26,16 @@ export interface RecentTransactionsData {
   items: RecentTransactionItem[];
   total: number;
 }
+
+export interface InitializePaymentRequest {
+  provider: 'PAYMOB';
+  amount: number; // in piasters (e.g. 100 EGP = 10000)
+  currency?: string;
+}
+
+export interface InitializePaymentResponse {
+  gatewayPaymentIntentId: string;
+  clientSecret: string;
+  paymentUrl: string;
+  idempotencyKey: string;
+}

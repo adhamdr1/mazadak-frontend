@@ -1,6 +1,12 @@
 import { executeGraphQL } from '@/services/api/graphqlClient';
+import { restClient } from '@/services/api/apiClient';
 import { subscribeToSubscription } from '@/services/websocket/socketClient';
-import type { WalletData, RecentTransactionItem } from '../types/wallet.types';
+import type {
+  WalletData,
+  RecentTransactionItem,
+  InitializePaymentRequest,
+  InitializePaymentResponse,
+} from '../types/wallet.types';
 
 // ==========================================
 // GraphQL Operations (Fragments & Queries)
@@ -94,5 +100,19 @@ export const walletService = {
       handlers,
       token
     );
+  },
+
+  /**
+   * Initializes a Paymob Unified Checkout payment session via REST API
+   * Converts user amount in EGP to piasters (1 EGP = 100 piasters)
+   */
+  async initializePayment(amountInEgp: number): Promise<InitializePaymentResponse> {
+    const amountInPiasters = Math.round(amountInEgp * 100);
+    const response = await restClient.post<InitializePaymentResponse>('/payments/initialize', {
+      provider: 'PAYMOB',
+      amount: amountInPiasters,
+      currency: 'EGP',
+    } satisfies InitializePaymentRequest);
+    return response.data;
   },
 };

@@ -26,6 +26,14 @@
     "CAPTURE": "دفع قيمة المزاد",
     "REFUND": "استرداد"
   },
+  "transactionStatuses": {
+    "SUCCESS": "مكتملة",
+    "PENDING": "قيد الانتظار",
+    "PROCESSING": "قيد المعالجة",
+    "FAILED": "فشلت",
+    "CANCELLED": "ملغاة",
+    "EXPIRED": "منتهية"
+  },
   "recentTransactions": {
     "title": "آخر المعاملات",
     "viewAll": "عرض الكل",
@@ -41,6 +49,41 @@
   },
   "errors": {
     "loadFailed": "فشل تحميل بيانات المحفظة. يرجى إعادة المحاولة.",
-    "retry": "إعادة المحاولة"
+    "retry": "إعادة المحاولة",
+    "PAYMENT_CREATION_FAILED": "تعذر بدء عملية الدفع حالياً. يرجى المحاولة مرة أخرى لاحقاً.",
+    "INVALID_PAYMENT_PROVIDER": "وسيلة الدفع المختارة غير متوفرة حالياً.",
+    "INSUFFICIENT_FUNDS": "رصيدك المتاح غير كافٍ لإتمام هذه العملية.",
+    "INVALID_AMOUNT": "المبلغ المدخل غير صالح."
+  },
+  "deposit": {
+    "pageTitle": "شحن رصيد المحفظة",
+    "pageSubtitle": "اختر المبلغ المطلوب لإيداع الرصيد فورياً عبر بوابة Paymob",
+    "backToWallet": "العودة للمحفظة",
+    "amountLabel": "مبلغ الشحن",
+    "quickPresetsLabel": "مبالغ شائعة",
+    "minMaxNotice": "الحد الأدنى: ١٠ ج.م • الحد الأقصى: ١٠٠,٠٠٠ ج.م",
+    "summaryAmount": "مبلغ الشحن",
+    "summaryTotal": "الإجمالي المستحق للدفع",
+    "submitButton": "متابعة الدفع عبر Paymob",
+    "processing": "جارٍ تجهيز جلسة الدفع...",
+    "redirecting": "جارٍ تحويلك بأمان إلى بوابة Paymob...",
+    "gatewayTitle": "بوابة الدفع الإلكتروني الموحدة",
+    "gatewaySubtitle": "مدعوم ومعتمد رسمياً من البنك المركزي المصري عبر Paymob",
+    "instantDeposit": "فوري",
+    "securityNote1": "تشفير بنكي 256-bit بمعايير PCI-DSS العالمية",
+    "securityNote2": "يتم تحويلك مباشرة لصفحة الدفع المشفرة ولا يتم تخزين بيانات بطاقتك",
+    "errorNoUrl": "فشل في الحصول على رابط الدفع من البوابة",
+    "errorGeneric": "تعذر بدء عملية الدفع، يرجى المحاولة مرة أخرى",
+    "methods": {
+      "cards": "البطاقات البنكية",
+      "wallets": "المحافظ الإلكترونية",
+      "instapay": "إنستاباي"
+    }
+  },
+  "validation": {
+    "amountRequired": "يرجى إدخال مبلغ الإيداع",
+    "amountInvalid": "يرجى إدخال رقم صحيح",
+    "depositMin": "الحد الأدنى للشحن هو ١٠ ج.م",
+    "depositMax": "الحد الأقصى للشحن هو ١٠٠,٠٠٠ ج.م"
   }
 }

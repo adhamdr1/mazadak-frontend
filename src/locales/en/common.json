@@ -85,6 +85,7 @@
     "SERVICE_UNAVAILABLE": "Service temporarily unavailable — server is under maintenance",
     "NETWORK_ERROR": "Network connection failed — please check your internet connection",
     "VALIDATION_ERROR": "Validation error — please verify the submitted form fields",
+    "PAYMENT_CREATION_FAILED": "Unable to initiate payment at this time. Please try again later.",
     "UNKNOWN_ERROR": "An unexpected error occurred. Please try again"
   }
 }
