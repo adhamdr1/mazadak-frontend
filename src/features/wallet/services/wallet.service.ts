@@ -6,6 +6,9 @@ import type {
   RecentTransactionItem,
   InitializePaymentRequest,
   InitializePaymentResponse,
+  TransactionsPageData,
+  TransactionsFilterInput,
+  PaginationInput,
 } from '../types/wallet.types';
 
 // ==========================================
@@ -21,6 +24,27 @@ export const WALLET_FIELDS_FRAGMENT = `
     availableBalance
     createdAt
     updatedAt
+  }
+`;
+
+export const TRANSACTION_FIELDS_FRAGMENT = `
+  fragment TransactionFields on Transaction {
+    _id
+    walletId
+    type
+    amount
+    currency
+    status
+    referenceId
+    idempotencyKey
+    gatewayPaymentIntentId
+    gatewayTransactionId
+    gatewayProvider
+    referenceType
+    expiresAt
+    hasChild
+    walletCredited
+    createdAt
   }
 `;
 
@@ -46,6 +70,20 @@ export const RECENT_TRANSACTIONS_QUERY = `
         createdAt
       }
       total
+    }
+  }
+`;
+
+export const MY_TRANSACTIONS_QUERY = `
+  ${TRANSACTION_FIELDS_FRAGMENT}
+  query MyTransactions($input: PaginationInput, $filter: TransactionsFilterInput) {
+    myTransactions(input: $input, filter: $filter) {
+      items {
+        ...TransactionFields
+      }
+      total
+      totalPages
+      hasNextPage
     }
   }
 `;
@@ -79,6 +117,23 @@ export const walletService = {
     const data = await executeGraphQL<{
       myTransactions: { items: RecentTransactionItem[]; total: number };
     }>(RECENT_TRANSACTIONS_QUERY);
+    return data.myTransactions;
+  },
+
+  /**
+   * Fetches full paginated and filtered transactions history
+   */
+  async getMyTransactions(
+    input: PaginationInput = { page: 1, limit: 10 },
+    filter?: TransactionsFilterInput
+  ): Promise<TransactionsPageData> {
+    const data = await executeGraphQL<{ myTransactions: TransactionsPageData }>(
+      MY_TRANSACTIONS_QUERY,
+      {
+        input,
+        filter: filter || null,
+      }
+    );
     return data.myTransactions;
   },
 

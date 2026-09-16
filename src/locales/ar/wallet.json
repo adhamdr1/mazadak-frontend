@@ -16,7 +16,8 @@
     "withdraw": "سحب الرصيد",
     "transactions": "سجل المعاملات",
     "statement": "سجل المعاملات",
-    "refresh": "تحديث البيانات"
+    "refresh": "تحديث البيانات",
+    "details": "التفاصيل"
   },
   "transactionTypes": {
     "DEPOSIT": "إيداع",
@@ -40,6 +41,54 @@
     "emptyTitle": "لا توجد معاملات حديثة",
     "emptyDescription": "لم تقم بأي عمليات مالية حتى الآن. عند شحن رصيدك أو المزايدة ستظهر معاملاتك هنا.",
     "depositButton": "شحن الرصيد الآن"
+  },
+  "transactions": {
+    "pageTitle": "سجل المعاملات المالية",
+    "pageSubtitle": "عرض وتتبع كافة الحركات المالية والإيداعات وسجل الحجوزات والسحوبات",
+    "backToWallet": "العودة للمحفظة",
+    "filters": {
+      "title": "تصفية المعاملات",
+      "allTypes": "جميع الأنواع",
+      "allStatuses": "جميع الحالات",
+      "type": "نوع المعاملة",
+      "status": "حالة المعاملة",
+      "startDate": "من تاريخ",
+      "endDate": "إلى تاريخ",
+      "reset": "إعادة ضبط الفلاتر",
+      "clearDate": "مسح التاريخ"
+    },
+    "table": {
+      "type": "النوع",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "date": "التاريخ والوقت",
+      "reference": "رقم المعاملة",
+      "actions": "التفاصيل"
+    },
+    "detailsModal": {
+      "title": "تفاصيل المعاملة المالية",
+      "transactionId": "رقم المعاملة",
+      "date": "تاريخ وتوقيت العملية",
+      "gatewayProvider": "مزود بوابة الدفع",
+      "gatewayId": "معرّف عملية البوابة",
+      "reference": "المرجع المرتبط",
+      "goToAuction": "عرض المزاد المرتبط",
+      "goToEscrow": "عرض صفقة الضمان",
+      "copy": "نسخ",
+      "close": "إغلاق النافذة"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "pageOf": "صفحة {{current}} من {{total}}",
+      "showing": "عرض {{from}} إلى {{to}} من إجمالي {{total}} معاملة"
+    },
+    "emptyState": {
+      "title": "لا توجد معاملات مطابقة",
+      "description": "لم تقم بأي عمليات مالية حتى الآن. عند شحن رصيدك أو المزايدة ستظهر معاملاتك هنا.",
+      "filteredDescription": "لم نتمكن من العثور على أي معاملات تطابق معايير الفلترة المحددة.",
+      "clearFilters": "مسح الفلاتر"
+    }
   },
   "notifications": {
     "depositSuccessTitle": "تم الشحن بنجاح!",

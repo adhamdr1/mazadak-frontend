@@ -71,13 +71,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         className
       )}
     >
-      {/* Icon with Ambient Glow */}
+      {/* Icon */}
       <div className="relative mb-4 flex items-center justify-center">
-        <div className="absolute inset-0 rounded-full bg-amber-500/10 dark:bg-amber-500/15 blur-lg transform scale-125" />
         <div
           className={cn(
             'relative flex items-center justify-center rounded-2xl',
-            'bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700/60',
+            'bg-slate-100 dark:bg-slate-800/80 shadow-2xs border border-slate-200/60 dark:border-slate-700/60',
             sizeStyles.iconWrapper
           )}
         >

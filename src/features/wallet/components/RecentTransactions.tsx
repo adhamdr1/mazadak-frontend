@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -7,129 +7,68 @@ import {
   Lock,
   Unlock,
   RotateCcw,
-  CheckCircle2,
+  Gavel,
   ChevronLeft,
   ChevronRight,
   Receipt,
 } from 'lucide-react';
 import { useRecentTransactions } from '../hooks/useRecentTransactions';
+import { TransactionStatusBadge } from './TransactionStatusBadge';
+import { TransactionDetailsModal } from './TransactionDetailsModal';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { ROUTES } from '@/constants/routes.constants';
 import { formatPrice, formatRelativeTime } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
+import {
+  type Transaction,
+  type TransactionType,
+  type TransactionStatus,
+  getTransactionAmountConfig,
+} from '../types/wallet.types';
 
 export const RecentTransactions: React.FC = () => {
   const { t, i18n } = useTranslation(['wallet']);
   const isRTL = i18n.language.startsWith('ar');
   const { transactions, isLoading } = useRecentTransactions();
+  const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
 
-  const getTypeDetails = (type: string) => {
-    const upperType = type.toUpperCase();
-    const label = t(`wallet:transactionTypes.${upperType}`, upperType);
-
+  const getTypeIconConfig = (type: string) => {
+    const upperType = type.toUpperCase() as TransactionType;
     switch (upperType) {
       case 'DEPOSIT':
         return {
           icon: <ArrowDownLeft className="h-4 w-4" />,
-          color: 'text-emerald-600 dark:text-emerald-400',
-          bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500/20',
-          prefix: '+',
-          label,
+          bg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
         };
       case 'WITHDRAW':
         return {
           icon: <ArrowUpRight className="h-4 w-4" />,
-          color: 'text-rose-600 dark:text-rose-400',
-          bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-500/20',
-          prefix: '-',
-          label,
+          bg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
         };
       case 'HOLD':
         return {
           icon: <Lock className="h-4 w-4" />,
-          color: 'text-amber-600 dark:text-amber-400',
-          bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-500/20',
-          prefix: '',
-          label,
+          bg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
         };
       case 'RELEASE':
         return {
           icon: <Unlock className="h-4 w-4" />,
-          color: 'text-emerald-600 dark:text-emerald-400',
-          bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500/20',
-          prefix: '+',
-          label,
+          bg: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+        };
+      case 'CAPTURE':
+        return {
+          icon: <Gavel className="h-4 w-4" />,
+          bg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
         };
       case 'REFUND':
         return {
           icon: <RotateCcw className="h-4 w-4" />,
-          color: 'text-blue-600 dark:text-blue-400',
-          bg: 'bg-blue-50 dark:bg-blue-950/40 border-blue-500/20',
-          prefix: '+',
-          label,
-        };
-      case 'CAPTURE':
-        return {
-          icon: <CheckCircle2 className="h-4 w-4" />,
-          color: 'text-indigo-600 dark:text-indigo-400',
-          bg: 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500/20',
-          prefix: '-',
-          label,
+          bg: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
         };
       default:
         return {
           icon: <Receipt className="h-4 w-4" />,
-          color: 'text-slate-600 dark:text-slate-400',
-          bg: 'bg-slate-50 dark:bg-slate-800 border-slate-700/20',
-          prefix: '',
-          label: type,
-        };
-    }
-  };
-
-  const getStatusDetails = (status: string) => {
-    const upperStatus = (status || 'PENDING').toUpperCase();
-    const label = t(`wallet:transactionStatuses.${upperStatus}`, upperStatus);
-
-    switch (upperStatus) {
-      case 'SUCCESS':
-        return {
-          label,
-          badgeBg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
-          dotBg: 'bg-emerald-500',
-          isCompleted: true,
-          isPending: false,
-          isFailed: false,
-        };
-      case 'PROCESSING':
-        return {
-          label,
-          badgeBg: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-500/20',
-          dotBg: 'bg-indigo-500 animate-pulse',
-          isCompleted: false,
-          isPending: true,
-          isFailed: false,
-        };
-      case 'PENDING':
-        return {
-          label,
-          badgeBg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-500/20',
-          dotBg: 'bg-amber-500 animate-pulse',
-          isCompleted: false,
-          isPending: true,
-          isFailed: false,
-        };
-      case 'FAILED':
-      case 'CANCELLED':
-      case 'EXPIRED':
-      default:
-        return {
-          label,
-          badgeBg: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-500/20',
-          dotBg: 'bg-rose-500',
-          isCompleted: false,
-          isPending: false,
-          isFailed: true,
+          bg: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
         };
     }
   };
@@ -180,47 +119,42 @@ export const RecentTransactions: React.FC = () => {
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
             {transactions.map((tx) => {
-              const typeDetails = getTypeDetails(tx.type);
-              const statusDetails = getStatusDetails(tx.status);
+              const iconConfig = getTypeIconConfig(tx.type);
+              const amountConfig = getTransactionAmountConfig(tx.type);
+              const typeLabel = t(`wallet:transactionTypes.${tx.type.toUpperCase()}`, tx.type);
 
-              // Amount styling logic based on transaction status:
-              // - Completed (SUCCESS): bold with positive/negative type color & prefix
-              // - Pending / Processing: neutral slate/amber without deceiving '+' prefix
-              // - Failed / Cancelled: line-through muted slate
-              let amountColorClass = typeDetails.color;
-              let amountPrefix = typeDetails.prefix;
+              const isFailedOrCancelled =
+                tx.status === 'FAILED' ||
+                tx.status === 'CANCELLED' ||
+                tx.status === 'EXPIRED';
 
-              if (statusDetails.isPending) {
-                amountColorClass = 'text-amber-700 dark:text-amber-400 font-bold';
-                amountPrefix = ''; // Do not display + to avoid falsely implying funds were added
-              } else if (statusDetails.isFailed) {
-                amountColorClass = 'text-slate-400 dark:text-slate-500';
-                amountPrefix = '';
-              }
+              const txObject: Transaction = {
+                _id: tx._id,
+                walletId: '',
+                type: tx.type as TransactionType,
+                amount: tx.amount,
+                currency: tx.currency,
+                status: tx.status as TransactionStatus,
+                referenceId: tx.referenceId,
+                createdAt: tx.createdAt,
+              };
 
               return (
                 <div
                   key={tx._id}
-                  className="flex items-center justify-between py-3.5 px-2 rounded-xl transition-colors hover:bg-slate-50/70 dark:hover:bg-slate-800/40"
+                  onClick={() => setSelectedTx(txObject)}
+                  className="flex items-center justify-between py-3.5 px-2 rounded-xl transition-colors hover:bg-slate-50/70 dark:hover:bg-slate-800/40 cursor-pointer group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn('p-2.5 rounded-xl border', typeDetails.bg, typeDetails.color)}>
-                      {typeDetails.icon}
+                    <div className={cn('p-2.5 rounded-xl border shrink-0', iconConfig.bg)}>
+                      {iconConfig.icon}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                          {typeDetails.label}
+                          {typeLabel}
                         </p>
-                        <span
-                          className={cn(
-                            'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border',
-                            statusDetails.badgeBg
-                          )}
-                        >
-                          <span className={cn('w-1.5 h-1.5 rounded-full', statusDetails.dotBg)} />
-                          {statusDetails.label}
-                        </span>
+                        <TransactionStatusBadge status={tx.status} size="sm" />
                       </div>
                       <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                         {formatRelativeTime(tx.createdAt, isRTL)}
@@ -230,20 +164,17 @@ export const RecentTransactions: React.FC = () => {
 
                   <div className={isRTL ? 'text-left' : 'text-right'}>
                     <p className="font-mono tracking-tight flex items-baseline justify-end gap-1">
-                      {amountPrefix && (
-                        <span className={cn('text-sm sm:text-base font-extrabold', amountColorClass)}>
-                          {amountPrefix}
+                      {amountConfig.sign && !isFailedOrCancelled && (
+                        <span className={cn('text-sm sm:text-base font-extrabold', amountConfig.textColor)}>
+                          {amountConfig.sign}
                         </span>
                       )}
                       <span
                         className={cn(
                           'font-mono',
-                          statusDetails.isFailed
-                            ? cn(
-                                'line-through text-slate-400 dark:text-slate-500 decoration-slate-400/80 dark:decoration-slate-500/80 decoration-[1.5px]',
-                                isRTL ? 'text-base sm:text-lg font-black tracking-wider' : 'text-sm sm:text-base font-medium'
-                              )
-                            : cn('text-sm sm:text-base font-extrabold', amountColorClass)
+                          isFailedOrCancelled
+                            ? 'line-through text-slate-400 dark:text-slate-500 decoration-slate-400/80 dark:decoration-slate-500/80 text-sm sm:text-base font-medium'
+                            : cn('text-sm sm:text-base font-extrabold', amountConfig.textColor)
                         )}
                       >
                         {formatPrice(tx.amount, isRTL)}
@@ -259,6 +190,15 @@ export const RecentTransactions: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Transaction Details Modal when clicking any recent transaction */}
+      <TransactionDetailsModal
+        transaction={selectedTx}
+        isOpen={Boolean(selectedTx)}
+        onClose={() => setSelectedTx(null)}
+      />
     </div>
   );
 };
+
+export default RecentTransactions;

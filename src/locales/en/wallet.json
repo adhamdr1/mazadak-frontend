@@ -14,16 +14,17 @@
   "actions": {
     "deposit": "Deposit",
     "withdraw": "Withdraw",
-    "transactions": "Transaction History",
-    "statement": "Transaction History",
-    "refresh": "Refresh Data"
+    "transactions": "Transactions",
+    "statement": "Transactions",
+    "refresh": "Refresh Data",
+    "details": "Details"
   },
   "transactionTypes": {
     "DEPOSIT": "Deposit",
     "WITHDRAW": "Withdrawal",
     "HOLD": "Bid Hold",
     "RELEASE": "Hold Released",
-    "CAPTURE": "Auction Settlement",
+    "CAPTURE": "Auction Payment",
     "REFUND": "Refund"
   },
   "transactionStatuses": {
@@ -40,6 +41,54 @@
     "emptyTitle": "No Recent Transactions",
     "emptyDescription": "You haven't made any financial transactions yet. Deposits and bids will appear here.",
     "depositButton": "Deposit Now"
+  },
+  "transactions": {
+    "pageTitle": "Transaction History",
+    "pageSubtitle": "Track and filter all your deposits, withdrawals, bid holds, and auction payments",
+    "backToWallet": "Back to Wallet",
+    "filters": {
+      "title": "Filter Transactions",
+      "allTypes": "All Types",
+      "allStatuses": "All Statuses",
+      "type": "Transaction Type",
+      "status": "Transaction Status",
+      "startDate": "From Date",
+      "endDate": "To Date",
+      "reset": "Reset Filters",
+      "clearDate": "Clear Date"
+    },
+    "table": {
+      "type": "Type",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date & Time",
+      "reference": "Transaction ID",
+      "actions": "Details"
+    },
+    "detailsModal": {
+      "title": "Transaction Details",
+      "transactionId": "Transaction ID",
+      "date": "Date & Time",
+      "gatewayProvider": "Payment Provider",
+      "gatewayId": "Gateway Reference ID",
+      "reference": "Linked Reference",
+      "goToAuction": "View Auction",
+      "goToEscrow": "View Escrow Deal",
+      "copy": "Copy",
+      "close": "Close"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {{current}} of {{total}}",
+      "showing": "Showing {{from}} to {{to}} of {{total}} transactions"
+    },
+    "emptyState": {
+      "title": "No Transactions Found",
+      "description": "You haven't made any financial transactions yet. Deposits and bids will appear here.",
+      "filteredDescription": "No transactions matched your selected filters.",
+      "clearFilters": "Clear Filters"
+    }
   },
   "notifications": {
     "depositSuccessTitle": "Deposit Successful!",
