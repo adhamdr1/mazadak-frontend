@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-} from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useAuctions } from '../hooks/useAuctions';
 import { useAuctionCreatedSubscription } from '../hooks/useAuctionCreatedSubscription';
 import { CategoryPillNav } from '../components/browse/CategoryPillNav';
@@ -12,8 +8,8 @@ import { AuctionFilterBar } from '../components/browse/AuctionFilterBar';
 import { AuctionSortDropdown } from '../components/browse/AuctionSortDropdown';
 import { AuctionGrid } from '../components/browse/AuctionGrid';
 import { NewAuctionsBanner } from '../components/browse/NewAuctionsBanner';
-import { Button } from '@/components/common/Button';
 import { Alert } from '@/components/common/Alert';
+import { Pagination } from '@/components/common/Pagination';
 import { toLocalizedDigits } from '@/utils/formatters';
 
 export const AuctionListPage: React.FC = () => {
@@ -131,36 +127,16 @@ export const AuctionListPage: React.FC = () => {
       </section>
 
       {/* Pagination Navigation */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-6 border-t border-slate-200 dark:border-slate-800">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1 || isLoading}
-            onClick={() => actions.setPage(page - 1)}
-            leftIcon={isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          >
-            {t('browse.prevPage')}
-          </Button>
-
-          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-            {t('browse.page', {
-              current: isRTL ? toLocalizedDigits(page, true) : page,
-              total: isRTL ? toLocalizedDigits(totalPages, true) : totalPages,
-            })}
-          </span>
-
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!hasNextPage || page >= totalPages || isLoading}
-            onClick={() => actions.setPage(page + 1)}
-            rightIcon={isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          >
-            {t('browse.nextPage')}
-          </Button>
-        </div>
-      )}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        limit={12}
+        hasNextPage={hasNextPage}
+        hasPreviousPage={page > 1}
+        onPageChange={actions.setPage}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

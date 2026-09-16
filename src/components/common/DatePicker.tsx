@@ -10,12 +10,15 @@ import {
 import { normalizeArabicDigits, toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 
-export interface CustomDateInputProps {
-  label: string;
+export interface DatePickerProps {
+  label?: string;
   value?: string; // YYYY-MM-DD
   min?: string; // YYYY-MM-DD
   max?: string; // YYYY-MM-DD
   onChange: (value?: string) => void;
+  placeholder?: string;
+  error?: string;
+  disabled?: boolean;
   className?: string;
 }
 
@@ -90,15 +93,18 @@ const parseInputToIso = (text: string): string | null => {
   return null;
 };
 
-export const CustomDateInput: React.FC<CustomDateInputProps> = ({
+export const DatePicker: React.FC<DatePickerProps> = ({
   label,
   value,
   min,
   max,
   onChange,
+  placeholder,
+  error,
+  disabled = false,
   className,
 }) => {
-  const { i18n } = useTranslation('wallet');
+  const { i18n } = useTranslation('common');
   const isRTL = i18n.language?.startsWith('ar');
 
   // Lock future dates: effectiveMax is capped at today unless otherwise restricted
@@ -169,19 +175,74 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
     }
   }, [value, isInputFocused, formatDisplayDate]);
 
-  // Available years for fast jump (2018 to current year)
+  // Available years for fast jump (bounded strictly between effectiveMin and effectiveMax)
   const currentYearNum = new Date().getFullYear();
   const availableYears = useMemo(() => {
     const years: number[] = [];
-    const startYear = effectiveMin ? parseInt(effectiveMin.slice(0, 4), 10) : 2018;
-    for (let y = currentYearNum; y >= Math.min(startYear, 2018); y--) {
+    const minYear = effectiveMin ? parseInt(effectiveMin.slice(0, 4), 10) : 2020;
+    const maxYear = effectiveMax ? parseInt(effectiveMax.slice(0, 4), 10) : currentYearNum;
+    for (let y = maxYear; y >= minYear; y--) {
       years.push(y);
     }
     return years;
-  }, [effectiveMin, currentYearNum]);
+  }, [effectiveMin, effectiveMax, currentYearNum]);
+
+  // Boundaries for month navigation
+  const canGoPrevMonth = useMemo(() => {
+    if (!effectiveMin) return true;
+    const [minY, minM] = effectiveMin.split('-').map(Number);
+    if (viewYear < minY) return false;
+    if (viewYear === minY && viewMonth <= minM - 1) return false;
+    return true;
+  }, [effectiveMin, viewYear, viewMonth]);
+
+  const canGoNextMonth = useMemo(() => {
+    if (!effectiveMax) return true;
+    const [maxY, maxM] = effectiveMax.split('-').map(Number);
+    if (viewYear > maxY) return false;
+    if (viewYear === maxY && viewMonth >= maxM - 1) return false;
+    return true;
+  }, [effectiveMax, viewYear, viewMonth]);
+
+  // Helper to check if a month in the month picker grid is disabled
+  const isMonthDisabled = useCallback(
+    (monthIdx: number) => {
+      if (effectiveMin) {
+        const [minY, minM] = effectiveMin.split('-').map(Number);
+        if (viewYear < minY) return true;
+        if (viewYear === minY && monthIdx < minM - 1) return true;
+      }
+      if (effectiveMax) {
+        const [maxY, maxM] = effectiveMax.split('-').map(Number);
+        if (viewYear > maxY) return true;
+        if (viewYear === maxY && monthIdx > maxM - 1) return true;
+      }
+      return false;
+    },
+    [effectiveMin, effectiveMax, viewYear]
+  );
+
+  // Clamp view to effectiveMin / effectiveMax if current view is out of bounds
+  useEffect(() => {
+    if (effectiveMin) {
+      const [minY, minM] = effectiveMin.split('-').map(Number);
+      if (viewYear < minY || (viewYear === minY && viewMonth < minM - 1)) {
+        setViewYear(minY);
+        setViewMonth(minM - 1);
+      }
+    }
+    if (effectiveMax) {
+      const [maxY, maxM] = effectiveMax.split('-').map(Number);
+      if (viewYear > maxY || (viewYear === maxY && viewMonth > maxM - 1)) {
+        setViewYear(maxY);
+        setViewMonth(maxM - 1);
+      }
+    }
+  }, [effectiveMin, effectiveMax, viewYear, viewMonth]);
 
   const handlePrevMonth = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!canGoPrevMonth) return;
     if (viewMonth === 0) {
       setViewMonth(11);
       setViewYear((prev) => prev - 1);
@@ -192,6 +253,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
 
   const handleNextMonth = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!canGoNextMonth) return;
     if (viewMonth === 11) {
       setViewMonth(0);
       setViewYear((prev) => prev + 1);
@@ -287,18 +349,25 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
   const PrevIcon = isRTL ? ChevronRight : ChevronLeft;
   const NextIcon = isRTL ? ChevronLeft : ChevronRight;
 
+  const defaultPlaceholder = isRTL ? 'يوم / شهر / سنة' : 'DD / MM / YYYY';
+
   return (
     <div ref={containerRef} className={cn('relative space-y-1.5 text-start', className)}>
-      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-        {label}
-      </label>
+      {label && (
+        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+          {label}
+        </label>
+      )}
 
       {/* Input Field with Calendar Trigger & Clear */}
       <div
         className={cn(
           'relative w-full flex items-center justify-between rounded-xl border text-xs font-semibold transition-all duration-150 shadow-2xs',
           'bg-white dark:bg-slate-900',
-          isOpen || isInputFocused
+          disabled && 'opacity-50 pointer-events-none',
+          error
+            ? 'border-rose-500 ring-2 ring-rose-500/20'
+            : isOpen || isInputFocused
             ? 'border-amber-500 ring-2 ring-amber-500/20 dark:border-amber-500'
             : value
             ? 'border-amber-500/70 dark:border-amber-500/50 text-slate-900 dark:text-slate-100'
@@ -308,6 +377,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
         {/* Calendar Icon Button */}
         <button
           type="button"
+          disabled={disabled}
           onClick={() => {
             setIsOpen((prev) => !prev);
             setViewMode('days');
@@ -322,6 +392,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
         <input
           ref={inputRef}
           type="text"
+          disabled={disabled}
           value={typedText}
           onChange={handleInputChange}
           onFocus={() => {
@@ -330,12 +401,12 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
             setViewMode('days');
           }}
           onBlur={handleInputBlur}
-          placeholder={isRTL ? 'يوم / شهر / سنة' : 'DD / MM / YYYY'}
+          placeholder={placeholder || defaultPlaceholder}
           className="w-full py-2 px-1 text-xs font-mono font-semibold bg-transparent text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:outline-none"
         />
 
         {/* Clear Button (only when value or text exists) */}
-        {(value || typedText) && (
+        {(value || typedText) && !disabled && (
           <button
             type="button"
             onClick={handleClear}
@@ -347,8 +418,11 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
         )}
       </div>
 
+      {/* Error Message if provided */}
+      {error && <p className="text-[11px] font-semibold text-rose-500 pt-0.5">{error}</p>}
+
       {/* Custom Popup Calendar */}
-      {isOpen && (
+      {isOpen && !disabled && (
         <div
           className={cn(
             'absolute z-50 mt-1.5 inset-x-0 sm:w-80 p-3.5 rounded-2xl select-none',
@@ -363,8 +437,14 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
               <>
                 <button
                   type="button"
+                  disabled={!canGoPrevMonth}
                   onClick={handlePrevMonth}
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                  className={cn(
+                    'p-1.5 rounded-lg transition-colors shrink-0',
+                    !canGoPrevMonth
+                      ? 'text-slate-300 dark:text-slate-700 cursor-default opacity-30'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer'
+                  )}
                   title={isRTL ? 'الشهر السابق' : 'Previous Month'}
                 >
                   <PrevIcon className="w-4 h-4" />
@@ -395,8 +475,14 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
 
                 <button
                   type="button"
+                  disabled={!canGoNextMonth}
                   onClick={handleNextMonth}
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                  className={cn(
+                    'p-1.5 rounded-lg transition-colors shrink-0',
+                    !canGoNextMonth
+                      ? 'text-slate-300 dark:text-slate-700 cursor-default opacity-30'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer'
+                  )}
                   title={isRTL ? 'الشهر التالي' : 'Next Month'}
                 >
                   <NextIcon className="w-4 h-4" />
@@ -480,7 +566,7 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
                         isSelected
                           ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
                           : isDisabled
-                          ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-40'
+                          ? 'text-slate-300 dark:text-slate-700 cursor-default opacity-40'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white cursor-pointer'
                       )}
                     >
@@ -492,13 +578,27 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
 
               {/* Footer Quick Action Buttons */}
               <div className="pt-2.5 mt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                <button
-                  type="button"
-                  onClick={handleSelectToday}
-                  className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
-                >
-                  {isRTL ? 'اليوم' : 'Today'}
-                </button>
+                {(() => {
+                  const isTodayDisabled = Boolean(
+                    (effectiveMin && todayStr < effectiveMin) ||
+                    (effectiveMax && todayStr > effectiveMax)
+                  );
+                  return (
+                    <button
+                      type="button"
+                      disabled={isTodayDisabled}
+                      onClick={handleSelectToday}
+                      className={cn(
+                        'text-[11px] font-bold transition-colors',
+                        isTodayDisabled
+                          ? 'text-slate-300 dark:text-slate-700 cursor-default opacity-30'
+                          : 'text-amber-600 dark:text-amber-400 hover:underline cursor-pointer'
+                      )}
+                    >
+                      {isRTL ? 'اليوم' : 'Today'}
+                    </button>
+                  );
+                })()}
 
                 {value && (
                   <button
@@ -518,19 +618,24 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
             <div className="grid grid-cols-3 gap-2 py-1">
               {months.map((mName, idx) => {
                 const isCurrentMonth = viewMonth === idx;
+                const isDisabled = isMonthDisabled(idx);
                 return (
                   <button
                     key={idx}
                     type="button"
+                    disabled={isDisabled}
                     onClick={() => {
+                      if (isDisabled) return;
                       setViewMonth(idx);
                       setViewMode('days');
                     }}
                     className={cn(
-                      'py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer select-none text-center',
+                      'py-2 px-2 rounded-xl text-xs font-bold transition-all select-none text-center',
                       isCurrentMonth
                         ? 'bg-amber-500 text-slate-950 shadow-xs'
-                        : 'bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 hover:bg-amber-500/15 hover:text-amber-600 dark:hover:text-amber-400'
+                        : isDisabled
+                        ? 'text-slate-300 dark:text-slate-700 cursor-default opacity-30 bg-slate-50/50 dark:bg-slate-800/30'
+                        : 'bg-slate-50 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 hover:bg-amber-500/15 hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer'
                     )}
                   >
                     {mName}
@@ -572,4 +677,4 @@ export const CustomDateInput: React.FC<CustomDateInputProps> = ({
   );
 };
 
-export default CustomDateInput;
+export default DatePicker;

@@ -11,8 +11,8 @@ import { useTransactions } from '../hooks/useTransactions';
 import { TransactionFilterBar } from '../components/TransactionFilterBar';
 import { TransactionRow } from '../components/TransactionRow';
 import { TransactionsSkeleton } from '../components/TransactionsSkeleton';
-import { TransactionsPagination } from '../components/TransactionsPagination';
 import { TransactionDetailsModal } from '../components/TransactionDetailsModal';
+import { Pagination } from '@/components/common/Pagination';
 import { Button } from '@/components/common/Button';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { ROUTES } from '@/constants/routes.constants';
@@ -194,7 +194,7 @@ export const TransactionsPage: React.FC = () => {
             </div>
 
             {/* Pagination Controls */}
-            <TransactionsPagination
+            <Pagination
               page={page}
               totalPages={totalPages}
               total={total}

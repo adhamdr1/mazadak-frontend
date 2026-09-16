@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Filter,
@@ -8,7 +8,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { CustomSelect, type CustomSelectOption } from '@/components/common/CustomSelect';
-import { CustomDateInput } from './CustomDateInput';
+import { DatePicker } from '@/components/common/DatePicker';
+import { useAuth } from '@/hooks/useAuth';
+import { useWallet } from '../hooks/useWallet';
 import type { TransactionType, TransactionStatus } from '../types/wallet.types';
 
 export interface TransactionFilterBarProps {
@@ -37,6 +39,15 @@ export const TransactionFilterBar: React.FC<TransactionFilterBarProps> = ({
   className,
 }) => {
   const { t } = useTranslation('wallet');
+  const { user } = useAuth();
+  const { wallet } = useWallet();
+
+  // Bound earliest selectable date to user account creation date (or wallet creation date)
+  const userMinDate = useMemo(() => {
+    const raw = user?.createdAt || wallet?.createdAt;
+    if (!raw) return undefined;
+    return raw.slice(0, 10);
+  }, [user?.createdAt, wallet?.createdAt]);
 
   // Type Options
   const typeOptions: CustomSelectOption<string>[] = [
@@ -143,18 +154,19 @@ export const TransactionFilterBar: React.FC<TransactionFilterBarProps> = ({
         </div>
 
         {/* 3. Start Date Picker (DD/MM/YYYY) */}
-        <CustomDateInput
+        <DatePicker
           label={t('transactions.filters.startDate')}
           value={startDate}
+          min={userMinDate}
           max={endDate}
           onChange={handleStartDateChange}
         />
 
         {/* 4. End Date Picker (DD/MM/YYYY) */}
-        <CustomDateInput
+        <DatePicker
           label={t('transactions.filters.endDate')}
           value={endDate}
-          min={startDate}
+          min={startDate || userMinDate}
           onChange={handleEndDateChange}
         />
       </div>

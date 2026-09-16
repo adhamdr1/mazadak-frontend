@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   PlusCircle,
-  ChevronRight,
-  ChevronLeft,
   Gavel,
   PackageOpen,
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
+import { Pagination } from '@/components/common/Pagination';
 import { MyAuctionsStats } from '../components/my-auctions/MyAuctionsStats';
 import { MyAuctionsFilterBar } from '../components/my-auctions/MyAuctionsFilterBar';
 import { MyAuctionCard } from '../components/my-auctions/MyAuctionCard';
@@ -17,12 +16,9 @@ import { useMyAuctions } from '../hooks/useMyAuctions';
 import { useCancelAuction } from '../hooks/useCancelAuction';
 import { ROUTES } from '@/constants/routes.constants';
 import type { Auction } from '../types/auctions.types';
-import { toLocalizedDigits } from '@/utils/formatters';
 
 export const MyAuctionsPage: React.FC = () => {
-  const { t, i18n } = useTranslation(['auctions', 'common']);
-  const isRTL = i18n.language?.startsWith('ar');
-  const ChevronIcon = isRTL ? ChevronLeft : ChevronRight;
+  const { t } = useTranslation(['auctions', 'common']);
 
   const [auctionToCancel, setAuctionToCancel] = useState<Auction | null>(null);
 
@@ -32,6 +28,7 @@ export const MyAuctionsPage: React.FC = () => {
     categoryFilter,
     searchQuery,
     page,
+    limit,
     auctions,
     total,
     totalPages,
@@ -205,43 +202,14 @@ export const MyAuctionsPage: React.FC = () => {
             </div>
 
             {/* 6. Pagination */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200 dark:border-slate-800 text-xs">
-                <span className="text-slate-500 dark:text-slate-400">
-                  {t('explore.showingResults', {
-                    current: isRTL ? toLocalizedDigits(auctions.length, true) : auctions.length,
-                    total: isRTL ? toLocalizedDigits(total, true) : total,
-                  })}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => setPage(page - 1)}
-                    leftIcon={<ChevronIcon className="w-3.5 h-3.5" />}
-                  >
-                    {t('explore.prevPage')}
-                  </Button>
-
-                  <span className="font-semibold px-2 text-slate-700 dark:text-slate-300">
-                    {isRTL ? toLocalizedDigits(page, true) : page} /{' '}
-                    {isRTL ? toLocalizedDigits(totalPages, true) : totalPages}
-                  </span>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= totalPages}
-                    onClick={() => setPage(page + 1)}
-                    rightIcon={<ChevronIcon className="w-3.5 h-3.5" />}
-                  >
-                    {t('explore.nextPage')}
-                  </Button>
-                </div>
-              </div>
-            )}
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              limit={limit}
+              onPageChange={setPage}
+              isLoading={isLoading}
+            />
           </div>
         )}
       </Card>

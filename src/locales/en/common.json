@@ -87,5 +87,11 @@
     "VALIDATION_ERROR": "Validation error — please verify the submitted form fields",
     "PAYMENT_CREATION_FAILED": "Unable to initiate payment at this time. Please try again later.",
     "UNKNOWN_ERROR": "An unexpected error occurred. Please try again"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{current}} of {{total}}",
+    "showing": "Showing {{from}} to {{to}} of {{total}}"
   }
 }

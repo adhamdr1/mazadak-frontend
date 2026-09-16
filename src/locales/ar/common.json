@@ -87,5 +87,11 @@
     "VALIDATION_ERROR": "يوجد خطأ في صحة البيانات المدخلة",
     "PAYMENT_CREATION_FAILED": "تعذر بدء عملية الدفع حالياً. يرجى المحاولة مرة أخرى لاحقاً.",
     "UNKNOWN_ERROR": "حدث خطأ غير متوقع، يرجى المحاولة لاحقاً"
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "pageOf": "صفحة {{current}} من {{total}}",
+    "showing": "عرض {{from}} إلى {{to}} من إجمالي {{total}}"
   }
 }
