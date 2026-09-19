@@ -117,6 +117,74 @@ export interface WithdrawInput {
   amount: number;
 }
 
+export type PayoutMethod =
+  | 'VODAFONE_CASH'
+  | 'ORANGE_CASH'
+  | 'ETISALAT_CASH'
+  | 'WE_PAY'
+  | 'INSTAPAY'
+  | 'BANK_ACCOUNT';
+
+export type WithdrawalStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'COMPLETED'
+  | 'REJECTED'
+  | 'CANCELLED';
+
+export interface PayoutDetailsInput {
+  bankName?: string;
+  accountHolderName?: string;
+  accountNumber?: string;
+  iban?: string;
+  phoneNumber?: string;
+  ipaAddress?: string;
+}
+
+export interface PayoutDetails {
+  bankName?: string | null;
+  accountHolderName?: string | null;
+  accountNumber?: string | null;
+  iban?: string | null;
+  phoneNumber?: string | null;
+  ipaAddress?: string | null;
+}
+
+export interface RequestWithdrawalInput {
+  amount: number;
+  payoutMethod: PayoutMethod;
+  payoutDetails: PayoutDetailsInput;
+}
+
+export interface WithdrawalFeePreview {
+  requestedAmount: string;
+  fee: string;
+  feePercentage: number;
+  netAmount: string;
+  maxAllowed: number;
+  estimatedDelivery: string;
+}
+
+export interface WithdrawalResponse {
+  _id: string;
+  userId: string;
+  amount: string;
+  fee: string;
+  feePercentage: number;
+  netAmount: string;
+  currency: string;
+  payoutMethod: PayoutMethod;
+  status: WithdrawalStatus;
+  payoutDetails?: PayoutDetails | null;
+  rejectionReason?: string | null;
+  receiptUrl?: string | null;
+  adminReference?: string | null;
+  createdAt: string;
+  processedAt?: string | null;
+  completedAt?: string | null;
+  updatedAt?: string;
+}
+
 /**
  * Returns type-specific amount styling and signs matching TransactionTypeBadge
  */

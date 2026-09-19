@@ -9,6 +9,10 @@ import type {
   TransactionsPageData,
   TransactionsFilterInput,
   PaginationInput,
+  PayoutMethod,
+  RequestWithdrawalInput,
+  WithdrawalFeePreview,
+  WithdrawalResponse,
 } from '../types/wallet.types';
 
 // ==========================================
@@ -97,6 +101,44 @@ export const WALLET_UPDATED_SUBSCRIPTION = `
   }
 `;
 
+export const WITHDRAWAL_FEE_PREVIEW_QUERY = `
+  query WithdrawalFeePreview($amount: Float!, $payoutMethod: PayoutMethod!) {
+    withdrawalFeePreview(amount: $amount, payoutMethod: $payoutMethod) {
+      requestedAmount
+      fee
+      feePercentage
+      netAmount
+      maxAllowed
+      estimatedDelivery
+    }
+  }
+`;
+
+export const REQUEST_WITHDRAWAL_MUTATION = `
+  mutation RequestWithdrawal($input: RequestWithdrawalInput!) {
+    requestWithdrawal(input: $input) {
+      _id
+      userId
+      amount
+      fee
+      feePercentage
+      netAmount
+      currency
+      payoutMethod
+      status
+      payoutDetails {
+        bankName
+        accountHolderName
+        accountNumber
+        iban
+        phoneNumber
+        ipaAddress
+      }
+      createdAt
+    }
+  }
+`;
+
 // ==========================================
 // Wallet Service Implementation
 // ==========================================
@@ -108,6 +150,31 @@ export const walletService = {
   async getMyWallet(): Promise<WalletData> {
     const data = await executeGraphQL<{ myWallet: WalletData }>(MY_WALLET_QUERY);
     return data.myWallet;
+  },
+
+  /**
+   * Fetches fee preview and delivery estimates for withdrawal
+   */
+  async getWithdrawalFeePreview(
+    amount: number,
+    payoutMethod: PayoutMethod
+  ): Promise<WithdrawalFeePreview> {
+    const data = await executeGraphQL<{ withdrawalFeePreview: WithdrawalFeePreview }>(
+      WITHDRAWAL_FEE_PREVIEW_QUERY,
+      { amount, payoutMethod }
+    );
+    return data.withdrawalFeePreview;
+  },
+
+  /**
+   * Submits a new withdrawal request (hold and pending process)
+   */
+  async requestWithdrawal(input: RequestWithdrawalInput): Promise<WithdrawalResponse> {
+    const data = await executeGraphQL<{ requestWithdrawal: WithdrawalResponse }>(
+      REQUEST_WITHDRAWAL_MUTATION,
+      { input }
+    );
+    return data.requestWithdrawal;
   },
 
   /**

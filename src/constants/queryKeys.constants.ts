@@ -19,6 +19,11 @@ export const QUERY_KEYS = {
   WALLET: {
     MY_WALLET: ['wallet', 'my'] as const,
     TRANSACTIONS: ['wallet', 'transactions'] as const,
+    FEE_PREVIEW: (amount: number, method: string) =>
+      ['wallet', 'fee-preview', amount, method] as const,
+    MY_WITHDRAWALS: (page?: number, filter?: Record<string, unknown>) =>
+      ['wallet', 'withdrawals', page, filter] as const,
+    WITHDRAWAL_DETAIL: (id: string) => ['wallet', 'withdrawal', id] as const,
   },
   ESCROW: {
     MY_ESCROWS: ['escrow', 'my'] as const,

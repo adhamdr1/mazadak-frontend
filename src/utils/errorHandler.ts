@@ -216,7 +216,7 @@ export function resolveCanonicalErrorCode(raw: string): string | null {
     return 'AUCTION_FORBIDDEN';
   }
 
-  // Wallet & Payments
+  // Wallet & Payments & Withdrawals
   if (
     lower.includes('payment creation failed') ||
     lower.includes('payment_creation_failed') ||
@@ -229,6 +229,24 @@ export function resolveCanonicalErrorCode(raw: string): string | null {
   }
   if (lower.includes('invalid payment provider') || lower.includes('invalid_provider')) {
     return 'INVALID_PAYMENT_PROVIDER';
+  }
+  if (lower.includes('invalid_payout_details') || lower.includes('invalid payout details')) {
+    return 'INVALID_PAYOUT_DETAILS';
+  }
+  if (lower.includes('withdrawal_below_minimum') || lower.includes('below minimum')) {
+    return 'WITHDRAWAL_BELOW_MINIMUM';
+  }
+  if (lower.includes('withdrawal_exceeds_max') || lower.includes('exceeds max')) {
+    return 'WITHDRAWAL_EXCEEDS_MAX';
+  }
+  if (lower.includes('daily_withdrawal_limit_reached') || lower.includes('daily withdrawal limit')) {
+    return 'DAILY_WITHDRAWAL_LIMIT_REACHED';
+  }
+  if (lower.includes('withdrawal_not_found') || lower.includes('withdrawal not found')) {
+    return 'WITHDRAWAL_NOT_FOUND';
+  }
+  if (lower.includes('withdrawal_not_cancellable') || lower.includes('cannot cancel withdrawal')) {
+    return 'WITHDRAWAL_NOT_CANCELLABLE';
   }
 
   // Auth Module

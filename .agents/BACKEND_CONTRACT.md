@@ -42,6 +42,7 @@ Authorization: Bearer <accessToken>
 * في المزايدات (`Bid`): `amount: String!`
 * في المزايدة التلقائية (`AutoBid`): `maxAmount: String!`
 * في المعاملات (`Transaction`): `amount: String!`
+* في طلبات السحب (`WithdrawalRequest`): `amount: String!`, `fee: String!`, `netAmount: String!`
 
 > **السبب وطريقة التعامل:**
 > يتم إرجاع المبالغ كـ `String` لحماية دقة الحسابات المالية (Decimal Precision) ومنع أخطاء الـ Floating Points.
@@ -801,7 +802,7 @@ query {
   myTransactions(
     input: { page: 1, limit: 10 }
     filter: {
-      type: DEPOSIT       # اختياري: DEPOSIT | WITHDRAW | HOLD | RELEASE | CAPTURE | REFUND
+      type: DEPOSIT       # اختياري: DEPOSIT | WITHDRAW | HOLD | RELEASE | CAPTURE | REFUND | ADMIN_CREDIT | ADMIN_DEBIT
       status: SUCCESS     # اختياري: PENDING | PROCESSING | SUCCESS | FAILED | CANCELLED | EXPIRED
       startDate: DateTime
       endDate: DateTime
@@ -1286,6 +1287,231 @@ mutation {
 
 ---
 
+## 13. Withdrawals & Financial Admin Module (نظام السحوبات والإدارة المالية)
+
+### أ) استعلامات ومعاملات المستخدم (User Endpoints)
+
+```graphql
+# 1. حساب العمولة والمبلغ الصافي والوقت المتوقع قبل تقديم الطلب (Public/Auth)
+query {
+  withdrawalFeePreview(amount: 5000, payoutMethod: INSTAPAY) {
+    requestedAmount    # "5000.00"
+    fee                # "100.00" (2%)
+    feePercentage      # 2
+    netAmount          # "4900.00"
+    maxAllowed         # 50000 (أو 10,000,000 للحساب البنكي)
+    estimatedDelivery  # "Within 24 business hours"
+  }
+}
+
+# 2. طلب سحب جديد (User Auth)
+mutation {
+  requestWithdrawal(input: {
+    amount: 5000
+    payoutMethod: INSTAPAY   # BANK_ACCOUNT | VODAFONE_CASH | ORANGE_CASH | ETISALAT_CASH | WE_PAY | INSTAPAY
+    payoutDetails: {
+      accountHolderName: "Adham Mohamed"
+      phoneNumber: "01012345678"
+      ipaAddress: "adham@instapay"
+    }
+  }) {
+    _id
+    amount
+    fee
+    netAmount
+    currency
+    payoutMethod
+    status        # PENDING
+    createdAt
+  }
+}
+
+# 3. إلغاء طلب السحب المعلق (User Auth)
+mutation {
+  cancelWithdrawal(id: "66123abc456def789") {
+    _id
+    status        # CANCELLED
+  }
+}
+
+# 4. عرض طلباتي مع الفلترة والترتيب (User Auth)
+query {
+  myWithdrawals(
+    pagination: { page: 1, limit: 10 }
+    filter: {
+      status: PENDING
+      payoutMethod: INSTAPAY
+      sortOrder: DESC
+    }
+  ) {
+    items {
+      _id
+      amount
+      fee
+      netAmount
+      status
+      payoutMethod
+      createdAt
+    }
+    total
+    totalPages
+    hasNextPage
+  }
+}
+
+# 5. متابعة التحديثات اللحظية لطلباتي (WebSocket Subscription)
+subscription {
+  myWithdrawalUpdated {
+    _id
+    status
+    rejectionReason
+    receiptUrl
+    adminReference
+    completedAt
+  }
+}
+```
+
+**الأخطاء المحتملة لطلبات السحب (User Operations):**
+| كود الخطأ | المعنى / سبب الحدوث |
+|:---|:---|
+| `INVALID_PAYOUT_DETAILS` | بيانات وسيلة السحب غير مكتملة (نقص رقم الحساب/IBAN للبنك، أو نقص IPA/الهاتف لانستاباي، أو نقص الهاتف للمحفظة) |
+| `WITHDRAWAL_BELOW_MINIMUM` | المبلغ المطلوب سحبه أقل من الحد الأدنى المسموح به (50 ج.م) |
+| `WITHDRAWAL_EXCEEDS_MAX_FOR_...` | المبلغ يتجاوز السقف المحدد للوسيلة (50,000 ج.م للمحافظ وانستاباي / 10,000,000 ج.م للحساب البنكي) |
+| `INSUFFICIENT_FUNDS` | الرصيد المتاح في المحفظة (الرصيد الكلي - الرصيد المحجوز) غير كافٍ لتغطية المبلغ |
+| `DAILY_WITHDRAWAL_LIMIT_REACHED` | تم استنفاد الحد اليومي (مسموح بطلب سحب نشط أو مكتمل واحد فقط يومياً حسب تقويم القاهرة `Africa/Cairo`) |
+| `WITHDRAWAL_NOT_FOUND` | طلب السحب غير موجود أو لا ينتمي للمستخدم الحالي |
+| `WITHDRAWAL_NOT_CANCELLABLE` | لا يمكن إلغاء الطلب لأنه لم يعد في حالة انتظار (`PENDING`)، حيث دخل حيز المعالجة أو اكتمل بالفعل |
+
+---
+
+### ب) استعلامات ومعاملات الأدمن المالي (Admin Financial Endpoints)
+
+> تتطلب صلاحية `role: ADMIN`.
+
+```graphql
+# 1. استعراض كافة طلبات السحب في النظام مع الفلترة
+query {
+  adminGetWithdrawals(
+    pagination: { page: 1, limit: 20 }
+    filter: {
+      status: PENDING
+      sortOrder: DESC
+    }
+  ) {
+    items {
+      _id
+      userId
+      amount
+      fee
+      netAmount
+      payoutMethod
+      payoutDetails {
+        accountHolderName
+        bankName
+        accountNumber
+        iban
+        phoneNumber
+        ipaAddress
+      }
+      status
+      createdAt
+    }
+    total
+  }
+}
+
+# 2. بدء معالجة الطلب (Lock to Admin)
+mutation {
+  adminStartWithdrawalProcessing(requestId: "66123abc456def789") {
+    _id
+    status        # PROCESSING
+    processedBy
+    processedAt
+  }
+}
+
+# 3. إتمام السحب وإرفاق بيانات وإيصال التحويل البنكي
+mutation {
+  adminCompleteWithdrawal(input: {
+    withdrawalId: "66123abc456def789"
+    adminReference: "CIB-TRX-987654321"
+    receiptUrl: "https://storage.mazadak.com/receipts/rec_98765.pdf"
+  }) {
+    _id
+    status                  # COMPLETED
+    adminReference
+    receiptUrl
+    completionTransactionId
+    completedAt
+  }
+}
+
+# 4. رفض طلب السحب مع ذكر السبب وإعادة الرصيد للمحفظة فوراً
+mutation {
+  adminRejectWithdrawal(input: {
+    withdrawalId: "66123abc456def789"
+    rejectionReason: "Invalid Instapay IPA address provided."
+  }) {
+    _id
+    status          # REJECTED
+    rejectionReason
+  }
+}
+
+# 5. تقرير الخزينة والسيولة الشامل (Treasury Liquidity Stats)
+query {
+  adminGetTreasuryStats {
+    totalWalletBalance         # إجمالي أرصدة المستخدمين في المنصة
+    totalHeldInWallets         # إجمالي الأموال المعلقة داخل المحافظ (مزادات/سحوبات)
+    totalPendingWithdrawals    # إجمالي مبالغ السحوبات المعلقة
+    pendingWithdrawalsCount    # عدد طلبات السحب المعلقة
+    totalHeldInEscrow          # إجمالي المبالغ المحتجزة في الوساطة (Escrow)
+    totalCompletedPayouts      # إجمالي الأموال التي تم تحويلها وسحبها بنجاح
+    totalCollectedFees         # إجمالي العمولات التي جنتها المنصة من السحوبات
+  }
+}
+
+# 6. تعديل رصيد مستخدم يدوياً (تسوية مالية / تعويض)
+mutation {
+  adminAdjustUserBalance(input: {
+    userId: "660abc123456789"
+    amount: 500
+    type: CREDIT   # CREDIT (إضافة) | DEBIT (خصم)
+    reason: "Compensating user for delivery disruption"
+  }) {
+    _id
+    balance
+    heldBalance
+  }
+}
+
+# 7. البث المباشر لطلبات السحب في لوحة تحكم الإدارة (Live Admin Feed)
+subscription {
+  adminWithdrawalFeed {
+    _id
+    userId
+    amount
+    netAmount
+    payoutMethod
+    status
+    createdAt
+  }
+}
+```
+
+**الأخطاء المحتملة لعمليات الأدمن المالي (Admin Operations):**
+| كود الخطأ | المعنى / سبب الحدوث |
+|:---|:---|
+| `WITHDRAWAL_NOT_FOUND` | طلب السحب المحدد غير موجود بالمعرف الممرر |
+| `WITHDRAWAL_NOT_PENDING` | الطلب ليس في حالة `PENDING` ولا يمكن قفله أو بدء معالجته |
+| `WITHDRAWAL_NOT_IN_PROGRESS` | الطلب ليس في حالة قيد التنفيذ (`PENDING` أو `PROCESSING`) ولا يمكن إتمامه |
+| `WITHDRAWAL_NOT_REJECTABLE` | الطلب مكتمل بالفعل (`COMPLETED`) أو ملغي ولا يمكن رفضه |
+| `AMOUNT_MUST_BE_POSITIVE` | مبلغ تعديل الرصيد اليدوي بواسطة الأدمن يجب أن يكون أكبر من الصفر |
+| `REASON_REQUIRED` / `REASON_TOO_SHORT` | سبب التعديل المالي اليدوي للأدمن إلزامي ولا يقل عن 10 أحرف لضمان التوثيق المالي |
+
+---
+
 ## ملخص سريع — جميع نقاط الـ API
 
 | نوع الطلب | الـ Endpoint | الوصف |
@@ -1296,4 +1522,5 @@ mutation {
 | **POST** | `/payments/webhooks/stripe` | Webhook من Stripe (Public) |
 | **POST** | `/payments/webhooks/paymob` | Webhook من Paymob (Public) |
 | **WS** | `/graphql` | WebSocket للـ Subscriptions |
+
 
