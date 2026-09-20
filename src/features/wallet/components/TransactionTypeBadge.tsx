@@ -1,6 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDownLeft, ArrowUpRight, Lock, Unlock, Gavel, RotateCcw } from 'lucide-react';
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Lock,
+  Unlock,
+  Gavel,
+  RotateCcw,
+  ShieldCheck,
+  ShieldAlert,
+} from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { TransactionType } from '../types/wallet.types';
 
@@ -62,6 +71,18 @@ export const TransactionTypeBadge: React.FC<TransactionTypeBadgeProps> = ({
     REFUND: {
       labelKey: 'transactionTypes.REFUND',
       icon: RotateCcw,
+      classes:
+        'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20',
+    },
+    ADMIN_CREDIT: {
+      labelKey: 'transactionTypes.ADMIN_CREDIT',
+      icon: ShieldCheck,
+      classes:
+        'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
+    },
+    ADMIN_DEBIT: {
+      labelKey: 'transactionTypes.ADMIN_DEBIT',
+      icon: ShieldAlert,
       classes:
         'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20',
     },

@@ -19,7 +19,9 @@ export type TransactionType =
   | 'HOLD'
   | 'RELEASE'
   | 'CAPTURE'
-  | 'REFUND';
+  | 'REFUND'
+  | 'ADMIN_CREDIT'
+  | 'ADMIN_DEBIT';
 
 export type TransactionStatus =
   | 'PENDING'
@@ -33,7 +35,8 @@ export type TransactionReferenceType =
   | 'AUCTION'
   | 'TRANSACTION'
   | 'ESCROW'
-  | 'DISPUTE';
+  | 'DISPUTE'
+  | 'WITHDRAWAL';
 
 export type TransactionsSortField = 'CREATED_AT' | 'AMOUNT';
 export type SortOrder = 'ASC' | 'DESC';
@@ -233,6 +236,16 @@ export const getTransactionAmountConfig = (type: TransactionType | string) => {
     case 'REFUND':
       return {
         sign: '+',
+        textColor: 'text-rose-600 dark:text-rose-400',
+      };
+    case 'ADMIN_CREDIT':
+      return {
+        sign: '+',
+        textColor: 'text-emerald-600 dark:text-emerald-400',
+      };
+    case 'ADMIN_DEBIT':
+      return {
+        sign: '-',
         textColor: 'text-rose-600 dark:text-rose-400',
       };
     default:

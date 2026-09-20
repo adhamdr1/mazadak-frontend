@@ -3,6 +3,10 @@ import { walletService } from '../services/wallet.service';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import type { WalletData } from '../types/wallet.types';
 
+export interface UseWalletOptions {
+  enabled?: boolean;
+}
+
 export interface UseWalletReturn {
   wallet: WalletData | undefined;
   isLoading: boolean;
@@ -17,7 +21,9 @@ export interface UseWalletReturn {
  * Custom hook to access and monitor user wallet data with parsed numerical values
  * Real-time updates are automatically synchronized via SocketContext
  */
-export const useWallet = (): UseWalletReturn => {
+export const useWallet = (options: UseWalletOptions = {}): UseWalletReturn => {
+  const { enabled = true } = options;
+
   const {
     data: wallet,
     isLoading,
@@ -28,6 +34,7 @@ export const useWallet = (): UseWalletReturn => {
     queryFn: () => walletService.getMyWallet(),
     staleTime: 30 * 1000,
     gcTime: 5 * 60 * 1000,
+    enabled,
   });
 
   const parsedBalance = Number(wallet?.balance || 0);

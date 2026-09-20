@@ -117,6 +117,16 @@ export const Footer: React.FC = () => {
               {isAuthenticated ? (
                 <>
                   <li>
+                    <Link to={ROUTES.WALLET} className="hover:text-amber-500 transition-colors">
+                      {t('footer.wallet')}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={ROUTES.WALLET_TRANSACTIONS} className="hover:text-amber-500 transition-colors">
+                      {t('footer.transactions')}
+                    </Link>
+                  </li>
+                  <li>
                     <Link to={ROUTES.UPDATE_PASSWORD} className="hover:text-amber-500 transition-colors">
                       {t('footer.updatePassword')}
                     </Link>

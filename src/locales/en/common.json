@@ -33,7 +33,13 @@
     "auctions": "Auctions",
     "myAuctions": "My Auctions",
     "myBids": "My Bids",
-    "createAuction": "Create Auction"
+    "createAuction": "Create Auction",
+    "wallet": "Wallet",
+    "deposit": "Deposit Funds",
+    "withdraw": "Withdraw Funds",
+    "withdrawals": "Withdrawal History",
+    "transactions": "Transactions",
+    "availableBalance": "Available Balance"
   },
   "rightsReserved": "All rights reserved.",
   "footerCopyright": "Mazadak Platform. All rights reserved.",
@@ -46,7 +52,9 @@
     "trustPayments": "Encrypted & secure financial transactions",
     "trustFairPlay": "Real-time transparent live bidding",
     "updatePassword": "Change Password",
-    "forgotPassword": "Forgot Password"
+    "forgotPassword": "Forgot Password",
+    "wallet": "My Wallet",
+    "transactions": "Transaction History"
   },
   "notFound": {
     "code": "404",

@@ -32,7 +32,9 @@
     "HOLD": "حجز مزايدة",
     "RELEASE": "إلغاء الحجز",
     "CAPTURE": "دفع قيمة المزاد",
-    "REFUND": "استرداد"
+    "REFUND": "استرداد",
+    "ADMIN_CREDIT": "إيداع إداري",
+    "ADMIN_DEBIT": "خصم إداري"
   },
   "transactionStatuses": {
     "SUCCESS": "مكتملة",
@@ -81,6 +83,7 @@
       "reference": "المرجع المرتبط",
       "goToAuction": "عرض المزاد المرتبط",
       "goToEscrow": "عرض صفقة الضمان",
+      "goToWithdrawals": "عرض سجل السحوبات",
       "copy": "نسخ",
       "close": "إغلاق"
     },

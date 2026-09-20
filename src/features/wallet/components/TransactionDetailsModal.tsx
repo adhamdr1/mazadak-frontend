@@ -180,8 +180,20 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
                     <ExternalLink className="w-3 h-3" />
                   </Link>
                 )}
+                {(transaction.referenceType === 'WITHDRAWAL' || transaction.type === 'WITHDRAW') && (
+                  <Link
+                    to={ROUTES.WALLET_WITHDRAWALS}
+                    onClick={onClose}
+                    className="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                  >
+                    <span>{t('transactions.detailsModal.goToWithdrawals', 'عرض سجل السحوبات')}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                )}
                 {transaction.referenceType !== 'AUCTION' &&
-                  transaction.referenceType !== 'ESCROW' && (
+                  transaction.referenceType !== 'ESCROW' &&
+                  transaction.referenceType !== 'WITHDRAWAL' &&
+                  transaction.type !== 'WITHDRAW' && (
                     <span className="font-mono text-slate-700 dark:text-slate-300">
                       {transaction.referenceId}
                     </span>

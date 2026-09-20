@@ -33,7 +33,13 @@
     "auctions": "المزادات",
     "myAuctions": "مزاداتي",
     "myBids": "مزايداتي",
-    "createAuction": "إنشاء مزاد"
+    "createAuction": "إنشاء مزاد",
+    "wallet": "المحفظة",
+    "deposit": "شحن الرصيد",
+    "withdraw": "سحب الرصيد",
+    "withdrawals": "سجل السحوبات",
+    "transactions": "سجل المعاملات",
+    "availableBalance": "الرصيد المتاح"
   },
   "rightsReserved": "جميع الحقوق محفوظة.",
   "footerCopyright": "منصة مزادك. جميع الحقوق محفوظة.",
@@ -46,7 +52,9 @@
     "trustPayments": "معاملات مالية مشفرة ومؤمنة",
     "trustFairPlay": "مزايدة حية وشفافة في الوقت الفعلي",
     "updatePassword": "تغيير كلمة المرور",
-    "forgotPassword": "استعادة كلمة المرور"
+    "forgotPassword": "استعادة كلمة المرور",
+    "wallet": "محفظتي",
+    "transactions": "سجل المعاملات المالية"
   },
   "notFound": {
     "code": "404",

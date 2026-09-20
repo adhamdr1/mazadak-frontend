@@ -32,7 +32,9 @@
     "HOLD": "Bid Hold",
     "RELEASE": "Hold Released",
     "CAPTURE": "Auction Payment",
-    "REFUND": "Refund"
+    "REFUND": "Refund",
+    "ADMIN_CREDIT": "Admin Credit",
+    "ADMIN_DEBIT": "Admin Debit"
   },
   "transactionStatuses": {
     "SUCCESS": "Completed",
@@ -81,6 +83,7 @@
       "reference": "Linked Reference",
       "goToAuction": "View Auction",
       "goToEscrow": "View Escrow Deal",
+      "goToWithdrawals": "View Withdrawals",
       "copy": "Copy",
       "close": "Close"
     },
