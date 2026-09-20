@@ -10,9 +10,12 @@ import type {
   TransactionsFilterInput,
   PaginationInput,
   PayoutMethod,
+  WithdrawalStatus,
   RequestWithdrawalInput,
   WithdrawalFeePreview,
   WithdrawalResponse,
+  WithdrawalsFilterInput,
+  WithdrawalsPageData,
 } from '../types/wallet.types';
 
 // ==========================================
@@ -139,6 +142,81 @@ export const REQUEST_WITHDRAWAL_MUTATION = `
   }
 `;
 
+export const WITHDRAWAL_FIELDS_FRAGMENT = `
+  fragment WithdrawalFields on WithdrawalRequest {
+    _id
+    userId
+    amount
+    fee
+    feePercentage
+    netAmount
+    currency
+    payoutMethod
+    status
+    payoutDetails {
+      bankName
+      accountHolderName
+      accountNumber
+      iban
+      phoneNumber
+      ipaAddress
+    }
+    rejectionReason
+    receiptUrl
+    adminReference
+    createdAt
+    processedAt
+    completedAt
+    updatedAt
+  }
+`;
+
+export const MY_WITHDRAWALS_QUERY = `
+  ${WITHDRAWAL_FIELDS_FRAGMENT}
+  query MyWithdrawals($pagination: PaginationInput!, $filter: WithdrawalsFilterInput) {
+    myWithdrawals(pagination: $pagination, filter: $filter) {
+      items {
+        ...WithdrawalFields
+      }
+      total
+      totalPages
+      hasNextPage
+    }
+  }
+`;
+
+export const MY_WITHDRAWAL_QUERY = `
+  ${WITHDRAWAL_FIELDS_FRAGMENT}
+  query MyWithdrawal($id: ID!) {
+    myWithdrawal(id: $id) {
+      ...WithdrawalFields
+    }
+  }
+`;
+
+export const CANCEL_WITHDRAWAL_MUTATION = `
+  mutation CancelWithdrawal($id: ID!) {
+    cancelWithdrawal(id: $id) {
+      _id
+      status
+      updatedAt
+    }
+  }
+`;
+
+export const MY_WITHDRAWAL_UPDATED_SUBSCRIPTION = `
+  subscription OnMyWithdrawalUpdated {
+    myWithdrawalUpdated {
+      _id
+      status
+      rejectionReason
+      receiptUrl
+      adminReference
+      completedAt
+    }
+  }
+`;
+
 // ==========================================
 // Wallet Service Implementation
 // ==========================================
@@ -175,6 +253,66 @@ export const walletService = {
       { input }
     );
     return data.requestWithdrawal;
+  },
+
+  /**
+   * Fetches paginated and filtered withdrawal requests for the user
+   */
+  async getMyWithdrawals(
+    pagination: PaginationInput = { page: 1, limit: 10 },
+    filter?: WithdrawalsFilterInput
+  ): Promise<WithdrawalsPageData> {
+    const data = await executeGraphQL<{ myWithdrawals: WithdrawalsPageData }>(
+      MY_WITHDRAWALS_QUERY,
+      {
+        pagination,
+        filter: filter || null,
+      }
+    );
+    return data.myWithdrawals;
+  },
+
+  /**
+   * Fetches full details for a single withdrawal request
+   */
+  async getMyWithdrawal(id: string): Promise<WithdrawalResponse> {
+    const data = await executeGraphQL<{ myWithdrawal: WithdrawalResponse }>(
+      MY_WITHDRAWAL_QUERY,
+      { id }
+    );
+    return data.myWithdrawal;
+  },
+
+  /**
+   * Cancels a pending withdrawal request and unlocks the held funds
+   */
+  async cancelWithdrawal(
+    id: string
+  ): Promise<{ _id: string; status: WithdrawalStatus; updatedAt?: string }> {
+    const data = await executeGraphQL<{
+      cancelWithdrawal: { _id: string; status: WithdrawalStatus; updatedAt?: string };
+    }>(CANCEL_WITHDRAWAL_MUTATION, { id });
+    return data.cancelWithdrawal;
+  },
+
+  /**
+   * Subscribes to real-time status updates on user withdrawals via WebSocket
+   */
+  subscribeToMyWithdrawalUpdated(
+    handlers: {
+      next: (data: { myWithdrawalUpdated: Partial<WithdrawalResponse> }) => void;
+      error?: (err: unknown) => void;
+      complete?: () => void;
+    },
+    token?: string | null
+  ): () => void {
+    return subscribeToSubscription<{ myWithdrawalUpdated: Partial<WithdrawalResponse> }>(
+      {
+        query: MY_WITHDRAWAL_UPDATED_SUBSCRIPTION,
+      },
+      handlers,
+      token
+    );
   },
 
   /**

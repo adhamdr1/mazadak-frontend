@@ -14,6 +14,7 @@
   "actions": {
     "deposit": "شحن الرصيد",
     "withdraw": "سحب الرصيد",
+    "withdrawals": "سجل السحوبات",
     "transactions": "سجل المعاملات",
     "statement": "سجل المعاملات",
     "refresh": "تحديث البيانات",
@@ -81,7 +82,7 @@
       "goToAuction": "عرض المزاد المرتبط",
       "goToEscrow": "عرض صفقة الضمان",
       "copy": "نسخ",
-      "close": "إغلاق النافذة"
+      "close": "إغلاق"
     },
     "pagination": {
       "previous": "السابق",
@@ -209,7 +210,7 @@
       "bankDelivery": "من ٣ إلى ٥ أيام عمل",
       "instapay": "إنستاباي",
       "instapayDesc": "عبر عنوان IPA أو رقم الهاتف المسجل بإنستاباي",
-      "fastDelivery": "من ٣ إلى ٥ أيام عمل",
+      "fastDelivery": "خلال ٢٤ ساعة عمل",
       "wallet": "محفظة كاش",
       "walletGeneralDesc": "فودافون كاش، أورنج كاش، اتصالات كاش، وي باي",
       "vodafone": "فودافون كاش",
@@ -217,6 +218,123 @@
       "etisalat": "اتصالات كاش",
       "we": "وي باي",
       "walletDesc": "تحويل مباشر للمحفظة الإلكترونية"
+    },
+    "limitNotice": {
+      "title": "تم استنفاد حد السحب اليومي",
+      "subtitle": "تسمح السياسة المالية لمنصة مزادك بطلب سحب واحد فقط يومياً (بتوقيت مصر) لضمان أعلى معايير الأمان المالي.",
+      "requestTitle": "تفاصيل طلب سحب اليوم",
+      "requestStatus": "حالة الطلب",
+      "requestAmount": "المبلغ المطلوب",
+      "requestMethod": "وسيلة الاستلام",
+      "requestDate": "تاريخ وتوقيت الطلب",
+      "resetsAt": "يتجدد الحد اليومي تلقائياً عند منتصف الليل بتوقيت مصر (12:00 ص). يمكنك تقديم طلب سحب جديد غداً.",
+      "pendingAction": "متابعة أو إلغاء الطلب في سجل السحوبات",
+      "processingAction": "تتبع حالة التحويل في سجل السحوبات",
+      "completedAction": "عرض تفاصيل السحب في السجل",
+      "viewHistory": "عرض سجل السحوبات",
+      "backToWallet": "العودة للمحفظة"
+    }
+  },
+  "withdrawalStatuses": {
+    "PENDING": "قيد المراجعة",
+    "PROCESSING": "قيد التحويل البنكي",
+    "COMPLETED": "تم التحويل بنجاح",
+    "REJECTED": "تم الرفض",
+    "CANCELLED": "ملغي"
+  },
+  "withdrawals": {
+    "pageTitle": "سجل ومتابعة السحوبات",
+    "pageSubtitle": "متابعة طلبات سحب الرصيد اللحظية وحالة التحويلات البنكية والمحافظ",
+    "backToWallet": "العودة للمحفظة",
+    "newWithdrawal": "طلب سحب جديد",
+    "limitReachedBadge": "الحد اليومي مستنفد",
+    "liveConnected": "اتصال لحظي نشط",
+    "activeRequestNoticeTitle": "لديك طلب سحب نشط اليوم",
+    "activeRequestNoticeDesc": "لديك طلب سحب قيد المراجعة أو التحويل اليوم. مسموح بطلب واحد يومياً بتوقيت مصر. يمكنك إلغاء الطلب الحالي إذا رغبت بتعديل المبلغ أو الوجهة.",
+    "activeRequestNoticeCompletedDesc": "لقد أتممت طلب سحب اليوم بنجاح. مسموح بطلب واحد يومياً لسلامة العمليات، ويتجدد الحد تلقائياً عند منتصف الليل بتوقيت مصر (12:00 ص).",
+    "activeRequestNoticeProcessingDesc": "طلب السحب الخاص بك قيد التحويل البنكي حالياً. مسموح بطلب واحد يومياً، ويتجدد الحد عند منتصف الليل بتوقيت مصر.",
+    "filters": {
+      "title": "تصفية السحوبات",
+      "status": "حالة الطلب",
+      "allStatuses": "جميع الحالات",
+      "method": "وسيلة السحب",
+      "allMethods": "جميع الوسائل",
+      "reset": "مسح الفلاتر"
+    },
+    "loadFailed": "فشل تحميل بيانات السحوبات. يرجى إعادة المحاولة.",
+    "retry": "إعادة المحاولة",
+    "card": {
+      "requestedAmount": "المبلغ المطلوب",
+      "fee": "رسوم الخدمة",
+      "netAmount": "المبلغ الصافي",
+      "accountMasked": "حساب ينتهي بـ",
+      "phoneMasked": "رقم المحفظة",
+      "ipaMasked": "عنوان IPA",
+      "cancelButton": "إلغاء الطلب",
+      "viewReceipt": "عرض إيصال التحويل",
+      "referenceNumber": "رقم المرجع:",
+      "rejectionReason": "سبب الرفض:",
+      "detailsButton": "عرض التفاصيل"
+    },
+    "detailsModal": {
+      "title": "تفاصيل طلب السحب",
+      "payoutMethodLabel": "وسيلة الاستلام:",
+      "requestId": "رقم الطلب",
+      "requestedAt": "تاريخ التقديم",
+      "processedAt": "تاريخ بدء المعالجة",
+      "completedAt": "تاريخ إتمام التحويل",
+      "payoutDestination": "بيانات وجهة الاستلام",
+      "bankName": "اسم البنك",
+      "holderName": "اسم صاحب الحساب",
+      "accountNumber": "رقم الحساب",
+      "iban": "رقم الآيبان (IBAN)",
+      "phone": "رقم الهاتف المسجل",
+      "ipaAddress": "عنوان الدفع اللحظي (IPA)",
+      "financialBreakdown": "التفاصيل المالية",
+      "amount": "المبلغ المسحوب",
+      "fee": "رسوم الخدمة",
+      "net": "المبلغ الصافي",
+      "adminReference": "رقم المرجع البنكي",
+      "copy": "نسخ",
+      "copied": "تم النسخ",
+      "receipt": "إيصال التحويل المعتمد",
+      "viewReceiptLink": "فتح وتحميل الإيصال الرسمي",
+      "rejectionAlertTitle": "تم رفض طلب السحب",
+      "rejectionAlertDesc": "تم إلغاء العملية وفك حجز كامل المبلغ وإعادته تلقائياً إلى رصيدك المتاح في المحفظة.",
+      "timelineTitle": "مراحل تنفيذ الطلب",
+      "timelineCreated": "تم استلام الطلب وحجز المبلغ",
+      "timelineProcessing": "بدء المعالجة والتحويل البنكي",
+      "timelineCompleted": "تم التحويل بنجاح وتوثيق الإيصال",
+      "timelineRejected": "تم رفض التحويل وفك حجز الأموال",
+      "timelineCancelled": "تم إلغاء الطلب من قبلك وفك الحجز",
+      "close": "إغلاق"
+    },
+    "cancelModal": {
+      "title": "تأكيد إلغاء طلب السحب",
+      "description": "هل أنت متأكد من رغبتك في إلغاء هذا الطلب؟",
+      "amountNotice": "سيتم فك حجز مبلغ {{amount}} ج.م فورياً وإعادته مباشرة إلى رصيدك المتاح للتصرف والمزايدة.",
+      "confirmButton": "نعم، قم بإلغاء الطلب",
+      "cancelButton": "تراجع",
+      "cancelling": "جارٍ إلغاء الطلب وفك الحجز..."
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "pageOf": "صفحة {{current}} من {{total}}",
+      "showing": "عرض {{from}} إلى {{to}} من إجمالي {{total}} طلب"
+    },
+    "emptyState": {
+      "noWithdrawalsTitle": "لا توجد طلبات سحب سابقة",
+      "noWithdrawalsDesc": "لم تقم بتقديم أي طلبات سحب حتى الآن. يمكنك سحب أرباحك ورصيدك المتاح في أي وقت بأمان.",
+      "newWithdrawalBtn": "طلب سحب رصيد الآن",
+      "noFilteredTitle": "لا توجد طلبات مطابقة للفلتر",
+      "noFilteredDesc": "لم نتمكن من العثور على أي طلبات سحب تطابق الفلاتر المحددة حالياً.",
+      "resetFiltersBtn": "مسح الفلاتر"
+    },
+    "toast": {
+      "cancelSuccess": "تم إلغاء طلب السحب بنجاح وفك حجز المبلغ وإعادته لرصيدك المتاح",
+      "cancelError": "تعذر إلغاء طلب السحب",
+      "notCancellable": "لا يمكن إلغاء هذا الطلب لأنه قيد التنفيذ أو تم إتمامه بالفعل"
     }
   },
   "validation": {

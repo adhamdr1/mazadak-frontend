@@ -30,6 +30,7 @@ export default {
       fontFamily: {
         sans: ['Cairo', 'Outfit', 'Inter', 'system-ui', 'sans-serif'],
         heading: ['Cairo', 'Outfit', 'sans-serif'],
+        mono: ['Cairo', 'Outfit', 'monospace'],
       },
     },
   },

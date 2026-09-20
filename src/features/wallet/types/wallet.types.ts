@@ -185,6 +185,21 @@ export interface WithdrawalResponse {
   updatedAt?: string;
 }
 
+export interface WithdrawalsFilterInput {
+  status?: WithdrawalStatus;
+  payoutMethod?: PayoutMethod;
+  sortOrder?: SortOrder;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface WithdrawalsPageData {
+  items: WithdrawalResponse[];
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+}
+
 /**
  * Returns type-specific amount styling and signs matching TransactionTypeBadge
  */

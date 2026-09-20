@@ -117,7 +117,11 @@ export const WithdrawSummaryStep: React.FC<WithdrawSummaryStepProps> = ({
           <div className="text-end">
             <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
               <Clock className="w-3.5 h-3.5 text-amber-500" />
-              <span>{isRTL ? 'من ٣ إلى ٥ أيام عمل' : '3 to 5 business days'}</span>
+              <span>
+                {payoutMethod === 'BANK_ACCOUNT'
+                  ? t('wallet:withdraw.methods.bankDelivery', isRTL ? 'من ٣ إلى ٥ أيام عمل' : '3 to 5 business days')
+                  : t('wallet:withdraw.methods.fastDelivery', isRTL ? 'خلال ٢٤ ساعة عمل' : 'Within 24 business hours')}
+              </span>
             </span>
           </div>
         </div>

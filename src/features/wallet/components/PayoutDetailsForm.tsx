@@ -91,9 +91,17 @@ export const PayoutDetailsForm: React.FC<PayoutDetailsFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRTL]);
 
+  // Helper to strip Egyptian country prefixes (+20, 0020, 20) when pasting
+  const cleanEgyptianPhone = (raw: string): string => {
+    let clean = normalizeArabicDigits(raw).replace(/[^0-9]/g, '');
+    if (clean.startsWith('0020')) clean = clean.slice(4);
+    else if (clean.startsWith('20') && clean.length > 11) clean = clean.slice(2);
+    return clean;
+  };
+
   // Auto-detect wallet operator
   const handleWalletPhoneChange = (raw: string) => {
-    const normalized = normalizeArabicDigits(raw).replace(/[\s-]/g, '');
+    const normalized = cleanEgyptianPhone(raw);
     handleFieldChange('phoneNumber', normalized);
 
     if (normalized.startsWith('010')) {
@@ -408,7 +416,7 @@ export const PayoutDetailsForm: React.FC<PayoutDetailsFormProps> = ({
                       : details.phoneNumber || ''
                   }
                   onChange={(e) => {
-                    const clean = normalizeArabicDigits(e.target.value).replace(/[^0-9]/g, '');
+                    const clean = cleanEgyptianPhone(e.target.value);
                     handleFieldChange('phoneNumber', clean);
                   }}
                   placeholder={isRTL ? '٠١٠١٢٣٤٥٦٧٨' : '01012345678'}

@@ -14,11 +14,14 @@ export interface FeePreviewCardProps {
 
 export const FeePreviewCard: React.FC<FeePreviewCardProps> = ({
   amount,
+  payoutMethod,
   feePreview,
   isError,
 }) => {
   const { t, i18n } = useTranslation(['wallet']);
   const isRTL = i18n.language.startsWith('ar');
+
+  const feePercentage = feePreview?.feePercentage ?? 2;
 
   // Live calculation values (or fallback estimated preview before method selection)
   const displayFee = feePreview
@@ -33,7 +36,16 @@ export const FeePreviewCard: React.FC<FeePreviewCardProps> = ({
     ? String((amount * 0.98).toFixed(2))
     : '0.00';
 
-  const feePercentage = feePreview?.feePercentage ?? 2;
+  // Delivery estimate resolution
+  const getDeliveryEstimate = () => {
+    if (payoutMethod === 'BANK_ACCOUNT') {
+      return t('wallet:withdraw.methods.bankDelivery', isRTL ? 'من ٣ إلى ٥ أيام عمل' : '3 to 5 business days');
+    }
+    if (payoutMethod) {
+      return t('wallet:withdraw.methods.fastDelivery', isRTL ? 'خلال ٢٤ ساعة عمل' : 'Within 24 business hours');
+    }
+    return isRTL ? 'حسب وسيلة الاستلام' : 'Depends on method';
+  };
 
   return (
     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500/60 dark:hover:border-amber-500/60 bg-white dark:bg-slate-900 p-5 space-y-4 shadow-2xs hover:shadow-md transition-all duration-300">
@@ -114,7 +126,7 @@ export const FeePreviewCard: React.FC<FeePreviewCardProps> = ({
           </span>
         </div>
         <span className="font-bold text-slate-900 dark:text-white">
-          {isRTL ? 'من ٣ إلى ٥ أيام عمل' : '3 to 5 business days'}
+          {getDeliveryEstimate()}
         </span>
       </div>
 

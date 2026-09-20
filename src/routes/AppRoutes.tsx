@@ -36,6 +36,7 @@ const MyBidsPage = lazy(() => import('@/features/bids/pages/MyBidsPage').then(m 
 const WalletPage = lazy(() => import('@/features/wallet/pages/WalletPage').then(m => ({ default: m.WalletPage })));
 const DepositPage = lazy(() => import('@/features/wallet/pages/DepositPage').then(m => ({ default: m.DepositPage })));
 const WithdrawPage = lazy(() => import('@/features/wallet/pages/WithdrawPage').then(m => ({ default: m.WithdrawPage })));
+const WithdrawalsPage = lazy(() => import('@/features/wallet/pages/WithdrawalsPage').then(m => ({ default: m.WithdrawalsPage })));
 const TransactionsPage = lazy(() => import('@/features/wallet/pages/TransactionsPage').then(m => ({ default: m.TransactionsPage })));
 
 // 5. General Platform Pages
@@ -65,6 +66,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.WALLET} element={<WalletPage />} />
               <Route path={ROUTES.WALLET_DEPOSIT} element={<DepositPage />} />
               <Route path={ROUTES.WALLET_WITHDRAW} element={<WithdrawPage />} />
+              <Route path={ROUTES.WALLET_WITHDRAWALS} element={<WithdrawalsPage />} />
               <Route path={ROUTES.WALLET_TRANSACTIONS} element={<TransactionsPage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>

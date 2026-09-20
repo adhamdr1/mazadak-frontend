@@ -40,9 +40,8 @@ export const useRequestWithdrawal = (): UseRequestWithdrawalReturn => {
         )
       );
 
-      // Redirect to withdrawals tracking list (or wallet page if list not yet ready)
-      // Navigate to /wallet/withdrawals or fallback to /wallet
-      navigate(ROUTES.WALLET);
+      // Redirect to withdrawals tracking list
+      navigate(ROUTES.WALLET_WITHDRAWALS);
     },
     onError: (err: unknown) => {
       const message =
