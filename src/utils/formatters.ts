@@ -131,4 +131,55 @@ export function formatBidTimestamp(
   return isRTL ? toLocalizedDigits(formatted, true) : formatted;
 }
 
+export const EGYPTIAN_BANKS_MAP: Array<{ ar: string; en: string }> = [
+  { ar: 'البنك الأهلي المصري', en: 'National Bank of Egypt (NBE)' },
+  { ar: 'بنك مصر', en: 'Banque Misr' },
+  { ar: 'البنك التجاري الدولي (CIB)', en: 'Commercial International Bank (CIB)' },
+  { ar: 'البنك التجاري الدولي', en: 'Commercial International Bank (CIB)' },
+  { ar: 'بنك QNB الأهلي', en: 'QNB Alahli' },
+  { ar: 'بنك كيو إن بي الأهلي', en: 'QNB Alahli' },
+  { ar: 'بنك الإسكندرية', en: 'Bank of Alexandria' },
+  { ar: 'بنك القاهرة', en: 'Banque du Caire' },
+  { ar: 'مصرف أبوظبي الإسلامي', en: 'Abu Dhabi Islamic Bank (ADIB)' },
+  { ar: 'بنك فيصل الإسلامي', en: 'Faisal Islamic Bank' },
+  { ar: 'بنك كريدي أجريكول', en: 'Crédit Agricole Egypt' },
+  { ar: 'بنك البركة', en: 'Al Baraka Bank' },
+  { ar: 'البنك العربي الأفريقي الدولي', en: 'Arab African International Bank (AAIB)' },
+  { ar: 'بنك قناة السويس', en: 'Suez Canal Bank' },
+  { ar: 'بنك التعمير والإسكان', en: 'Housing and Development Bank' },
+  { ar: 'بنك Saib', en: 'Société Arabe Internationale de Banque (saib)' },
+  { ar: 'المصرف المتحد', en: 'The United Bank' },
+];
 
+/**
+ * Localizes Egyptian bank names dynamically based on the active language
+ */
+export function localizeBankName(bankName?: string | null, isRTL = false): string {
+  if (!bankName) return '';
+  const trimmed = bankName.trim();
+  const match = EGYPTIAN_BANKS_MAP.find(
+    (b) =>
+      b.ar.toLowerCase() === trimmed.toLowerCase() ||
+      b.en.toLowerCase() === trimmed.toLowerCase() ||
+      trimmed.toLowerCase().includes(b.ar.toLowerCase()) ||
+      trimmed.toLowerCase().includes(b.en.toLowerCase())
+  );
+  if (match) {
+    return isRTL ? match.ar : match.en;
+  }
+  return trimmed;
+}
+
+/**
+ * Returns YYYY-MM-DD date string in Africa/Cairo timezone, exactly matching backend logic
+ */
+export function getCairoDateString(dateInput: string | Date = new Date()): string {
+  const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (isNaN(d.getTime())) return '';
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Cairo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d);
+}

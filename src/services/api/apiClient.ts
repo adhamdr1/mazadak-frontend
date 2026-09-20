@@ -13,17 +13,24 @@ export const apiClient = axios.create({
   },
 });
 
-// Request Interceptor: Attach Bearer token if present
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = authStorage.getAccessToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+export const restClient = axios.create({
+  baseURL: env.restUrl || '',
+  headers: {
+    'Content-Type': 'application/json',
   },
-  (error: AxiosError) => Promise.reject(error)
-);
+});
+
+// Request Interceptor: Attach Bearer token if present to both clients
+const attachAuthToken = (config: InternalAxiosRequestConfig) => {
+  const token = authStorage.getAccessToken();
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+};
+
+apiClient.interceptors.request.use(attachAuthToken, (error: AxiosError) => Promise.reject(error));
+restClient.interceptors.request.use(attachAuthToken, (error: AxiosError) => Promise.reject(error));
 
 // Shared Single-Flight Promise instance to prevent race condition during token rotation
 let refreshPromise: Promise<string | null> | null = null;
@@ -145,6 +152,26 @@ apiClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
         return apiClient(originalRequest);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+restClient.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig;
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const newAccessToken = await attemptTokenRefresh();
+      if (newAccessToken) {
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        }
+        return restClient(originalRequest);
       }
     }
 

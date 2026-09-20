@@ -35,6 +35,21 @@ Authorization: Bearer <accessToken>
 
 ---
 
+### ⚠️ تنبيه حاسم للفرونت إند: أنواع الحقول المالية (Decimal as String)
+جميع مبالغ الفلوس والأسعار في الـ GraphQL Responses:
+* في المحفظة (`Wallet`): `balance: String!`, `heldBalance: String!`, `availableBalance: String!`
+* في المزادات (`Auction`): `currentPrice: String!`, `startingPrice: String!`, `minimumBidIncrement: String!`
+* في المزايدات (`Bid`): `amount: String!`
+* في المزايدة التلقائية (`AutoBid`): `maxAmount: String!`
+* في المعاملات (`Transaction`): `amount: String!`
+* في طلبات السحب (`WithdrawalRequest`): `amount: String!`, `fee: String!`, `netAmount: String!`
+
+> **السبب وطريقة التعامل:**
+> يتم إرجاع المبالغ كـ `String` لحماية دقة الحسابات المالية (Decimal Precision) ومنع أخطاء الـ Floating Points.
+> **على مطور الفرونت إند:** استخدم دائماً `Number(value)` أو `parseFloat(value)` قبل إجراء أي عمليات حسابية أو استدعاء دوال الأرقام مثل `value.toFixed(2)` حتى لا ينهار التطبيق بخطأ Runtime (`toFixed is not a function`).
+
+---
+
 ## كيف تبعت GraphQL Request
 
 ```ts
@@ -444,18 +459,20 @@ mutation { deleteAccount }
 ```graphql
 query {
   auctions(
-    input: { page: Int!  limit: Int! }
+    input: { page: 1, limit: 10 }
     filter: {
       category: AuctionCategory   # ELECTRONICS | FASHION | JEWELRY | WATCHES | ANTIQUES | ART | COLLECTIBLES | BOOKS | FURNITURE | HOME_APPLIANCES | CARS | MOTORCYCLES | REAL_ESTATE | SPORTS | TOYS | OTHER
       status: AuctionStatus       # PENDING | ACTIVE | ENDED | CANCELLED
-      search: String
-      sort: { field: CREATED_AT | START_TIME | END_TIME | CURRENT_PRICE | TITLE  order: ASC | DESC }
+      search: String              # بحث جزئي غير حساس لحالة الأحرف (Partial Regex Search) في العنوان والوصف
+      sort: { field: CREATED_AT | START_TIME | END_TIME | CURRENT_PRICE | TITLE, order: ASC | DESC }
     }
   ) {
     items {
       _id  title  description  images
       category  status
-      startingPrice  currentPrice  minimumBidIncrement
+      startingPrice       # String! (Decimal — حوله بـ Number في الفرونت)
+      currentPrice        # String! (Decimal — حوله بـ Number في الفرونت)
+      minimumBidIncrement # String! (Decimal — حوله بـ Number في الفرونت)
       startTime  endTime
       sellerId  winnerId  isFinalized
       createdAt
@@ -470,7 +487,19 @@ query {
 ### 3.2 تفاصيل مزاد (auction) — عام
 
 ```graphql
-query { auction(id: ID!) { # نفس حقول الـ Auction } }
+query {
+  auction(id: ID!) {
+    _id  title  description  images
+    category  status
+    startingPrice        # String!
+    currentPrice         # String!
+    minimumBidIncrement  # String!
+    startTime  endTime
+    sellerId  winnerId  isFinalized
+    adminActionReason
+    createdAt  updatedAt
+  }
+}
 ```
 
 **الأخطاء:**
@@ -493,7 +522,7 @@ mutation {
     images: [String!]!              # URLs بعد رفعها على Cloudinary
     startTime: DateTime!            # لازم بعد الحالي بشوية
     endTime: DateTime!              # لازم بعد startTime
-  }) { _id  title  status  ... }
+  }) { _id  title  status  currentPrice  ... }
 }
 ```
 
@@ -544,8 +573,8 @@ mutation { cancelAuction(id: ID!) }
 ```graphql
 query {
   myAuctions(
-    input: { page: 1  limit: 10 }
-    filter: { status: AuctionStatus  sort: { ... } }
+    input: { page: 1, limit: 10 }
+    filter: { status: AuctionStatus, sort: { field: CREATED_AT, order: DESC } }
   ) { items { ... }  total  totalPages  hasNextPage }
 }
 ```
@@ -556,16 +585,36 @@ query {
 
 ```graphql
 query {
-  myWonAuctions(input: { page: 1  limit: 10 }) {
-    items { _id  title  currentPrice  status  isFinalized  winnerId  ... }
-    total  totalPages
+  myWonAuctions(
+    input: { page: 1, limit: 10 }
+    filter: { status: ENDED }
+  ) {
+    items { _id  title  currentPrice  status  isFinalized  winnerId  sellerId  images  endTime }
+    total  totalPages  hasNextPage
   }
 }
 ```
 
 ---
 
-### 3.8 رفع صورة (uploadImage) — محمي
+### 3.8 مزادات مستخدم معين (userAuctions) — عام
+
+```graphql
+query {
+  userAuctions(
+    userId: ID!
+    input: { page: 1, limit: 10 }
+    filter: { status: ACTIVE }
+  ) {
+    items { _id  title  currentPrice  startingPrice  status  images  endTime }
+    total  totalPages  hasNextPage
+  }
+}
+```
+
+---
+
+### 3.9 رفع صورة (uploadImage) — محمي
 
 ```graphql
 mutation {
@@ -601,7 +650,10 @@ mutation {
     auctionId: ID!
     amount: Float!     # لازم يكون > currentPrice + minimumBidIncrement
   }) {
-    _id  auctionId  bidderId  amount  status  createdAt
+    _id  auctionId  bidderId
+    amount             # String! (Decimal)
+    status             # WINNING | OUTBID
+    createdAt
   }
 }
 ```
@@ -611,7 +663,7 @@ mutation {
 |:---|:---|:---|
 | `AUCTION_NOT_FOUND` | المزاد غير موجود | — |
 | `This auction is not currently active` | المزاد انتهى أو لم يبدأ | "المزاد غير نشط حالياً" |
-| `INSUFFICIENT_FUNDS` | الرصيد غير كافي | "رصيدك غير كافٍ" + زر "شحن الرصيد" |
+| `INSUFFICIENT_FUNDS` | الرصيد المتاح غير كافٍ | "رصيدك غير كافٍ" + زر "شحن الرصيد" |
 | `You cannot place a bid on your own auction` | محاولة المزايدة على مزادك | "لا يمكنك المزايدة على مزادك الخاص" |
 | `You are already the highest bidder for this auction` | أنت بالفعل الأعلى | "أنت المزايد الأعلى بالفعل!" |
 | `High bidding volume on this auction. Please try again in a moment.` | ضغط عالٍ | "يرجى الانتظار لحظة والمحاولة مجدداً" |
@@ -626,10 +678,16 @@ mutation {
     auctionId: ID!
     maxAmount: Float!    # الحد الأقصى للمزايدة التلقائية
   }) {
-    _id  auctionId  userId  maxAmount  status  # ACTIVE | EXHAUSTED | CANCELLED
+    _id  auctionId  userId
+    maxAmount            # String! (Decimal)
+    status               # ACTIVE | EXHAUSTED | CANCELLED
+    createdAt  updatedAt
   }
 }
 ```
+
+> **ملاحظة معمارية حاسمة (Multi-Auction Balance Check):**
+> الباك إند يقوم بحساب المبالغ المحجوزة عبر كافة المزادات الأخرى النشطة التي وضع فيها المستخدم Auto-Bid. إذا لم يكن الرصيد المتاح كافياً لتغطية `maxAmount` بالتزامن مع باقي الـ Auto-Bids النشطة، سيرفض الطلب بـ `INSUFFICIENT_FUNDS`.
 
 **الأخطاء:**
 | كود الخطأ | المعنى |
@@ -640,7 +698,35 @@ mutation {
 
 ---
 
-### 4.3 إلغاء المزايدة التلقائية (cancelAutoBid) — محمي
+### 4.3 عرض المزايدة التلقائية لمزاد معين (myAutoBid) — محمي
+
+```graphql
+query {
+  myAutoBid(auctionId: ID!) {
+    _id  auctionId  userId  maxAmount  status  createdAt  updatedAt
+  }
+}
+```
+
+---
+
+### 4.4 قائمة مزايداتي التلقائية (myAutoBids) — محمي
+
+```graphql
+query {
+  myAutoBids(
+    input: { page: 1, limit: 10 }
+    status: ACTIVE    # اختياري: ACTIVE | EXHAUSTED | CANCELLED
+  ) {
+    items { _id  auctionId  maxAmount  status  createdAt }
+    total  totalPages  hasNextPage
+  }
+}
+```
+
+---
+
+### 4.5 إلغاء المزايدة التلقائية (cancelAutoBid) — محمي
 
 ```graphql
 mutation { cancelAutoBid(input: { auctionId: ID! }) }
@@ -648,29 +734,43 @@ mutation { cancelAutoBid(input: { auctionId: ID! }) }
 
 ---
 
-### 4.4 مزايداتي (myBids) — محمي
+### 4.6 مزايداتي (myBids) — محمي
 
 ```graphql
 query {
   myBids(
-    input: { page: 1  limit: 10 }
-    filter: { status: WINNING | OUTBID }
+    input: { page: 1, limit: 10 }
+    filter: { status: WINNING } # اختياري: WINNING | OUTBID
   ) {
-    items { _id  auctionId  amount  status  createdAt }
-    total  totalPages
+    items {
+      _id  auctionId  bidderId
+      amount     # String! (Decimal)
+      status
+      createdAt
+    }
+    total  totalPages  hasNextPage
   }
 }
 ```
 
 ---
 
-### 4.5 مزايدات مزاد معين (auctionBids) — عام
+### 4.7 مزايدات مزاد معين (auctionBids) — عام
 
 ```graphql
 query {
-  auctionBids(auctionId: String!  input: { page: 1  limit: 10 }) {
-    items { _id  bidderId  amount  status  createdAt }
-    total
+  auctionBids(
+    auctionId: "auction_id_here"
+    input: { page: 1, limit: 10 }
+    filter: { status: WINNING }
+  ) {
+    items {
+      _id  bidderId
+      amount     # String! (Decimal)
+      status
+      createdAt
+    }
+    total  totalPages  hasNextPage
   }
 }
 ```
@@ -685,9 +785,9 @@ query {
 query {
   myWallet {
     _id  userId
-    balance           # الرصيد الإجمالي
-    heldBalance       # المحجوز (في مزايدات نشطة + escrow)
-    availableBalance  # المتاح للسحب والمزايدة
+    balance           # String! (Decimal — الرصيد الإجمالي، استخدم Number() في الفرونت)
+    heldBalance       # String! (Decimal — المحجوز في مزادات نشطة و escrow)
+    availableBalance  # String! (Decimal — المتاح للسحب والمزايدة)
     createdAt  updatedAt
   }
 }
@@ -700,21 +800,26 @@ query {
 ```graphql
 query {
   myTransactions(
-    input: { page: 1  limit: 10 }
+    input: { page: 1, limit: 10 }
     filter: {
-      type: DEPOSIT | WITHDRAW | HOLD | RELEASE | CAPTURE | REFUND
-      status: PENDING | PROCESSING | SUCCESS | FAILED | CANCELLED | EXPIRED
+      type: DEPOSIT       # اختياري: DEPOSIT | WITHDRAW | HOLD | RELEASE | CAPTURE | REFUND | ADMIN_CREDIT | ADMIN_DEBIT
+      status: SUCCESS     # اختياري: PENDING | PROCESSING | SUCCESS | FAILED | CANCELLED | EXPIRED
       startDate: DateTime
       endDate: DateTime
     }
   ) {
     items {
-      _id  type  amount  currency  status
-      referenceId  referenceType  # AUCTION | TRANSACTION | ESCROW | DISPUTE
-      gatewayProvider  gatewayTransactionId
+      _id  type
+      amount              # String! (Decimal — حوله بـ Number في الفرونت)
+      currency            # "EGP"
+      status              # PENDING | PROCESSING | SUCCESS | FAILED | CANCELLED | EXPIRED
+      referenceId         # ID المرجع (مزاد، صفقة، أو نزاع)
+      referenceType       # AUCTION | TRANSACTION | ESCROW | DISPUTE
+      gatewayProvider     # "PAYMOB" | "STRIPE"
+      gatewayTransactionId
       createdAt
     }
-    total  totalPages
+    total  totalPages  hasNextPage
   }
 }
 ```
@@ -726,7 +831,10 @@ query {
 ```graphql
 mutation {
   withdraw(input: { amount: Float! }) {
-    _id  availableBalance  balance  heldBalance
+    _id
+    balance           # String!
+    heldBalance       # String!
+    availableBalance  # String!
   }
 }
 ```
@@ -743,36 +851,51 @@ mutation {
 
 ### 6.1 بدء عملية الإيداع (initializePayment)
 
-```
+```http
 POST http://localhost:3000/payments/initialize
 Authorization: Bearer <accessToken>
 Content-Type: application/json
 
 Body:
 {
-  "provider": "STRIPE" | "PAYMOB",
-  "amount": 10000,     // بالـ cents/piasters (مثال: 10000 = 100 جنيه)
-  "currency": "EGP"    // اختياري — الافتراضي EGP
+  "provider": "PAYMOB",  // أو "STRIPE"
+  "amount": 10000,       // بالوحدات الصغرى (قروش / cents): 100 جنيه = 10000
+  "currency": "EGP"      // اختياري — الافتراضي EGP
 }
 ```
+
+> ⚠️ **معادلة المبلغ في الفرونت إند:**
+> `amountInRequest = userAmountInEgp * 100`
 
 **Response الناجح:**
 ```json
 {
-  "gatewayPaymentIntentId": "pi_3...",
-  "clientSecret": "pi_3_secret_...",   // لـ Stripe فقط
-  "paymentUrl": null,                   // لـ Paymob بيكون URL
-  "idempotencyKey": "uuid..."
+  "gatewayPaymentIntentId": "67890",
+  "clientSecret": "cs_test_...",
+  "paymentUrl": "https://accept.paymob.com/unifiedcheckout/?publicKey=egy_pk_test_...&clientSecret=cs_test_...",
+  "idempotencyKey": "uuid-..."
 }
 ```
 
-> **فلو الإيداع:**
-> 1. الفرونت بيبعت `POST /payments/initialize`
-> 2. يجيب `clientSecret` (Stripe) أو `paymentUrl` (Paymob)
-> 3. Stripe: يفتح Stripe.js Checkout بالـ `clientSecret`
-> 4. بعد الدفع: Stripe بيبعت Webhook للباك إند تلقائياً
-> 5. الباك إند بيكريدت الـ Wallet تلقائياً
-> 6. الفرونت بيعمل `refetch` على `myWallet` بعد نجاح العملية
+---
+
+### 6.2 دورة حياة الدفع الكاملة في الفرونت إند (Paymob Unified Checkout Flow):
+
+1. **إرسال الطلب:** يرسل الفرونت `POST /payments/initialize` بالمبلغ بالقرش.
+2. **توجيه العميل:** يقرأ الفرونت `response.paymentUrl` ويوجه متصفح المستخدم فوراً:
+   ```javascript
+   window.location.href = response.paymentUrl;
+   ```
+3. **صفحة الدفع الموحدة:** تفتح للمستخدم صفحة Paymob الرسمية وفيها كافة طرق الدفع المفعلة:
+   * البطاقات البنكية (Visa / MasterCard).
+   * المحافظ الإلكترونية (فودافون كاش، اتصالات، أورنج، وي).
+   * إنستاباي (InstaPay).
+4. **بعد الدفع (التحويل التلقائي):** تقوم صفحة Paymob بتحويل متصفح العميل إلى:
+   `http://localhost:5173/wallet` (أو الرابط المعرّف في Redirect URL).
+5. **تحديث الرصيد اللحظي:**
+   * سيرفر Paymob يرسل الـ Webhook مباشرة للباك إند `POST /payments/webhooks/paymob`.
+   * الباك إند يتحقق من الـ HMAC ويشحن الرصيد في الداتابيز.
+   * في صفحة `/wallet` بالفرونت إند، يمكنك عمل `refetch` لـ `myWallet` أو الاعتماد على الاشتراك اللحظي `walletUpdated` لإظهار الرصيد الجديد فوراً!
 
 ---
 
@@ -1024,6 +1147,16 @@ mutation {
 يستخدم مزادك **GraphQL Subscriptions** عبر WebSocket Protocol.
 الاتصال على: `ws://localhost:3000/graphql`
 
+> ⚠️ **المصادقة في الـ WebSocket:**
+> عند الاتصال بالـ WebSocket، يجب إرسال الـ Token في الـ `connectionParams`:
+> ```json
+> {
+>   "authorization": "Bearer <accessToken>"
+> }
+> ```
+
+---
+
 ### 11.1 إشعارات فورية (notificationAdded) — محمي
 
 ```graphql
@@ -1036,7 +1169,21 @@ subscription {
 
 ---
 
-### 11.2 تغيير حالة مزاد (auctionStatusChanged)
+### 11.2 مزاد جديد تم إنشاؤه (auctionCreated) — عام
+
+```graphql
+subscription {
+  auctionCreated {
+    _id  title  description  startingPrice  currentPrice  status  images  endTime  createdAt
+  }
+}
+```
+
+> يُستخدم في الصفحة الرئيسية وقوائم المزادات لإضافة المزاد الجديد فور إنشائه بدون Refresh.
+
+---
+
+### 11.3 تغيير حالة مزاد (auctionStatusChanged)
 
 ```graphql
 subscription {
@@ -1050,7 +1197,7 @@ subscription {
 
 ---
 
-### 11.3 مزايدة جديدة (bidAdded)
+### 11.4 مزايدة جديدة (bidAdded)
 
 ```graphql
 subscription {
@@ -1063,11 +1210,11 @@ subscription {
 }
 ```
 
-> يُستخدم لتحديث الـ `currentPrice` فورياً بدون Polling.
+> يُستخدم لتحديث الـ `currentPrice` فورياً في الشاشة بدون Polling.
 
 ---
 
-### 11.4 تحديث المحفظة اللحظي (walletUpdated) — محمي
+### 11.5 تحديث المحفظة اللحظي (walletUpdated) — محمي
 
 ```graphql
 subscription {
@@ -1077,22 +1224,37 @@ subscription {
 }
 ```
 
-> يُستخدم لمزامنة رصيد المحفظة المتاح والمحجوز لحظياً فور أي عملية مزايدة أو سحب أو إيداع.
+> يُستخدم لمزامنة رصيد المحفظة المتاح والمحجوز لحظياً فور أي عملية مزايدة أو سحب أو إيداع ناجح.
 
 ---
 
-### 11.5 رسائل الشات (messageSent / messageUpdated)
+### 11.6 رسائل الشات (messageSent / messageUpdated)
 
 ```graphql
 subscription {
   messageSent(auctionId: ID!) {
-    _id  content  senderId  senderName  type  createdAt
+    _id  content  senderId  senderName  type  mediaUrls  createdAt
   }
 }
 
 subscription {
   messageUpdated(auctionId: ID!) {
     _id  content  isEdited  isDeleted  reactions { emoji  userId }
+  }
+}
+```
+
+---
+
+### 11.7 تحديث حالة قراءة الشات (chatReadStatusUpdated)
+
+```graphql
+subscription {
+  chatReadStatusUpdated(auctionId: ID!) {
+    auctionId
+    userId
+    lastReadMessageId
+    lastReadAt
   }
 }
 ```
@@ -1125,6 +1287,231 @@ mutation {
 
 ---
 
+## 13. Withdrawals & Financial Admin Module (نظام السحوبات والإدارة المالية)
+
+### أ) استعلامات ومعاملات المستخدم (User Endpoints)
+
+```graphql
+# 1. حساب العمولة والمبلغ الصافي والوقت المتوقع قبل تقديم الطلب (Public/Auth)
+query {
+  withdrawalFeePreview(amount: 5000, payoutMethod: INSTAPAY) {
+    requestedAmount    # "5000.00"
+    fee                # "100.00" (2%)
+    feePercentage      # 2
+    netAmount          # "4900.00"
+    maxAllowed         # 50000 (أو 10,000,000 للحساب البنكي)
+    estimatedDelivery  # "Within 24 business hours"
+  }
+}
+
+# 2. طلب سحب جديد (User Auth)
+mutation {
+  requestWithdrawal(input: {
+    amount: 5000
+    payoutMethod: INSTAPAY   # BANK_ACCOUNT | VODAFONE_CASH | ORANGE_CASH | ETISALAT_CASH | WE_PAY | INSTAPAY
+    payoutDetails: {
+      accountHolderName: "Adham Mohamed"
+      phoneNumber: "01012345678"
+      ipaAddress: "adham@instapay"
+    }
+  }) {
+    _id
+    amount
+    fee
+    netAmount
+    currency
+    payoutMethod
+    status        # PENDING
+    createdAt
+  }
+}
+
+# 3. إلغاء طلب السحب المعلق (User Auth)
+mutation {
+  cancelWithdrawal(id: "66123abc456def789") {
+    _id
+    status        # CANCELLED
+  }
+}
+
+# 4. عرض طلباتي مع الفلترة والترتيب (User Auth)
+query {
+  myWithdrawals(
+    pagination: { page: 1, limit: 10 }
+    filter: {
+      status: PENDING
+      payoutMethod: INSTAPAY
+      sortOrder: DESC
+    }
+  ) {
+    items {
+      _id
+      amount
+      fee
+      netAmount
+      status
+      payoutMethod
+      createdAt
+    }
+    total
+    totalPages
+    hasNextPage
+  }
+}
+
+# 5. متابعة التحديثات اللحظية لطلباتي (WebSocket Subscription)
+subscription {
+  myWithdrawalUpdated {
+    _id
+    status
+    rejectionReason
+    receiptUrl
+    adminReference
+    completedAt
+  }
+}
+```
+
+**الأخطاء المحتملة لطلبات السحب (User Operations):**
+| كود الخطأ | المعنى / سبب الحدوث |
+|:---|:---|
+| `INVALID_PAYOUT_DETAILS` | بيانات وسيلة السحب غير مكتملة (نقص رقم الحساب/IBAN للبنك، أو نقص IPA/الهاتف لانستاباي، أو نقص الهاتف للمحفظة) |
+| `WITHDRAWAL_BELOW_MINIMUM` | المبلغ المطلوب سحبه أقل من الحد الأدنى المسموح به (50 ج.م) |
+| `WITHDRAWAL_EXCEEDS_MAX_FOR_...` | المبلغ يتجاوز السقف المحدد للوسيلة (50,000 ج.م للمحافظ وانستاباي / 10,000,000 ج.م للحساب البنكي) |
+| `INSUFFICIENT_FUNDS` | الرصيد المتاح في المحفظة (الرصيد الكلي - الرصيد المحجوز) غير كافٍ لتغطية المبلغ |
+| `DAILY_WITHDRAWAL_LIMIT_REACHED` | تم استنفاد الحد اليومي (مسموح بطلب سحب نشط أو مكتمل واحد فقط يومياً حسب تقويم القاهرة `Africa/Cairo`) |
+| `WITHDRAWAL_NOT_FOUND` | طلب السحب غير موجود أو لا ينتمي للمستخدم الحالي |
+| `WITHDRAWAL_NOT_CANCELLABLE` | لا يمكن إلغاء الطلب لأنه لم يعد في حالة انتظار (`PENDING`)، حيث دخل حيز المعالجة أو اكتمل بالفعل |
+
+---
+
+### ب) استعلامات ومعاملات الأدمن المالي (Admin Financial Endpoints)
+
+> تتطلب صلاحية `role: ADMIN`.
+
+```graphql
+# 1. استعراض كافة طلبات السحب في النظام مع الفلترة
+query {
+  adminGetWithdrawals(
+    pagination: { page: 1, limit: 20 }
+    filter: {
+      status: PENDING
+      sortOrder: DESC
+    }
+  ) {
+    items {
+      _id
+      userId
+      amount
+      fee
+      netAmount
+      payoutMethod
+      payoutDetails {
+        accountHolderName
+        bankName
+        accountNumber
+        iban
+        phoneNumber
+        ipaAddress
+      }
+      status
+      createdAt
+    }
+    total
+  }
+}
+
+# 2. بدء معالجة الطلب (Lock to Admin)
+mutation {
+  adminStartWithdrawalProcessing(requestId: "66123abc456def789") {
+    _id
+    status        # PROCESSING
+    processedBy
+    processedAt
+  }
+}
+
+# 3. إتمام السحب وإرفاق بيانات وإيصال التحويل البنكي
+mutation {
+  adminCompleteWithdrawal(input: {
+    withdrawalId: "66123abc456def789"
+    adminReference: "CIB-TRX-987654321"
+    receiptUrl: "https://storage.mazadak.com/receipts/rec_98765.pdf"
+  }) {
+    _id
+    status                  # COMPLETED
+    adminReference
+    receiptUrl
+    completionTransactionId
+    completedAt
+  }
+}
+
+# 4. رفض طلب السحب مع ذكر السبب وإعادة الرصيد للمحفظة فوراً
+mutation {
+  adminRejectWithdrawal(input: {
+    withdrawalId: "66123abc456def789"
+    rejectionReason: "Invalid Instapay IPA address provided."
+  }) {
+    _id
+    status          # REJECTED
+    rejectionReason
+  }
+}
+
+# 5. تقرير الخزينة والسيولة الشامل (Treasury Liquidity Stats)
+query {
+  adminGetTreasuryStats {
+    totalWalletBalance         # إجمالي أرصدة المستخدمين في المنصة
+    totalHeldInWallets         # إجمالي الأموال المعلقة داخل المحافظ (مزادات/سحوبات)
+    totalPendingWithdrawals    # إجمالي مبالغ السحوبات المعلقة
+    pendingWithdrawalsCount    # عدد طلبات السحب المعلقة
+    totalHeldInEscrow          # إجمالي المبالغ المحتجزة في الوساطة (Escrow)
+    totalCompletedPayouts      # إجمالي الأموال التي تم تحويلها وسحبها بنجاح
+    totalCollectedFees         # إجمالي العمولات التي جنتها المنصة من السحوبات
+  }
+}
+
+# 6. تعديل رصيد مستخدم يدوياً (تسوية مالية / تعويض)
+mutation {
+  adminAdjustUserBalance(input: {
+    userId: "660abc123456789"
+    amount: 500
+    type: CREDIT   # CREDIT (إضافة) | DEBIT (خصم)
+    reason: "Compensating user for delivery disruption"
+  }) {
+    _id
+    balance
+    heldBalance
+  }
+}
+
+# 7. البث المباشر لطلبات السحب في لوحة تحكم الإدارة (Live Admin Feed)
+subscription {
+  adminWithdrawalFeed {
+    _id
+    userId
+    amount
+    netAmount
+    payoutMethod
+    status
+    createdAt
+  }
+}
+```
+
+**الأخطاء المحتملة لعمليات الأدمن المالي (Admin Operations):**
+| كود الخطأ | المعنى / سبب الحدوث |
+|:---|:---|
+| `WITHDRAWAL_NOT_FOUND` | طلب السحب المحدد غير موجود بالمعرف الممرر |
+| `WITHDRAWAL_NOT_PENDING` | الطلب ليس في حالة `PENDING` ولا يمكن قفله أو بدء معالجته |
+| `WITHDRAWAL_NOT_IN_PROGRESS` | الطلب ليس في حالة قيد التنفيذ (`PENDING` أو `PROCESSING`) ولا يمكن إتمامه |
+| `WITHDRAWAL_NOT_REJECTABLE` | الطلب مكتمل بالفعل (`COMPLETED`) أو ملغي ولا يمكن رفضه |
+| `AMOUNT_MUST_BE_POSITIVE` | مبلغ تعديل الرصيد اليدوي بواسطة الأدمن يجب أن يكون أكبر من الصفر |
+| `REASON_REQUIRED` / `REASON_TOO_SHORT` | سبب التعديل المالي اليدوي للأدمن إلزامي ولا يقل عن 10 أحرف لضمان التوثيق المالي |
+
+---
+
 ## ملخص سريع — جميع نقاط الـ API
 
 | نوع الطلب | الـ Endpoint | الوصف |
@@ -1135,4 +1522,5 @@ mutation {
 | **POST** | `/payments/webhooks/stripe` | Webhook من Stripe (Public) |
 | **POST** | `/payments/webhooks/paymob` | Webhook من Paymob (Public) |
 | **WS** | `/graphql` | WebSocket للـ Subscriptions |
+
 

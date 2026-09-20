@@ -8,7 +8,7 @@ import {
   subscribeToSubscription,
 } from '@/services/websocket/socketClient';
 import { useAuth } from '@/hooks/useAuth';
-import { bidsService } from '@/features/bids/services/bids.service';
+import { walletService } from '@/features/wallet';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -46,7 +46,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     if (!isAuthenticated || !accessToken) return;
 
-    const unsubscribe = bidsService.subscribeToWalletUpdated(
+    const unsubscribe = walletService.subscribeToWalletUpdated(
       {
         next: (data) => {
           if (data?.walletUpdated) {

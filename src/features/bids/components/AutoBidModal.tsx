@@ -505,6 +505,17 @@ export const AutoBidModal: React.FC<AutoBidModalProps> = ({
                         deficit: `${formatPrice(deficit, isRTL)} ${t('currency.symbol')}`,
                       })}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        navigate(ROUTES.WALLET_DEPOSIT);
+                      }}
+                      className="mt-2 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl px-3 py-1.5 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Wallet className="w-3.5 h-3.5 text-amber-500" />
+                      <span>{t('autoBid.walletSummary.depositButton', { defaultValue: 'إيداع رصيد الآن' })}</span>
+                    </button>
                   </div>
                 </div>
               </div>

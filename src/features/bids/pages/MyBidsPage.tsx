@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  ChevronRight,
-  ChevronLeft,
   Gavel,
   TrendingUp,
   PackageOpen,
@@ -11,8 +9,8 @@ import {
   AlertCircle,
   History,
 } from 'lucide-react';
-import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
+import { Pagination } from '@/components/common/Pagination';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { MyBidsStats } from '../components/MyBidsStats';
 import { MyBidsFilters } from '../components/MyBidsFilters';
@@ -20,19 +18,17 @@ import { MyBidCard } from '../components/MyBidCard';
 import { MyBidsSkeleton } from '../components/MyBidsSkeleton';
 import { useMyBids } from '../hooks/useMyBids';
 import { ROUTES } from '@/constants/routes.constants';
-import { toLocalizedDigits } from '@/utils/formatters';
 
 export const MyBidsPage: React.FC = () => {
-  const { t, i18n } = useTranslation(['bids', 'common', 'auctions']);
+  const { t } = useTranslation(['bids', 'common', 'auctions']);
   const { t: tCommon } = useTranslation('common');
-  const isRTL = i18n.language?.startsWith('ar');
   const navigate = useNavigate();
-  const ChevronIcon = isRTL ? ChevronLeft : ChevronRight;
 
   const {
     statusFilter,
     sortOption,
     page,
+    limit,
     bids,
     total,
     totalPages,
@@ -159,43 +155,14 @@ export const MyBidsPage: React.FC = () => {
             </div>
 
             {/* 6. Pagination Bar */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200 dark:border-slate-800 text-xs">
-                <span className="text-slate-500 dark:text-slate-400">
-                  {t('myBids.pagination.showingResults', {
-                    current: isRTL ? toLocalizedDigits(bids.length, true) : bids.length,
-                    total: isRTL ? toLocalizedDigits(total, true) : total,
-                  })}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => setPage(page - 1)}
-                    leftIcon={<ChevronIcon className="w-3.5 h-3.5" />}
-                  >
-                    {t('myBids.pagination.prev')}
-                  </Button>
-
-                  <span className="font-semibold px-2 text-slate-700 dark:text-slate-300">
-                    {isRTL ? toLocalizedDigits(page, true) : page} /{' '}
-                    {isRTL ? toLocalizedDigits(totalPages, true) : totalPages}
-                  </span>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page >= totalPages}
-                    onClick={() => setPage(page + 1)}
-                    rightIcon={<ChevronIcon className="w-3.5 h-3.5" />}
-                  >
-                    {t('myBids.pagination.next')}
-                  </Button>
-                </div>
-              </div>
-            )}
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              limit={limit}
+              onPageChange={setPage}
+              isLoading={isLoading}
+            />
           </div>
         )}
       </Card>

@@ -32,6 +32,7 @@ export const ROUTES = {
   WALLET: '/wallet',
   WALLET_DEPOSIT: '/wallet/deposit',
   WALLET_WITHDRAW: '/wallet/withdraw',
+  WALLET_WITHDRAWALS: '/wallet/withdrawals',
   WALLET_TRANSACTIONS: '/wallet/transactions',
 
   // Escrow & Disputes

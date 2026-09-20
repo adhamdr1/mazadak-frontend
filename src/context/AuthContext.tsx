@@ -23,6 +23,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (token && storedUser) {
       setUserState(storedUser);
       setAccessToken(token);
+
+      // If stored user is missing createdAt, fetch fresh profile from me query
+      if (!storedUser.createdAt) {
+        authService
+          .getMe()
+          .then((freshUser) => {
+            if (freshUser) {
+              authStorage.setUser(freshUser);
+              setUserState(freshUser);
+            }
+          })
+          .catch(() => {
+            // Silently ignore network failures on background refresh
+          });
+      }
     } else {
       authStorage.clearAuth();
       setUserState(null);

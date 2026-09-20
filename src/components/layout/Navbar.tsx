@@ -9,6 +9,9 @@ import {
   Gavel,
   Layers,
   TrendingUp,
+  Wallet,
+  Receipt,
+  History,
   KeyRound,
   User,
   LogOut,
@@ -77,6 +80,12 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
             label: t('nav.myBids'),
             icon: TrendingUp,
             isActive: location.pathname === ROUTES.MY_BIDS,
+          },
+          {
+            to: ROUTES.WALLET,
+            label: t('nav.wallet'),
+            icon: Wallet,
+            isActive: location.pathname.startsWith('/wallet'),
           },
         ]
       : []),
@@ -341,7 +350,58 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   </Link>
                 )}
 
-                {/* 6. تغيير كلمة المرور */}
+                {/* 6. المحفظة والرصيد */}
+                {isAuthenticated && (
+                  <Link
+                    to={ROUTES.WALLET}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
+                      location.pathname === ROUTES.WALLET
+                        ? 'bg-amber-500 text-slate-950 shadow-sm'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    )}
+                  >
+                    <Wallet className="w-4 h-4" />
+                    <span>{t('nav.wallet')}</span>
+                  </Link>
+                )}
+
+                {/* 7. سجل السحوبات */}
+                {isAuthenticated && (
+                  <Link
+                    to={ROUTES.WALLET_WITHDRAWALS}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
+                      location.pathname === ROUTES.WALLET_WITHDRAWALS
+                        ? 'bg-amber-500 text-slate-950 shadow-sm'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    )}
+                  >
+                    <History className="w-4 h-4" />
+                    <span>{t('nav.withdrawals')}</span>
+                  </Link>
+                )}
+
+                {/* 8. سجل المعاملات */}
+                {isAuthenticated && (
+                  <Link
+                    to={ROUTES.WALLET_TRANSACTIONS}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
+                      location.pathname === ROUTES.WALLET_TRANSACTIONS
+                        ? 'bg-amber-500 text-slate-950 shadow-sm'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    )}
+                  >
+                    <Receipt className="w-4 h-4" />
+                    <span>{t('nav.transactions')}</span>
+                  </Link>
+                )}
+
+                {/* 9. تغيير كلمة المرور */}
                 {isAuthenticated && (
                   <Link
                     to={ROUTES.UPDATE_PASSWORD}

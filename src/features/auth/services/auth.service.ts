@@ -1,5 +1,6 @@
 import { executeGraphQL } from '@/services/api/graphqlClient';
 import type {
+  User,
   AuthResponse,
   RegisterResponse,
   LoginInput,
@@ -49,6 +50,21 @@ const USER_FIELDS_FRAGMENT = `
     }
     createdAt
     updatedAt
+  }
+`;
+
+// ============================================================================
+// ARCHITECTURAL NOTE / ملاحظة معمارية:
+// استعلام 'me' يتبع في الباك إند موديول المستخدمين (Users Module - Section 2.1).
+// تم وضعه هنا مؤقتاً كجسر ترطيب (Hydration Bridge) لـ AuthContext لجلب createdAt
+// وسيتم نقله إلى features/users/services/users.service.ts عند بناء Module 10.
+// ============================================================================
+const ME_QUERY = `
+  ${USER_FIELDS_FRAGMENT}
+  query Me {
+    me {
+      ...UserFields
+    }
   }
 `;
 
@@ -279,5 +295,13 @@ export const authService = {
       { token }
     );
     return data.confirmReactivation;
+  },
+
+  /**
+   * مؤقت لـ AuthContext — سيُنقل لـ users.service.ts في Module 10 (Users Module)
+   */
+  getMe: async (): Promise<User> => {
+    const data = await executeGraphQL<{ me: User }>(ME_QUERY);
+    return data.me;
   },
 };
