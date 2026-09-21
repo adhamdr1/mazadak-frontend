@@ -122,6 +122,11 @@ export const Footer: React.FC = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link to={ROUTES.WALLET_WITHDRAWALS} className="hover:text-amber-500 transition-colors">
+                      {t('footer.withdrawals')}
+                    </Link>
+                  </li>
+                  <li>
                     <Link to={ROUTES.WALLET_TRANSACTIONS} className="hover:text-amber-500 transition-colors">
                       {t('footer.transactions')}
                     </Link>

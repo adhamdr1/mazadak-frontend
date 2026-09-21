@@ -54,6 +54,7 @@
     "updatePassword": "تغيير كلمة المرور",
     "forgotPassword": "استعادة كلمة المرور",
     "wallet": "محفظتي",
+    "withdrawals": "سجل السحوبات",
     "transactions": "سجل المعاملات المالية"
   },
   "notFound": {

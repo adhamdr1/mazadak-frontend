@@ -39,12 +39,12 @@ export const WalletPage: React.FC = () => {
 
         // 1. Immediate Cache Invalidation
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WALLET.TRANSACTIONS] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.TRANSACTIONS });
 
         // 2. Safety Fallback Refetch after 1000ms
         const timer = setTimeout(() => {
           refetch();
-          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WALLET.TRANSACTIONS] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.TRANSACTIONS });
         }, 1000);
 
         // 3. Clean up URL
