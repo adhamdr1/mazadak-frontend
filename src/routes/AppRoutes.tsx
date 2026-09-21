@@ -39,7 +39,10 @@ const WithdrawPage = lazy(() => import('@/features/wallet/pages/WithdrawPage').t
 const WithdrawalsPage = lazy(() => import('@/features/wallet/pages/WithdrawalsPage').then(m => ({ default: m.WithdrawalsPage })));
 const TransactionsPage = lazy(() => import('@/features/wallet/pages/TransactionsPage').then(m => ({ default: m.TransactionsPage })));
 
-// 5. General Platform Pages
+// 5. Escrow Module Pages
+const MyEscrowsPage = lazy(() => import('@/features/escrow/pages/MyEscrowsPage').then(m => ({ default: m.MyEscrowsPage })));
+
+// 6. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
@@ -68,6 +71,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.WALLET_WITHDRAW} element={<WithdrawPage />} />
               <Route path={ROUTES.WALLET_WITHDRAWALS} element={<WithdrawalsPage />} />
               <Route path={ROUTES.WALLET_TRANSACTIONS} element={<TransactionsPage />} />
+              <Route path={ROUTES.MY_ESCROWS} element={<MyEscrowsPage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>
           </Route>

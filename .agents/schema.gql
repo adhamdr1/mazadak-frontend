@@ -347,12 +347,16 @@ type Escrow {
   currency: String!
   status: EscrowStatus!
   inspectionPeriodEndsAt: DateTime!
+
+  """Total inspection window in hours (168 hours = 7 days)"""
+  inspectionDurationHours: Int!
   releasedAt: DateTime
   refundedAt: DateTime
   disputeId: ID
   releaseReason: String
   createdAt: DateTime!
   updatedAt: DateTime!
+  auction: Auction
 }
 
 """Lifecycle status of an escrow hold"""
@@ -417,6 +421,26 @@ type EscrowsPage {
   total: Int!
   totalPages: Int!
   hasNextPage: Boolean!
+}
+
+type EscrowStatusChangedPayload {
+  escrowId: ID!
+  auctionId: ID!
+  status: EscrowStatus!
+  releasedAt: DateTime
+  refundedAt: DateTime
+  disputeId: ID
+  releaseReason: String
+}
+
+type DisputeStatusChangedPayload {
+  disputeId: ID!
+  escrowId: ID!
+  auctionId: ID!
+  status: DisputeStatus!
+  adminDecision: DisputeResolution
+  adminNotes: String
+  resolvedAt: DateTime
 }
 
 type PayoutDetails {
@@ -1057,6 +1081,8 @@ type Subscription {
   auctionCreated: Auction!
   auctionStatusChanged(auctionId: ID!): AuctionStatusChangedPayload!
   bidAdded(auctionId: ID!): BidAddedPayload!
+  escrowStatusChanged(escrowId: ID!): EscrowStatusChangedPayload!
+  disputeStatusChanged(disputeId: ID!): DisputeStatusChangedPayload!
   adminWithdrawalFeed: WithdrawalRequest!
   myWithdrawalUpdated: WithdrawalRequest!
   messageSent(auctionId: ID!): ChatMessage!

@@ -1,0 +1,71 @@
+{
+  "currency": {
+    "egp": "EGP"
+  },
+  "status": {
+    "HELD": "Held in Escrow",
+    "RELEASED": "Released to Seller",
+    "REFUNDED": "Refunded to Buyer",
+    "DISPUTED": "Dispute Active"
+  },
+  "releaseReason": {
+    "BUYER_CONFIRMED": "Buyer confirmed delivery",
+    "EXPIRED_INSPECTION_WINDOW": "Automatic release after inspection window (7 days)",
+    "DISPUTE_RESOLVED_PAY_SELLER": "Dispute resolved in seller's favor",
+    "ADMIN_MANUAL_RELEASE": "Admin manual settlement"
+  },
+  "card": {
+    "unknownAuction": "Completed Auction",
+    "roleBuyer": "You are Buyer",
+    "roleSeller": "You are Seller",
+    "securedAmount": "Secured Escrow Amount",
+    "viewDetails": "View Details",
+    "inspectionDays": "{{days}} days inspection window",
+    "releasedNotice": "Item delivered & funds released to seller successfully",
+    "disputedNotice": "Dispute under review by Mazadak administration",
+    "refundedNotice": "Full amount refunded back to buyer's wallet",
+    "noImage": "Auction",
+    "escrowIdLabel": "Escrow ID",
+    "copied": "Copied"
+  },
+  "myEscrows": {
+    "title": "My Escrows",
+    "subtitle": "Track secured auction funds held in escrow between buyer and seller throughout the 7-day inspection window.",
+    "browseAuctions": "Explore Auctions",
+    "tabs": {
+      "ALL": "All Transactions",
+      "HELD": "Held in Escrow",
+      "RELEASED": "Released",
+      "REFUNDED": "Refunded",
+      "DISPUTED": "Disputes"
+    },
+    "banner": {
+      "title": "How does Mazadak Escrow Protection work?",
+      "body": "Winning auction amounts are securely held upon completion. The buyer has 7 days to inspect the item, after which funds auto-release to the seller unless a dispute is opened.",
+      "point1": "Encrypted and secured fund holding",
+      "point2": "Full 7-day inspection window",
+      "point3": "Direct dispute resolution if issues arise"
+    },
+    "empty": {
+      "title": "No escrow transactions found",
+      "descAll": "When you win an auction or complete a sale, all escrow-protected transactions will appear here.",
+      "descFilter": "No transactions match the selected filter.",
+      "action": "Browse Live Auctions"
+    },
+    "errorTitle": "Failed to load escrows",
+    "errorMessage": "Please check your internet connection and try again."
+  },
+  "errors": {
+    "ESCROW_NOT_FOUND": "Escrow transaction not found",
+    "ESCROW_UNAUTHORIZED": "You are not authorized to perform this action",
+    "ESCROW_ALREADY_RELEASED": "Escrow funds have already been released",
+    "ESCROW_ALREADY_DISPUTED": "A dispute is already active on this auction",
+    "ESCROW_INVALID_STATUS": "Current escrow status does not allow this action",
+    "INVALID_DISPUTE_ACTION": "Cannot open a dispute under current status",
+    "DISPUTE_WINDOW_EXPIRED": "Inspection period has expired (7 days)",
+    "DISPUTE_NOT_FOUND": "Dispute not found",
+    "DISPUTE_ALREADY_RESOLVED": "Cannot cancel an already resolved dispute",
+    "NETWORK_ERROR": "Network connection error, please check your internet",
+    "GENERIC_ERROR": "An unexpected error occurred, please try again"
+  }
+}
