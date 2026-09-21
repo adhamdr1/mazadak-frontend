@@ -16,7 +16,7 @@ export interface UseRecentTransactionsReturn {
  */
 export const useRecentTransactions = (): UseRecentTransactionsReturn => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [QUERY_KEYS.WALLET.TRANSACTIONS, 'recent'],
+    queryKey: [...QUERY_KEYS.WALLET.TRANSACTIONS, 'recent'],
     queryFn: () => walletService.getRecentTransactions(),
     staleTime: 30 * 1000,
   });

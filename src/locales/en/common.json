@@ -54,6 +54,7 @@
     "updatePassword": "Change Password",
     "forgotPassword": "Forgot Password",
     "wallet": "My Wallet",
+    "withdrawals": "Withdrawal History",
     "transactions": "Transaction History"
   },
   "notFound": {
