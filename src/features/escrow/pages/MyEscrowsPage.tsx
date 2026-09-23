@@ -172,7 +172,7 @@ export const MyEscrowsPage: React.FC = () => {
             leftIcon={<RefreshCw className="w-4 h-4" />}
             className="font-bold border-rose-300 dark:border-rose-800"
           >
-            {t('common:actions.retry', 'إعادة المحاولة')}
+            {t('common:actions.retry', isRTL ? 'إعادة المحاولة' : 'Try Again')}
           </Button>
         </div>
       ) : escrows.length === 0 ? (

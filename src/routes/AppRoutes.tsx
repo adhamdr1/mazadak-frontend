@@ -41,6 +41,7 @@ const TransactionsPage = lazy(() => import('@/features/wallet/pages/Transactions
 
 // 5. Escrow Module Pages
 const MyEscrowsPage = lazy(() => import('@/features/escrow/pages/MyEscrowsPage').then(m => ({ default: m.MyEscrowsPage })));
+const EscrowDetailPage = lazy(() => import('@/features/escrow/pages/EscrowDetailPage').then(m => ({ default: m.EscrowDetailPage })));
 
 // 6. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -72,6 +73,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.WALLET_WITHDRAWALS} element={<WithdrawalsPage />} />
               <Route path={ROUTES.WALLET_TRANSACTIONS} element={<TransactionsPage />} />
               <Route path={ROUTES.MY_ESCROWS} element={<MyEscrowsPage />} />
+              <Route path={ROUTES.ESCROW_DETAIL()} element={<EscrowDetailPage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>
           </Route>

@@ -14,6 +14,19 @@
   "close": "Close",
   "error": "An unexpected error occurred",
   "success": "Operation completed successfully",
+  "actions": {
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "copy": "Copy",
+    "copied": "Copied",
+    "save": "Save",
+    "back": "Back",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "close": "Close"
+  },
   "switchToLanguage": "Switch to Arabic",
   "theme": {
     "light": "Light",

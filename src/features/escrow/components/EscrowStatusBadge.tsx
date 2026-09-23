@@ -24,7 +24,7 @@ export const EscrowStatusBadge: React.FC<EscrowStatusBadgeProps> = ({
 }) => {
   const { t } = useTranslation('escrow');
 
-  const normalizedStatus = status.toUpperCase() as EscrowStatus;
+  const safeStatus = (status || '').toUpperCase() as EscrowStatus;
 
   const config: Record<
     EscrowStatus,
@@ -67,9 +67,9 @@ export const EscrowStatusBadge: React.FC<EscrowStatusBadgeProps> = ({
     },
   };
 
-  const item = config[normalizedStatus] || {
-    labelKey: `status.${status}`,
-    defaultLabel: status,
+  const item = config[safeStatus] || {
+    labelKey: `status.${safeStatus || 'UNKNOWN'}`,
+    defaultLabel: status || 'Pending',
     icon: Lock,
     classes:
       'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/20 shadow-sm',

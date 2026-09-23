@@ -14,6 +14,19 @@
   "close": "إغلاق",
   "error": "حدث خطأ غير متوقع",
   "success": "تمت العملية بنجاح",
+  "actions": {
+    "retry": "إعادة المحاولة",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "copy": "نسخ",
+    "copied": "تم النسخ",
+    "save": "حفظ",
+    "back": "رجوع",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "view": "عرض",
+    "close": "إغلاق"
+  },
   "switchToLanguage": "تحويل الي انجليزي",
   "theme": {
     "light": "فاتح",
