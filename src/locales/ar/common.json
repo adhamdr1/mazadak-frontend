@@ -46,6 +46,7 @@
     "auctions": "المزادات",
     "myAuctions": "مزاداتي",
     "myBids": "مزايداتي",
+    "myEscrows": "معاملات الضمان",
     "createAuction": "إنشاء مزاد",
     "wallet": "المحفظة",
     "deposit": "شحن الرصيد",
@@ -66,6 +67,7 @@
     "trustFairPlay": "مزايدة حية وشفافة في الوقت الفعلي",
     "updatePassword": "تغيير كلمة المرور",
     "forgotPassword": "استعادة كلمة المرور",
+    "myEscrows": "معاملات الضمان",
     "wallet": "محفظتي",
     "withdrawals": "سجل السحوبات",
     "transactions": "سجل المعاملات المالية"

@@ -30,6 +30,7 @@ export const QUERY_KEYS = {
     BY_AUCTION: (auctionId: string) => ['escrow', 'auction', auctionId] as const,
     DETAIL: (id: string) => ['escrow', id] as const,
     DISPUTE: (id: string) => ['dispute', id] as const,
+    DISPUTE_BY_AUCTION: (auctionId: string) => ['dispute', 'auction', auctionId] as const,
   },
   NOTIFICATIONS: {
     ALL: ['notifications'] as const,

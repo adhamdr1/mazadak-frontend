@@ -46,6 +46,7 @@
     "auctions": "Auctions",
     "myAuctions": "My Auctions",
     "myBids": "My Bids",
+    "myEscrows": "My Escrows",
     "createAuction": "Create Auction",
     "wallet": "Wallet",
     "deposit": "Deposit Funds",
@@ -66,6 +67,7 @@
     "trustFairPlay": "Real-time transparent live bidding",
     "updatePassword": "Change Password",
     "forgotPassword": "Forgot Password",
+    "myEscrows": "My Escrows",
     "wallet": "My Wallet",
     "withdrawals": "Withdrawal History",
     "transactions": "Transaction History"

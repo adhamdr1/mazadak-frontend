@@ -15,6 +15,7 @@ import { CancelAuctionModal } from '../components/shared/CancelAuctionModal';
 import { AutoBidModal } from '@/features/bids/components/AutoBidModal';
 import { AuctionBidHistory } from '@/features/bids/components/AuctionBidHistory';
 import { Button } from '@/components/common/Button';
+import { EscrowBanner } from '@/components/common/EscrowBanner';
 import { ROUTES } from '@/constants/routes.constants';
 
 
@@ -88,6 +89,9 @@ export const AuctionDetailPage: React.FC = () => {
       {/* Main Auction Presentation */}
       {!isLoading && auction && (
         <>
+          {/* Top Real-time Escrow & Dispute Status Banner */}
+          <EscrowBanner auctionId={auction._id} />
+
           {/* Main 2-Column Responsive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             {/* Left Column (Desktop 7/8 cols): Gallery, Specs, Description & Desktop Seller Profile */}
