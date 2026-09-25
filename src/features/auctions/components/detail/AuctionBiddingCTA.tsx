@@ -192,7 +192,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
                 {t('detail.sellerWinnerInstructions')}
               </p>
               <Link
-                to={ROUTES.MY_ESCROWS}
+                to={ROUTES.ESCROW_DETAIL(auction._id)}
                 className="flex items-center justify-center gap-2 w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all cursor-pointer"
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -225,7 +225,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
             {t('detail.wonBannerMessage')}
           </p>
           <Link
-            to={ROUTES.MY_ESCROWS}
+            to={ROUTES.ESCROW_DETAIL(auction._id)}
             className="flex items-center justify-center w-full mt-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs py-2 px-3.5 rounded-xl shadow-md shadow-amber-500/20 text-center transition-all cursor-pointer"
           >
             <span>{t('detail.proceedToEscrow')}</span>

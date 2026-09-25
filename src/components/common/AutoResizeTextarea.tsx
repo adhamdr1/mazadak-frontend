@@ -65,7 +65,7 @@ export const AutoResizeTextarea = React.forwardRef<
           'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500',
           hasError
             ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
-            : 'border-slate-200/90 dark:border-slate-700/90 hover:border-slate-300 dark:hover:border-slate-600 focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20',
+            : 'border-slate-200/90 dark:border-slate-700/90 hover:border-amber-500/50 dark:hover:border-amber-500/50 focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20',
           className
         )}
         {...props}

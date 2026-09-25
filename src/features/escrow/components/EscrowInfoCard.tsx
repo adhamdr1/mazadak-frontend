@@ -293,8 +293,8 @@ export const EscrowInfoCard: React.FC<EscrowInfoCardProps> = ({ escrow, classNam
         </div>
       )}
 
-      {escrow.status === 'DISPUTED' && escrow.disputeId && (
-        <div className="rounded-2xl p-4 bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {escrow.status === 'DISPUTED' && (
+        <div className="rounded-2xl p-4 bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-rose-800 dark:text-rose-300 font-black text-xs sm:text-sm">
               <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
@@ -309,8 +309,8 @@ export const EscrowInfoCard: React.FC<EscrowInfoCardProps> = ({ escrow, classNam
           </div>
 
           <Link
-            to={ROUTES.DISPUTE_DETAIL(escrow.disputeId)}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black bg-rose-600 hover:bg-rose-700 text-white transition-colors shrink-0 shadow-sm"
+            to={escrow.disputeId ? ROUTES.DISPUTE_DETAIL(escrow.disputeId) : ROUTES.MY_ESCROWS}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-rose-700 dark:text-rose-300 bg-white dark:bg-slate-900 hover:bg-rose-100/90 dark:hover:bg-rose-900/50 border border-rose-300/90 dark:border-rose-800/80 hover:border-rose-400 dark:hover:border-rose-700 transition-all duration-200 shrink-0 shadow-xs cursor-pointer select-none active:scale-98"
           >
             <span>{t('detail.viewDisputeDetails', 'عرض تفاصيل النزاع')}</span>
             <ExternalLink className="w-3.5 h-3.5" />
