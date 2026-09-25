@@ -3,11 +3,10 @@
  * GraphQL API calls for Auctions Module — Pure production GraphQL connected directly to NestJS Backend
  */
 
-import axios from 'axios';
 import { executeGraphQL } from '@/services/api/graphqlClient';
 import { subscribeToSubscription } from '@/services/websocket/socketClient';
+import { uploadService } from '@/services/api/upload.service';
 import { authStorage } from '@/utils/storage.utils';
-import { compressImage, compressImageToFile } from '@/utils/imageCompression';
 import type {
   Auction,
   AuctionsPage,
@@ -15,8 +14,6 @@ import type {
   AuctionsFilterInput,
   CreateAuctionInput,
   UpdateAuctionInput,
-  UploadImageResponse,
-  UploadSignatureResponse,
   AuctionStatusChangedPayload,
 } from '../types/auctions.types';
 
@@ -120,27 +117,6 @@ const CANCEL_AUCTION_MUTATION = `
     cancelAuction(id: $id)
   }
 `;
-
-const GENERATE_UPLOAD_SIGNATURE_QUERY = `
-  query GenerateUploadSignature($folder: String) {
-    generateUploadSignature(folder: $folder) {
-      signature
-      timestamp
-      apiKey
-      cloudName
-      folder
-    }
-  }
-`;
-
-const UPLOAD_IMAGE_MUTATION = `
-  mutation UploadImage($input: UploadImageInput!) {
-    uploadImage(input: $input) {
-      url
-    }
-  }
-`;
-
 
 // ----------------------------------------------------
 // Public API Methods
@@ -267,118 +243,25 @@ export const auctionsService = {
 
   /**
    * Get Cloudinary upload signature for direct browser uploads
+  /**
+   * Get Cloudinary upload signature for direct browser uploads (Delegated to centralized uploadService)
    */
-  getUploadSignature: async (folder = 'auctions'): Promise<UploadSignatureResponse> => {
-    const data = await executeGraphQL<{ generateUploadSignature: UploadSignatureResponse }>(
-      GENERATE_UPLOAD_SIGNATURE_QUERY,
-      { folder }
-    );
-    return data.generateUploadSignature;
-  },
+  getUploadSignature: (folder = 'auctions') => uploadService.getUploadSignature(folder),
 
   /**
-   * Upload image via Base64 endpoint (NestJS Backend Mutation)
+   * Upload image via Base64 endpoint (Delegated to centralized uploadService)
    */
-  uploadImage: async (base64Data: string, folder = 'auctions'): Promise<UploadImageResponse> => {
-    const data = await executeGraphQL<{ uploadImage: UploadImageResponse }>(UPLOAD_IMAGE_MUTATION, {
-      input: { base64Data, folder },
-    });
-    return data.uploadImage;
-  },
+  uploadImage: (base64Data: string, folder = 'auctions') => uploadService.uploadImage(base64Data, folder),
 
   /**
-   * Upload an image file: Tries direct signed Cloudinary upload first (zero backend load),
-   * falling back to compressed base64 backend mutation.
+   * Upload single image file (Delegated to centralized uploadService)
    */
-  uploadImageFile: async (file: File, folder = 'auctions'): Promise<string> => {
-    // 1. Try Direct Cloudinary Signed Upload
-    try {
-      const sig = await auctionsService.getUploadSignature(folder);
-      if (sig && sig.signature && sig.apiKey && sig.cloudName) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('api_key', sig.apiKey);
-        formData.append('timestamp', String(sig.timestamp));
-        formData.append('signature', sig.signature);
-        if (sig.folder) formData.append('folder', sig.folder);
-
-        const uploadRes = await axios.post<{ secure_url?: string; url?: string }>(
-          `https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`,
-          formData
-        );
-
-        if (uploadRes.data?.secure_url || uploadRes.data?.url) {
-          return (uploadRes.data.secure_url || uploadRes.data.url) as string;
-        }
-      }
-    } catch {
-      // Direct Cloudinary upload failed or not configured, fall through to backend mutation
-    }
-
-    // 2. Fallback: Compress image to crisp lightweight payload (~100KB) and send via Backend GraphQL
-    const compressedBase64 = await compressImage(file, 1000, 1000, 0.75);
-    const res = await auctionsService.uploadImage(compressedBase64, folder);
-    if (res?.url) {
-      return res.url;
-    }
-
-    throw new Error('UPLOAD_FAILED');
-  },
+  uploadImageFile: (file: File, folder = 'auctions') => uploadService.uploadImageFile(file, folder),
 
   /**
-   * High-speed parallel batch image upload:
-   * Requests signature ONCE for the entire batch and uploads in parallel directly to Cloudinary CDN
+   * High-speed parallel batch image upload (Delegated to centralized uploadService)
    */
-  uploadBatchImages: async (files: File[], folder = 'auctions'): Promise<string[]> => {
-    let sig: UploadSignatureResponse | null = null;
-    try {
-      sig = await auctionsService.getUploadSignature(folder);
-    } catch {
-      // Signature query fallback
-    }
-
-    const uploadPromises = files.map(async (rawFile) => {
-      // 1. High-speed client-side GPU compression to lightweight Blob (~50KB) in ~10ms
-      const file = await compressImageToFile(rawFile, 1200, 1200, 0.78);
-
-      // 2. Try Direct Cloudinary Signed Upload if signature is valid
-      if (sig && sig.signature && sig.apiKey && sig.cloudName) {
-        try {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('api_key', sig.apiKey);
-          formData.append('timestamp', String(Math.floor(sig.timestamp)));
-          formData.append('signature', sig.signature);
-          if (sig.folder) formData.append('folder', sig.folder);
-
-          const uploadRes = await axios.post<{ secure_url?: string; url?: string }>(
-            `https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`,
-            formData
-          );
-
-          if (uploadRes.data?.secure_url || uploadRes.data?.url) {
-            return (uploadRes.data.secure_url || uploadRes.data.url) as string;
-          }
-        } catch {
-          // Fall through to compressed base64 backend mutation
-        }
-      }
-
-      // 3. Fallback: Fast client-side compression + Backend mutation
-      try {
-        const compressedBase64 = await compressImage(file, 1000, 1000, 0.75);
-        const res = await auctionsService.uploadImage(compressedBase64, folder);
-        if (res?.url) {
-          return res.url;
-        }
-        throw new Error('UPLOAD_FAILED');
-      } catch (err: unknown) {
-        throw err instanceof Error ? err : new Error('UPLOAD_FAILED');
-      }
-    });
-
-    return await Promise.all(uploadPromises);
-  },
+  uploadBatchImages: (files: File[], folder = 'auctions') => uploadService.uploadBatchImages(files, folder),
 
   /**
    * Subscribe to live auction status changes via WebSocket (GraphQL Subscriptions)

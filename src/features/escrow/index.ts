@@ -13,6 +13,9 @@ export * from './hooks/useEscrowDetail';
 export * from './hooks/useConfirmDelivery';
 export * from './hooks/useEscrowSubscription';
 export * from './hooks/useOpenDispute';
+export * from './hooks/useDisputeDetail';
+export * from './hooks/useCancelDispute';
+export * from './hooks/useDisputeSubscription';
 
 // Components
 export * from './components/EscrowStatusBadge';
@@ -24,9 +27,15 @@ export * from './components/EscrowAuctionCard';
 export * from './components/EscrowCounterpartyCard';
 export * from './components/ConfirmDeliveryModal';
 export * from './components/EvidenceUploader';
+export * from './components/DisputeStatusBadge';
+export * from './components/DisputeEvidenceGallery';
+export * from './components/CancelDisputeModal';
+export * from './components/DisputeAdminResolutionCard';
 
 // Pages
 export * from './pages/MyEscrowsPage';
 export * from './pages/EscrowDetailPage';
 export * from './pages/OpenDisputePage';
+export * from './pages/DisputeDetailPage';
+
 
