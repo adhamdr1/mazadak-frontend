@@ -91,19 +91,30 @@ export function formatDateTime(
   isRTL = false,
   options?: Intl.DateTimeFormatOptions
 ): string {
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  if (isNaN(date.getTime())) return '';
+  try {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    if (isNaN(date.getTime())) return '';
 
-  const formatted = new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    ...options,
-  }).format(date);
+    const defaultOptions: Intl.DateTimeFormatOptions =
+      options?.dateStyle || options?.timeStyle
+        ? {}
+        : {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          };
 
-  return isRTL ? toLocalizedDigits(formatted, true) : formatted;
+    const formatted = new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', {
+      ...defaultOptions,
+      ...options,
+    }).format(date);
+
+    return isRTL ? toLocalizedDigits(formatted, true) : formatted;
+  } catch {
+    return typeof dateString === 'string' ? dateString : '';
+  }
 }
 
 /**

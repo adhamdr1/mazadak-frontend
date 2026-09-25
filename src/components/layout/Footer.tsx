@@ -78,6 +78,11 @@ export const Footer: React.FC = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link to={ROUTES.MY_ESCROWS} className="hover:text-amber-500 transition-colors">
+                      {t('nav.myEscrows')}
+                    </Link>
+                  </li>
+                  <li>
                     <Link to={ROUTES.CREATE_AUCTION} className="hover:text-amber-500 transition-colors">
                       {tAuctions('create.title')}
                     </Link>

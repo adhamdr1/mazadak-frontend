@@ -14,6 +14,19 @@
   "close": "إغلاق",
   "error": "حدث خطأ غير متوقع",
   "success": "تمت العملية بنجاح",
+  "actions": {
+    "retry": "إعادة المحاولة",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "copy": "نسخ",
+    "copied": "تم النسخ",
+    "save": "حفظ",
+    "back": "رجوع",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "view": "عرض",
+    "close": "إغلاق"
+  },
   "switchToLanguage": "تحويل الي انجليزي",
   "theme": {
     "light": "فاتح",
@@ -33,6 +46,7 @@
     "auctions": "المزادات",
     "myAuctions": "مزاداتي",
     "myBids": "مزايداتي",
+    "myEscrows": "معاملات الضمان",
     "createAuction": "إنشاء مزاد",
     "wallet": "المحفظة",
     "deposit": "شحن الرصيد",
@@ -53,6 +67,7 @@
     "trustFairPlay": "مزايدة حية وشفافة في الوقت الفعلي",
     "updatePassword": "تغيير كلمة المرور",
     "forgotPassword": "استعادة كلمة المرور",
+    "myEscrows": "معاملات الضمان",
     "wallet": "محفظتي",
     "withdrawals": "سجل السحوبات",
     "transactions": "سجل المعاملات المالية"

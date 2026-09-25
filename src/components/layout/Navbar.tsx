@@ -9,6 +9,7 @@ import {
   Gavel,
   Layers,
   TrendingUp,
+  ShieldCheck,
   Wallet,
   Receipt,
   History,
@@ -80,6 +81,12 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
             label: t('nav.myBids'),
             icon: TrendingUp,
             isActive: location.pathname === ROUTES.MY_BIDS,
+          },
+          {
+            to: ROUTES.MY_ESCROWS,
+            label: t('nav.myEscrows'),
+            icon: ShieldCheck,
+            isActive: location.pathname.startsWith('/my-escrows') || location.pathname.startsWith('/escrow/') || location.pathname.startsWith('/disputes/'),
           },
           {
             to: ROUTES.WALLET,
@@ -350,7 +357,24 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   </Link>
                 )}
 
-                {/* 6. المحفظة والرصيد */}
+                {/* 6. معاملات الضمان */}
+                {isAuthenticated && (
+                  <Link
+                    to={ROUTES.MY_ESCROWS}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
+                      location.pathname.startsWith('/my-escrows') || location.pathname.startsWith('/escrow/') || location.pathname.startsWith('/disputes/')
+                        ? 'bg-amber-500 text-slate-950 shadow-sm'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    )}
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>{t('nav.myEscrows')}</span>
+                  </Link>
+                )}
+
+                {/* 7. المحفظة والرصيد */}
                 {isAuthenticated && (
                   <Link
                     to={ROUTES.WALLET}

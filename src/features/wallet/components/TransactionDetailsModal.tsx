@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Copy,
   Check,
@@ -10,6 +10,12 @@ import {
   Clock,
   Layers,
   FileText,
+  ShieldCheck,
+  Lock,
+  CheckCircle2,
+  RotateCcw,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react';
 import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
@@ -18,7 +24,7 @@ import { TransactionStatusBadge } from './TransactionStatusBadge';
 import { formatPrice, formatDateTime } from '@/utils/formatters';
 import { ROUTES } from '@/constants/routes.constants';
 import { cn } from '@/utils/cn';
-import { type Transaction, getTransactionAmountConfig } from '../types/wallet.types';
+import { type Transaction, type TransactionType, getTransactionAmountConfig } from '../types/wallet.types';
 
 export interface TransactionDetailsModalProps {
   transaction: Transaction | null;
@@ -32,6 +38,7 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
   onClose,
 }) => {
   const { t, i18n } = useTranslation(['wallet', 'common']);
+  const location = useLocation();
   const isRTL = i18n.language?.startsWith('ar');
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -47,6 +54,59 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
 
   const amountConfig = getTransactionAmountConfig(transaction.type);
 
+  // Check if user is already browsing the referenced escrow or auction page
+  const isAlreadyOnReferencedPage = Boolean(
+    (transaction.referenceId && location.pathname.includes(transaction.referenceId)) ||
+    (location.pathname.startsWith('/escrow/') &&
+      (transaction.referenceType === 'ESCROW' || transaction.referenceType === 'AUCTION'))
+  );
+
+  // Helper to get detailed financial balance impact info
+  const getImpactDetails = (type: TransactionType | string) => {
+    switch (type) {
+      case 'HOLD':
+        return {
+          icon: <Lock className="w-4 h-4 text-amber-500 shrink-0" />,
+          desc: t('transactions.detailsModal.impactHold'),
+          containerClass: 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200/80 dark:border-amber-900/40 text-amber-900 dark:text-amber-200',
+        };
+      case 'RELEASE':
+        return {
+          icon: <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />,
+          desc: t('transactions.detailsModal.impactRelease'),
+          containerClass: 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200/80 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-200',
+        };
+      case 'REFUND':
+        return {
+          icon: <RotateCcw className="w-4 h-4 text-blue-500 shrink-0" />,
+          desc: t('transactions.detailsModal.impactRefund'),
+          containerClass: 'bg-blue-50/80 dark:bg-blue-950/30 border-blue-200/80 dark:border-blue-900/40 text-blue-900 dark:text-blue-200',
+        };
+      case 'DEPOSIT':
+        return {
+          icon: <TrendingUp className="w-4 h-4 text-emerald-500 shrink-0" />,
+          desc: t('transactions.detailsModal.impactDeposit'),
+          containerClass: 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200/80 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-200',
+        };
+      case 'WITHDRAW':
+        return {
+          icon: <TrendingDown className="w-4 h-4 text-indigo-500 shrink-0" />,
+          desc: t('transactions.detailsModal.impactWithdraw'),
+          containerClass: 'bg-indigo-50/80 dark:bg-indigo-950/30 border-indigo-200/80 dark:border-indigo-900/40 text-indigo-900 dark:text-indigo-200',
+        };
+      case 'CAPTURE':
+        return {
+          icon: <ShieldCheck className="w-4 h-4 text-purple-500 shrink-0" />,
+          desc: t('transactions.detailsModal.impactCapture'),
+          containerClass: 'bg-purple-50/80 dark:bg-purple-950/30 border-purple-200/80 dark:border-purple-900/40 text-purple-900 dark:text-purple-200',
+        };
+      default:
+        return null;
+    }
+  };
+
+  const impact = getImpactDetails(transaction.type);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -54,8 +114,8 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
       title={t('transactions.detailsModal.title')}
       size="md"
     >
-      <div className="space-y-5">
-        {/* Top Hero Card: Amount + Badges (with Type-specific amount color) */}
+      <div className="space-y-4">
+        {/* Top Hero Card: Amount + Badges */}
         <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-center space-y-2.5">
           <div className="flex items-center justify-center gap-2">
             <TransactionTypeBadge type={transaction.type} size="md" />
@@ -75,6 +135,19 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
             </span>
           </div>
         </div>
+
+        {/* Financial Balance Impact Explanation Card */}
+        {impact && (
+          <div className={cn('p-3 rounded-xl border text-xs flex items-start gap-2.5 leading-relaxed', impact.containerClass)}>
+            {impact.icon}
+            <div className="space-y-0.5">
+              <span className="font-bold block text-[11px]">
+                {t('transactions.detailsModal.walletImpact')}
+              </span>
+              <p className="opacity-90">{impact.desc}</p>
+            </div>
+          </div>
+        )}
 
         {/* Details Grid */}
         <div className="space-y-3 divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -152,8 +225,8 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
             </div>
           )}
 
-          {/* 4. Reference Type & Action Link */}
-          {transaction.referenceId && (
+          {/* 4. Reference Type & Action Link (Only shown when browsing from external pages like Wallet Transactions) */}
+          {!isAlreadyOnReferencedPage && transaction.referenceId && (
             <div className="pt-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
                 <Layers className="w-3.5 h-3.5 text-amber-500 shrink-0" />
@@ -215,3 +288,4 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
 };
 
 export default TransactionDetailsModal;
+

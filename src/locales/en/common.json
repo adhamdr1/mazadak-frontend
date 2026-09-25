@@ -14,6 +14,19 @@
   "close": "Close",
   "error": "An unexpected error occurred",
   "success": "Operation completed successfully",
+  "actions": {
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "copy": "Copy",
+    "copied": "Copied",
+    "save": "Save",
+    "back": "Back",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "close": "Close"
+  },
   "switchToLanguage": "Switch to Arabic",
   "theme": {
     "light": "Light",
@@ -33,6 +46,7 @@
     "auctions": "Auctions",
     "myAuctions": "My Auctions",
     "myBids": "My Bids",
+    "myEscrows": "My Escrows",
     "createAuction": "Create Auction",
     "wallet": "Wallet",
     "deposit": "Deposit Funds",
@@ -53,6 +67,7 @@
     "trustFairPlay": "Real-time transparent live bidding",
     "updatePassword": "Change Password",
     "forgotPassword": "Forgot Password",
+    "myEscrows": "My Escrows",
     "wallet": "My Wallet",
     "withdrawals": "Withdrawal History",
     "transactions": "Transaction History"

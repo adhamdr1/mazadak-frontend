@@ -39,7 +39,13 @@ const WithdrawPage = lazy(() => import('@/features/wallet/pages/WithdrawPage').t
 const WithdrawalsPage = lazy(() => import('@/features/wallet/pages/WithdrawalsPage').then(m => ({ default: m.WithdrawalsPage })));
 const TransactionsPage = lazy(() => import('@/features/wallet/pages/TransactionsPage').then(m => ({ default: m.TransactionsPage })));
 
-// 5. General Platform Pages
+// 5. Escrow Module Pages
+const MyEscrowsPage = lazy(() => import('@/features/escrow/pages/MyEscrowsPage').then(m => ({ default: m.MyEscrowsPage })));
+const EscrowDetailPage = lazy(() => import('@/features/escrow/pages/EscrowDetailPage').then(m => ({ default: m.EscrowDetailPage })));
+const OpenDisputePage = lazy(() => import('@/features/escrow/pages/OpenDisputePage').then(m => ({ default: m.OpenDisputePage })));
+const DisputeDetailPage = lazy(() => import('@/features/escrow/pages/DisputeDetailPage').then(m => ({ default: m.DisputeDetailPage })));
+
+// 6. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
@@ -68,6 +74,10 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.WALLET_WITHDRAW} element={<WithdrawPage />} />
               <Route path={ROUTES.WALLET_WITHDRAWALS} element={<WithdrawalsPage />} />
               <Route path={ROUTES.WALLET_TRANSACTIONS} element={<TransactionsPage />} />
+              <Route path={ROUTES.MY_ESCROWS} element={<MyEscrowsPage />} />
+              <Route path={ROUTES.ESCROW_DETAIL()} element={<EscrowDetailPage />} />
+              <Route path={ROUTES.OPEN_DISPUTE()} element={<OpenDisputePage />} />
+              <Route path={ROUTES.DISPUTE_DETAIL()} element={<DisputeDetailPage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>
           </Route>

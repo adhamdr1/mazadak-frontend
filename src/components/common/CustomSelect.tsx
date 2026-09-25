@@ -63,7 +63,7 @@ export function CustomSelect<T extends string = string>({
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className={cn('relative inline-block text-start', className)}>
+    <div ref={containerRef} className={cn('relative w-full text-start', className)}>
       {/* Trigger Button */}
       <button
         type="button"
@@ -72,36 +72,36 @@ export function CustomSelect<T extends string = string>({
         aria-expanded={isOpen}
         aria-label={ariaLabel || selectedOption?.label || placeholder}
         className={cn(
-          'w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold select-none cursor-pointer',
-          'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200',
+          'w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold select-none cursor-pointer',
+          'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100',
           'border transition-all duration-150 shadow-2xs',
           isOpen
             ? 'border-amber-500 ring-2 ring-amber-500/20 dark:border-amber-500'
             : 'border-slate-200 dark:border-slate-800 hover:border-amber-500/50 dark:hover:border-amber-500/50'
         )}
       >
-        <div className="flex items-center gap-2 truncate">
-          {Icon && <Icon className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+        <div className="flex items-center gap-2.5 truncate min-w-0">
+          {Icon && <Icon className="w-4 h-4 text-amber-500 shrink-0" />}
           <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
         </div>
 
         <ChevronDown
           className={cn(
-            'w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200',
+            'w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200',
             isOpen && 'rotate-180 text-amber-500'
           )}
         />
       </button>
 
-      {/* Dropdown Menu Popover (Exactly matched to button width) */}
+      {/* Dropdown Menu Popover (Matches full input width) */}
       {isOpen && (
         <div
           role="listbox"
           className={cn(
-            'absolute z-50 mt-1.5 inset-x-0 w-full rounded-2xl p-1.5 select-none',
+            'absolute z-50 mt-2 inset-x-0 w-full rounded-2xl p-2 select-none',
             'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800',
             'shadow-xl shadow-slate-900/10 dark:shadow-black/40 backdrop-blur-md',
-            'animate-in fade-in-0 zoom-in-95 duration-100',
+            'animate-in fade-in-0 zoom-in-95 duration-100 max-h-60 overflow-y-auto space-y-1',
             menuClassName
           )}
         >
@@ -120,17 +120,17 @@ export function CustomSelect<T extends string = string>({
                   setIsOpen(false);
                 }}
                 className={cn(
-                  'w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors text-start cursor-pointer',
+                  'w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-colors text-start cursor-pointer',
                   isSelected
                     ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
                 )}
               >
-                <div className="flex items-center gap-2 truncate">
+                <div className="flex items-center gap-2.5 truncate min-w-0">
                   {OptionIcon && (
                     <OptionIcon
                       className={cn(
-                        'w-3.5 h-3.5 shrink-0',
+                        'w-4 h-4 shrink-0',
                         isSelected ? 'text-amber-500' : 'text-slate-400'
                       )}
                     />
@@ -139,7 +139,7 @@ export function CustomSelect<T extends string = string>({
                 </div>
 
                 {isSelected && (
-                  <Check className="w-3.5 h-3.5 text-amber-500 shrink-0 ms-1.5" />
+                  <Check className="w-4 h-4 text-amber-500 shrink-0 ms-2" />
                 )}
               </button>
             );
