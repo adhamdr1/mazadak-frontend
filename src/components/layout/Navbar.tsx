@@ -18,6 +18,7 @@ import {
   LogOut,
   LogIn,
   UserPlus,
+  MessageSquare,
 } from 'lucide-react';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
@@ -87,6 +88,12 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
             label: t('nav.myEscrows'),
             icon: ShieldCheck,
             isActive: location.pathname.startsWith('/my-escrows') || location.pathname.startsWith('/escrow/') || location.pathname.startsWith('/disputes/'),
+          },
+          {
+            to: ROUTES.MESSAGES,
+            label: t('nav.messages'),
+            icon: MessageSquare,
+            isActive: location.pathname.startsWith('/messages'),
           },
           {
             to: ROUTES.WALLET,
@@ -374,7 +381,24 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   </Link>
                 )}
 
-                {/* 7. المحفظة والرصيد */}
+                {/* 7. الرسائل والمحادثات */}
+                {isAuthenticated && (
+                  <Link
+                    to={ROUTES.MESSAGES}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
+                      location.pathname.startsWith('/messages')
+                        ? 'bg-amber-500 text-slate-950 shadow-sm'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                    )}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>{t('nav.messages')}</span>
+                  </Link>
+                )}
+
+                {/* 8. المحفظة والرصيد */}
                 {isAuthenticated && (
                   <Link
                     to={ROUTES.WALLET}

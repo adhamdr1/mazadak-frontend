@@ -45,7 +45,10 @@ const EscrowDetailPage = lazy(() => import('@/features/escrow/pages/EscrowDetail
 const OpenDisputePage = lazy(() => import('@/features/escrow/pages/OpenDisputePage').then(m => ({ default: m.OpenDisputePage })));
 const DisputeDetailPage = lazy(() => import('@/features/escrow/pages/DisputeDetailPage').then(m => ({ default: m.DisputeDetailPage })));
 
-// 6. General Platform Pages
+// 6. Chat Module Pages
+const MessagesPage = lazy(() => import('@/features/chat/pages/MessagesPage').then(m => ({ default: m.MessagesPage })));
+
+// 7. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
@@ -78,6 +81,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.ESCROW_DETAIL()} element={<EscrowDetailPage />} />
               <Route path={ROUTES.OPEN_DISPUTE()} element={<OpenDisputePage />} />
               <Route path={ROUTES.DISPUTE_DETAIL()} element={<DisputeDetailPage />} />
+              <Route path={ROUTES.MESSAGES} element={<MessagesPage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>
           </Route>

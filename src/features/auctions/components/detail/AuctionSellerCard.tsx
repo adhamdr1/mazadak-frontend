@@ -4,7 +4,6 @@ import {
   UserCheck,
   Star,
   ShieldCheck,
-  MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { toLocalizedDigits } from '@/utils/formatters';
@@ -17,7 +16,6 @@ export interface AuctionSellerCardProps {
   reviewsCount?: number;
   memberSince?: string;
   isVerified?: boolean;
-  canContact?: boolean;
   className?: string;
 }
 
@@ -28,7 +26,6 @@ export const AuctionSellerCard: React.FC<AuctionSellerCardProps> = ({
   reviewsCount,
   memberSince,
   isVerified = true,
-  canContact = false,
   className,
 }) => {
   const { t, i18n } = useTranslation('auctions');
@@ -102,17 +99,6 @@ export const AuctionSellerCard: React.FC<AuctionSellerCardProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Contact Seller Button — strictly restricted to auction winner */}
-      {canContact && (
-        <button
-          type="button"
-          className="w-full bg-slate-100 hover:bg-amber-500/10 text-slate-800 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-amber-500/50 dark:hover:border-amber-500/50 font-bold text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none active:scale-[0.99]"
-        >
-          <MessageSquare className="w-4 h-4 text-amber-500" />
-          <span>{t('detail.contactSeller')}</span>
-        </button>
-      )}
     </div>
   );
 };

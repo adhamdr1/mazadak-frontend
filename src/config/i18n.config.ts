@@ -8,12 +8,14 @@ import arAuctions from '@/locales/ar/auctions.json';
 import arBids from '@/locales/ar/bids.json';
 import arWallet from '@/locales/ar/wallet.json';
 import arEscrow from '@/locales/ar/escrow.json';
+import arChat from '@/locales/ar/chat.json';
 import enCommon from '@/locales/en/common.json';
 import enAuth from '@/locales/en/auth.json';
 import enAuctions from '@/locales/en/auctions.json';
 import enBids from '@/locales/en/bids.json';
 import enWallet from '@/locales/en/wallet.json';
 import enEscrow from '@/locales/en/escrow.json';
+import enChat from '@/locales/en/chat.json';
 
 export const defaultNS = 'common';
 export const resources = {
@@ -24,6 +26,7 @@ export const resources = {
     bids: arBids,
     wallet: arWallet,
     escrow: arEscrow,
+    chat: arChat,
   },
   en: {
     common: enCommon,
@@ -32,6 +35,7 @@ export const resources = {
     bids: enBids,
     wallet: enWallet,
     escrow: enEscrow,
+    chat: enChat,
   },
 } as const;
 

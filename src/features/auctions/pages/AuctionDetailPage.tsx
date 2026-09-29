@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, MessageSquare } from 'lucide-react';
 import { useAuctionDetail } from '../hooks/useAuctionDetail';
 import { useCancelAuction } from '../hooks/useCancelAuction';
 import { AuctionImageGallery } from '../components/detail/AuctionImageGallery';
@@ -14,17 +14,20 @@ import { AuctionDetailSkeleton } from '../components/detail/AuctionDetailSkeleto
 import { CancelAuctionModal } from '../components/shared/CancelAuctionModal';
 import { AutoBidModal } from '@/features/bids/components/AutoBidModal';
 import { AuctionBidHistory } from '@/features/bids/components/AuctionBidHistory';
+import { AuctionChatDrawer } from '@/features/chat';
 import { Button } from '@/components/common/Button';
 import { EscrowBanner } from '@/components/common/EscrowBanner';
 import { ROUTES } from '@/constants/routes.constants';
-
+import { useAuth } from '@/hooks/useAuth';
 
 export const AuctionDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation('auctions');
+  const { t } = useTranslation(['auctions', 'chat']);
+  const { user } = useAuth();
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isAutoBidModalOpen, setIsAutoBidModalOpen] = useState(false);
+  const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
 
   const {
     auction,
@@ -37,6 +40,12 @@ export const AuctionDetailPage: React.FC = () => {
     hasBids,
     refetch,
   } = useAuctionDetail(id);
+
+  // Chat is strictly available ONLY when the auction has a winner AND the user is Seller, Winner, or Admin
+  const hasWinner = Boolean(auction?.winnerId);
+  const canAccessChat = Boolean(
+    user && hasWinner && (isSeller || isWinner || user.role === 'ADMIN')
+  );
 
   const {
     cancel,
@@ -122,7 +131,6 @@ export const AuctionDetailPage: React.FC = () => {
                   <section aria-label="Seller Information">
                     <AuctionSellerCard
                       sellerId={auction.sellerId}
-                      canContact={isWinner}
                     />
                   </section>
                 </div>
@@ -157,24 +165,48 @@ export const AuctionDetailPage: React.FC = () => {
                 auctionStatus={effectiveStatus || auction.status}
               />
 
-              {/* 3. Verified Seller Profile Card — strictly visible under Bid History on Mobile / Split-Screen */}
+              {/* 3. Live Auction Chat CTA Card (Strictly visible only when auction has a winner and user is authorized) */}
+              {canAccessChat && (
+                <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-3 hover:border-amber-500/30 dark:hover:border-amber-500/40 transition-colors">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/20">
+                        <MessageSquare className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                          {t('chat:drawer.title', 'شات المزاد')}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                          {t('chat:messages.chatSub', 'تواصل مباشر بين البائع والفائز')}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="accent"
+                      size="sm"
+                      onClick={() => setIsChatDrawerOpen(true)}
+                      className="rounded-xl shrink-0 font-bold"
+                    >
+                      {t('chat:openChat', 'فتح الشات')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Verified Seller Profile Card — strictly visible under Bid History on Mobile / Split-Screen */}
               {!isSeller && auction.sellerId && (
                 <div className="block lg:hidden">
                   <section aria-label="Seller Information">
                     <AuctionSellerCard
                       sellerId={auction.sellerId}
-                      canContact={isWinner}
                     />
                   </section>
                 </div>
               )}
             </div>
           </div>
-
-
-
-
-
 
           {/* Dedicated Bottom Section: Auction Terms & Platform Rules */}
           <section aria-label="Auction Terms">
@@ -197,6 +229,17 @@ export const AuctionDetailPage: React.FC = () => {
               isOpen={isAutoBidModalOpen}
               auction={auction}
               onClose={() => setIsAutoBidModalOpen(false)}
+            />
+          )}
+
+          {/* Real-time Auction Chat Drawer (Only for authorized winner / seller / admin) */}
+          {canAccessChat && (
+            <AuctionChatDrawer
+              auctionId={auction._id}
+              auctionTitle={auction.title}
+              isAuctionActive={(effectiveStatus || auction.status) === 'ACTIVE'}
+              isOpen={isChatDrawerOpen}
+              onClose={() => setIsChatDrawerOpen(false)}
             />
           )}
         </>
