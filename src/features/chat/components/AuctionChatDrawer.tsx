@@ -385,6 +385,15 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
         {/* Drawer Footer Input Bar */}
         <ChatInputBar
           auctionId={auctionId}
+          isReadOnly={isCurrentlyActive}
+          readOnlyReason={
+            isCurrentlyActive
+              ? t(
+                  'input.auctionActiveReadOnly',
+                  'المحادثة تتاح بعد انتهاء المزاد وتحديد الفائز'
+                )
+              : undefined
+          }
           onSendMessage={(content, type = 'TEXT', mediaUrls) => {
             sendMessage(content, type, mediaUrls);
             setTimeout(() => scrollToBottom(true), 30);

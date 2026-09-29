@@ -23,6 +23,7 @@ export function useMyRooms(options: UseMyRoomsOptions = {}) {
     queryFn: () => chatService.getMyChatRooms(page, limit),
     staleTime: 15_000,
     refetchOnWindowFocus: true,
+    refetchInterval: 15_000,
   });
 
   const rooms: ChatRoomData[] = query.data?.items ?? [];

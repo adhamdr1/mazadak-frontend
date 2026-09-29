@@ -14,6 +14,7 @@ import {
   X,
   Loader2,
   Edit2,
+  Lock,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { EmojiPanel } from './EmojiPanel';
@@ -38,6 +39,8 @@ export interface ChatInputBarProps {
   editingMessage?: { id: string; content: string } | null;
   onSaveEdit?: (messageId: string, newContent: string) => Promise<void> | void;
   onCancelEdit?: () => void;
+  isReadOnly?: boolean;
+  readOnlyReason?: string;
   className?: string;
 }
 
@@ -47,6 +50,8 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   editingMessage = null,
   onSaveEdit,
   onCancelEdit,
+  isReadOnly = false,
+  readOnlyReason,
   className,
 }) => {
   const { t, i18n } = useTranslation('chat');
@@ -249,159 +254,168 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         className
       )}
     >
-      {/* Active Edit Banner with clean non-italic text & symmetric quotes */}
-      {editingMessage && (
-        <div className="flex items-center justify-between px-3.5 py-2 bg-amber-500/10 border border-amber-500/25 rounded-2xl text-xs text-amber-600 dark:text-amber-400 animate-in fade-in duration-150">
-          <div className="flex items-center gap-2 font-medium truncate min-w-0">
-            <Edit2 className="w-3.5 h-3.5 shrink-0 text-amber-500" />
-            <span className="font-bold text-slate-900 dark:text-white shrink-0 not-italic">
-              {t('input.editingLabel', 'تعديل الرسالة')}:
-            </span>
-            <span
-              dir="auto"
-              className="truncate text-slate-700 dark:text-slate-300 max-w-xs font-normal not-italic"
-            >
-              &quot;{editingMessage.content}&quot;
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={handleCancelEdit}
-            className="p-1 hover:bg-amber-500/20 rounded-xl transition-colors shrink-0 cursor-pointer text-slate-400 hover:text-slate-700 dark:hover:text-white"
-            title={t('input.cancelEdit', 'إلغاء التعديل')}
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+      {isReadOnly ? (
+        <div className="flex items-center justify-center gap-2 p-3 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 select-none">
+          <Lock className="w-4 h-4 text-amber-500 shrink-0" />
+          <span>{readOnlyReason || t('input.readOnlyHint', 'المحادثة للقراءة فقط')}</span>
         </div>
-      )}
-
-      {/* Selected Image Attachment Preview Card */}
-      {selectedImage && (
-        <div className="relative flex items-center gap-2.5 p-2 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150">
-          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-900/10 shrink-0">
-            <img
-              src={selectedImage.previewUrl}
-              alt={selectedImage.name}
-              className="w-full h-full object-cover"
-            />
-            {isUploading && (
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                <Loader2 className="w-5 h-5 animate-spin text-white" />
+      ) : (
+        <>
+          {/* Active Edit Banner with clean non-italic text & symmetric quotes */}
+          {editingMessage && (
+            <div className="flex items-center justify-between px-3.5 py-2 bg-amber-500/10 border border-amber-500/25 rounded-2xl text-xs text-amber-600 dark:text-amber-400 animate-in fade-in duration-150">
+              <div className="flex items-center gap-2 font-medium truncate min-w-0">
+                <Edit2 className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                <span className="font-bold text-slate-900 dark:text-white shrink-0 not-italic">
+                  {t('input.editingLabel', 'تعديل الرسالة')}:
+                </span>
+                <span
+                  dir="auto"
+                  className="truncate text-slate-700 dark:text-slate-300 max-w-xs font-normal not-italic"
+                >
+                  &quot;{editingMessage.content}&quot;
+                </span>
               </div>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-              {selectedImage.name}
-            </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {isUploading
-                ? `${t('message.uploadingImage', 'جار الرفع...')} (${progress}%)`
-                : selectedImage.sizeFormatted}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleRemoveSelectedImage}
-            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors shrink-0 cursor-pointer"
-            title={t('actions.cancel', 'إلغاء الصورة')}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Main WhatsApp-Style Input Row */}
-      <div className="flex items-end gap-2">
-        {/* Hidden File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileSelect}
-          disabled={isUploading}
-        />
-
-        {/* Unified Input Capsule: Attachment + Emoji + Textarea */}
-        <div className="flex-1 min-w-0 flex items-end bg-slate-100 dark:bg-slate-800/90 rounded-2xl border border-transparent focus-within:border-amber-500/50 focus-within:ring-1 focus-within:ring-amber-500/30 transition-all p-1">
-          {/* Attachment Button */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="w-9 h-9 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700 rounded-xl transition-colors disabled:opacity-50 shrink-0 cursor-pointer mb-0.5"
-            title={t('input.attachImage', 'إرفاق صورة')}
-          >
-            <Paperclip className="w-5 h-5" />
-          </button>
-
-          {/* Emoji Button */}
-          <button
-            type="button"
-            onClick={() => setIsEmojiOpen((prev) => !prev)}
-            className={cn(
-              'w-9 h-9 flex items-center justify-center rounded-xl transition-colors shrink-0 cursor-pointer mb-0.5',
-              isEmojiOpen
-                ? 'bg-amber-500/20 text-amber-500 font-bold'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700'
-            )}
-            title={t('input.openEmoji', 'الرموز التعبيرية')}
-          >
-            <Smile className="w-5 h-5" />
-          </button>
-
-          {/* Text Area (Expands upwards smoothly up to 240px) */}
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={text}
-            onChange={handleTextChange}
-            onKeyDown={handleKeyDown}
-            placeholder={
-              selectedImage
-                ? t('input.imageCaptionPlaceholder', 'أضف تعليقاً على الصورة...')
-                : t('input.placeholder', 'اكتب رسالة...')
-            }
-            className="flex-1 min-w-0 py-2 px-2.5 bg-transparent text-sm text-slate-900 dark:text-white resize-none focus:outline-none max-h-60 custom-scrollbar placeholder:text-slate-400 leading-relaxed"
-          />
-        </div>
-
-        {/* Circular Send Button with Horizontal Arrow */}
-        <button
-          type="button"
-          onClick={() => handleSubmit()}
-          disabled={!canSubmit}
-          className={cn(
-            'w-11 h-11 rounded-full transition-all duration-150 flex items-center justify-center shrink-0 shadow-md select-none',
-            canSubmit
-              ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 active:scale-95 cursor-pointer shadow-amber-500/25'
-              : 'bg-slate-200 dark:bg-slate-800 text-slate-400 opacity-50 cursor-default'
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="p-1 hover:bg-amber-500/20 rounded-xl transition-colors shrink-0 cursor-pointer text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                title={t('input.cancelEdit', 'إلغاء التعديل')}
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           )}
-          title={t('input.sendLabel', 'إرسال')}
-        >
-          {isUploading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <SendHorizontal
-              className={cn(
-                'w-5 h-5 transition-transform',
-                isRTL ? 'rotate-180' : ''
-              )}
+
+          {/* Selected Image Attachment Preview Card */}
+          {selectedImage && (
+            <div className="relative flex items-center gap-2.5 p-2 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150">
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-900/10 shrink-0">
+                <img
+                  src={selectedImage.previewUrl}
+                  alt={selectedImage.name}
+                  className="w-full h-full object-cover"
+                />
+                {isUploading && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                  {selectedImage.name}
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  {isUploading
+                    ? `${t('message.uploadingImage', 'جار الرفع...')} (${progress}%)`
+                    : selectedImage.sizeFormatted}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleRemoveSelectedImage}
+                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors shrink-0 cursor-pointer"
+                title={t('actions.cancel', 'إلغاء الصورة')}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Main WhatsApp-Style Input Row */}
+          <div className="flex items-end gap-2">
+            {/* Hidden File Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileSelect}
+              disabled={isUploading}
             />
-          )}
-        </button>
-      </div>
 
-      {/* Emoji Picker Popover */}
-      {isEmojiOpen && (
-        <div className="absolute bottom-16 z-40 ltr:left-3 ltr:right-auto rtl:right-3 rtl:left-auto">
-          <EmojiPanel
-            onSelect={handleEmojiSelect}
-            onClose={() => setIsEmojiOpen(false)}
-          />
-        </div>
+            {/* Unified Input Capsule: Attachment + Emoji + Textarea */}
+            <div className="flex-1 min-w-0 flex items-end bg-slate-100 dark:bg-slate-800/90 rounded-2xl border border-transparent focus-within:border-amber-500/50 focus-within:ring-1 focus-within:ring-amber-500/30 transition-all p-1">
+              {/* Attachment Button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="w-9 h-9 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700 rounded-xl transition-colors disabled:opacity-50 shrink-0 cursor-pointer mb-0.5"
+                title={t('input.attachImage', 'إرفاق صورة')}
+              >
+                <Paperclip className="w-5 h-5" />
+              </button>
+
+              {/* Emoji Button */}
+              <button
+                type="button"
+                onClick={() => setIsEmojiOpen((prev) => !prev)}
+                className={cn(
+                  'w-9 h-9 flex items-center justify-center rounded-xl transition-colors shrink-0 cursor-pointer mb-0.5',
+                  isEmojiOpen
+                    ? 'bg-amber-500/20 text-amber-500 font-bold'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700'
+                )}
+                title={t('input.openEmoji', 'الرموز التعبيرية')}
+              >
+                <Smile className="w-5 h-5" />
+              </button>
+
+              {/* Text Area (Expands upwards smoothly up to 240px) */}
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                value={text}
+                onChange={handleTextChange}
+                onKeyDown={handleKeyDown}
+                placeholder={
+                  selectedImage
+                    ? t('input.imageCaptionPlaceholder', 'أضف تعليقاً على الصورة...')
+                    : t('input.placeholder', 'اكتب رسالة...')
+                }
+                className="flex-1 min-w-0 py-2 px-2.5 bg-transparent text-sm text-slate-900 dark:text-white resize-none focus:outline-none max-h-60 custom-scrollbar placeholder:text-slate-400 leading-relaxed"
+              />
+            </div>
+
+            {/* Circular Send Button with Horizontal Arrow */}
+            <button
+              type="button"
+              onClick={() => handleSubmit()}
+              disabled={!canSubmit}
+              className={cn(
+                'w-11 h-11 rounded-full transition-all duration-150 flex items-center justify-center shrink-0 shadow-md select-none',
+                canSubmit
+                  ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 active:scale-95 cursor-pointer shadow-amber-500/25'
+                  : 'bg-slate-200 dark:bg-slate-800 text-slate-400 opacity-50 cursor-default'
+              )}
+              title={t('input.sendLabel', 'إرسال')}
+            >
+              {isUploading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <SendHorizontal
+                  className={cn(
+                    'w-5 h-5 transition-transform',
+                    isRTL ? 'rotate-180' : ''
+                  )}
+                />
+              )}
+            </button>
+          </div>
+
+          {/* Emoji Picker Popover */}
+          {isEmojiOpen && (
+            <div className="absolute bottom-16 z-40 ltr:left-3 ltr:right-auto rtl:right-3 rtl:left-auto">
+              <EmojiPanel
+                onSelect={handleEmojiSelect}
+                onClose={() => setIsEmojiOpen(false)}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
