@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, MessageSquare } from 'lucide-react';
 import { useAuctionDetail } from '../hooks/useAuctionDetail';
@@ -22,6 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 export const AuctionDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation(['auctions', 'chat']);
   const { user } = useAuth();
 
@@ -46,6 +47,21 @@ export const AuctionDetailPage: React.FC = () => {
   const canAccessChat = Boolean(
     user && hasWinner && (isSeller || isWinner || user.role === 'ADMIN')
   );
+
+  // Auto-open chat drawer if navigated with ?chat=true
+  useEffect(() => {
+    if (searchParams.get('chat') === 'true' && canAccessChat) {
+      setIsChatDrawerOpen(true);
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('chat');
+          return next;
+        },
+        { replace: true }
+      );
+    }
+  }, [canAccessChat, searchParams, setSearchParams]);
 
   const {
     cancel,

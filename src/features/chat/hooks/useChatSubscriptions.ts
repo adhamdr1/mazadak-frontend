@@ -18,6 +18,7 @@ import type {
   ChatMessagesConnectionData,
   ChatMessageData,
   ChatReadStateUpdatedPayload,
+  ChatReadStateData,
 } from '../types/chat.types';
 
 export interface UseChatSubscriptionsOptions {
@@ -122,6 +123,11 @@ export function useChatSubscriptions({
             }
           );
 
+          // Invalidate inbox rooms cache so unreadCount and snippet update
+          queryClient.invalidateQueries({
+            queryKey: QUERY_KEYS.CHAT.MY_ROOMS(),
+          });
+
           // Auto-mark as read if Drawer is open & message came from another participant
           if (
             isOpenRef.current &&
@@ -197,10 +203,19 @@ export function useChatSubscriptions({
             [payload.userId]: payload.lastReadMessageId,
           }));
 
-          // Direct cache update for read state
-          queryClient.setQueryData(
+          // Type-safe cache update for read state (preserves existing _id)
+          queryClient.setQueryData<ChatReadStateData | null | undefined>(
             QUERY_KEYS.CHAT.READ_STATE(auctionId),
-            payload
+            (old) => {
+              if (!old) return old;
+              return {
+                ...old,
+                auctionId: payload.auctionId,
+                userId: payload.userId,
+                lastReadMessageId: payload.lastReadMessageId,
+                lastReadAt: payload.lastReadAt,
+              };
+            }
           );
         },
         error: (err) => {

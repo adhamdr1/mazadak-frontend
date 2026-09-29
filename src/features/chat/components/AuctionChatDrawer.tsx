@@ -26,6 +26,7 @@ export interface AuctionChatDrawerProps {
   auctionId: string;
   auctionTitle?: string;
   isAuctionActive?: boolean;
+  auctionStatus?: string;
   isOpen: boolean;
   onClose: () => void;
   className?: string;
@@ -34,13 +35,15 @@ export interface AuctionChatDrawerProps {
 export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
   auctionId,
   auctionTitle,
-  isAuctionActive = true,
+  isAuctionActive,
+  auctionStatus,
   isOpen,
   onClose,
   className,
 }) => {
   const { t } = useTranslation('chat');
   const { user: currentUser } = useAuth();
+  const isCurrentlyActive = isAuctionActive ?? (auctionStatus === 'ACTIVE');
 
   const [editingMessage, setEditingMessage] = useState<{
     id: string;
@@ -49,6 +52,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
+  const hasScrolledInitially = useRef(false);
 
   // 1. Fetch Paginated Messages & Read State
   const {
@@ -126,31 +130,43 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
   };
 
   const messagesRef = useRef(messages);
-  messagesRef.current = messages;
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   const currentUserRef = useRef(currentUser);
-  currentUserRef.current = currentUser;
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
 
   const markChatAsReadRef = useRef(markChatAsRead);
-  markChatAsReadRef.current = markChatAsRead;
+  useEffect(() => {
+    markChatAsReadRef.current = markChatAsRead;
+  }, [markChatAsRead]);
 
   const scrollToBottomRef = useRef(scrollToBottom);
-  scrollToBottomRef.current = scrollToBottom;
-
-  // 7. Initial scroll & mark as read on open ONLY (never on message updates to prevent unwanted jumps)
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => scrollToBottomRef.current(false), 50);
+    scrollToBottomRef.current = scrollToBottom;
+  }, [scrollToBottom]);
 
-      const msgs = messagesRef.current;
-      if (msgs.length > 0) {
-        const otherMsgs = msgs.filter(
-          (m) => m.senderId !== currentUserRef.current?._id && m._id && !m._id.startsWith('pending-')
-        );
-        const latestOther = otherMsgs[otherMsgs.length - 1];
-        if (latestOther?._id) {
-          markChatAsReadRef.current(latestOther._id).catch(() => {});
-        }
+  // 7. Initial scroll reset & mark as read on open
+  useEffect(() => {
+    if (!isOpen) {
+      hasScrolledInitially.current = false;
+      return;
+    }
+
+    const msgs = messagesRef.current;
+    if (msgs.length > 0) {
+      const otherMsgs = msgs.filter(
+        (m) =>
+          m.senderId !== currentUserRef.current?._id &&
+          m._id &&
+          !m._id.startsWith('pending-')
+      );
+      const latestOther = otherMsgs[otherMsgs.length - 1];
+      if (latestOther?._id) {
+        markChatAsReadRef.current(latestOther._id).catch(() => {});
       }
     }
   }, [isOpen]);
@@ -168,13 +184,30 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     };
   }, [isOpen]);
 
-  // 9. Memoize sorted combined messages
+  // 9. Memoize sorted combined messages with pending deduplication (Fix BUG-05)
   const allMessages = useMemo<(ChatMessageData | PendingMessage)[]>(() => {
-    const combined = [...messages, ...pendingMessages];
+    const realClientIds = new Set(
+      messages.map((m) => m.clientMessageId).filter(Boolean)
+    );
+    const activePending = pendingMessages.filter(
+      (p) => !realClientIds.has(p.clientMessageId)
+    );
+    const combined = [...messages, ...activePending];
     return combined.sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
   }, [messages, pendingMessages]);
+
+  // Initial scroll effect after messages are loaded and DOM rendered (Fix BUG-01)
+  useEffect(() => {
+    if (!isOpen || hasScrolledInitially.current) return;
+    if (!isLoadingMessages && allMessages.length > 0) {
+      hasScrolledInitially.current = true;
+      requestAnimationFrame(() => {
+        scrollToBottomRef.current(false);
+      });
+    }
+  }, [isOpen, isLoadingMessages, allMessages.length]);
 
   // 10. Compute accurate Read Horizon timestamp for other participants
   const maxOtherReadTime = useMemo(() => {
@@ -225,7 +258,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
                 <h2 className="font-bold text-sm text-slate-900 dark:text-white truncate">
                   {t('drawer.title', 'شات المزاد')}
                 </h2>
-                {isAuctionActive ? (
+                {isCurrentlyActive ? (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
                     <Radio className="w-2.5 h-2.5 animate-pulse text-emerald-500" />
                     <span>{t('messages.auctionActive', 'مباشر')}</span>
