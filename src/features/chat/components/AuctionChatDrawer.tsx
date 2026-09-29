@@ -10,7 +10,7 @@ import {
   MessageSquare,
   X,
   Loader2,
-  ChevronUp,
+  ChevronDown,
   Radio,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
@@ -20,6 +20,7 @@ import { useChatActions } from '../hooks/useChatActions';
 import { useChatSubscriptions } from '../hooks/useChatSubscriptions';
 import { ChatMessageBubble } from './ChatMessageBubble';
 import { ChatInputBar } from './ChatInputBar';
+import { DateSeparator } from './DateSeparator';
 import type { ChatMessageData, PendingMessage } from '../types/chat.types';
 
 export interface AuctionChatDrawerProps {
@@ -50,6 +51,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     content: string;
   } | null>(null);
 
+  const [showScrollDown, setShowScrollDown] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
   const hasScrolledInitially = useRef(false);
@@ -104,17 +106,9 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     onNewMessage: handleNewMessage,
   });
 
-  // 5. Detect scroll position
-  const handleScroll = useCallback(() => {
-    if (!messagesContainerRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-    // User is near bottom if within 120px of bottom
-    isNearBottomRef.current = scrollHeight - (scrollTop + clientHeight) < 120;
-  }, []);
-
-  // 6. Older Messages with Scroll Anchor (preserves reading position)
-  const handleLoadOlder = async () => {
-    if (!messagesContainerRef.current || isFetchingOlderMessages) return;
+  // 6. Automatic load older on top scroll with Scroll Anchor
+  const handleLoadOlder = useCallback(async () => {
+    if (!messagesContainerRef.current || isFetchingOlderMessages || !hasOlderMessages) return;
     const container = messagesContainerRef.current;
     const previousScrollHeight = container.scrollHeight;
     const previousScrollTop = container.scrollTop;
@@ -127,7 +121,21 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
         messagesContainerRef.current.scrollTop = previousScrollTop + heightDiff;
       }
     });
-  };
+  }, [fetchOlderMessages, hasOlderMessages, isFetchingOlderMessages]);
+
+  // 5. Detect scroll position, toggle scroll-to-bottom FAB & auto-load older on top scroll
+  const handleScroll = useCallback(() => {
+    if (!messagesContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+    isNearBottomRef.current = distanceFromBottom < 120;
+    setShowScrollDown(distanceFromBottom > 200);
+
+    // Auto-fetch older messages when user scrolls near top
+    if (scrollTop < 60 && hasOlderMessages && !isFetchingOlderMessages) {
+      handleLoadOlder();
+    }
+  }, [hasOlderMessages, isFetchingOlderMessages, handleLoadOlder]);
 
   const messagesRef = useRef(messages);
   useEffect(() => {
@@ -149,42 +157,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     scrollToBottomRef.current = scrollToBottom;
   }, [scrollToBottom]);
 
-  // 7. Initial scroll reset & mark as read on open
-  useEffect(() => {
-    if (!isOpen) {
-      hasScrolledInitially.current = false;
-      return;
-    }
-
-    const msgs = messagesRef.current;
-    if (msgs.length > 0) {
-      const otherMsgs = msgs.filter(
-        (m) =>
-          m.senderId !== currentUserRef.current?._id &&
-          m._id &&
-          !m._id.startsWith('pending-')
-      );
-      const latestOther = otherMsgs[otherMsgs.length - 1];
-      if (latestOther?._id) {
-        markChatAsReadRef.current(latestOther._id).catch(() => {});
-      }
-    }
-  }, [isOpen]);
-
-  // 8. Lock body scroll on mobile when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      setEditingMessage(null);
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  // 9. Memoize sorted combined messages with pending deduplication (Fix BUG-05)
+  // 7. Memoize sorted combined messages with pending deduplication (Fix BUG-05)
   const allMessages = useMemo<(ChatMessageData | PendingMessage)[]>(() => {
     const realClientIds = new Set(
       messages.map((m) => m.clientMessageId).filter(Boolean)
@@ -198,7 +171,47 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     );
   }, [messages, pendingMessages]);
 
-  // Initial scroll effect after messages are loaded and DOM rendered (Fix BUG-01)
+  // 8. Mark latest other participant message as read on open & when messages load
+  const lastMarkedReadMessageIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      hasScrolledInitially.current = false;
+      return;
+    }
+
+    if (!isLoadingMessages && allMessages.length > 0) {
+      const otherMsgs = allMessages.filter(
+        (m) =>
+          m.senderId !== currentUserRef.current?._id &&
+          m._id &&
+          !m._id.startsWith('pending-')
+      );
+      const latestOther = otherMsgs[otherMsgs.length - 1];
+      if (
+        latestOther?._id &&
+        latestOther._id !== lastMarkedReadMessageIdRef.current
+      ) {
+        lastMarkedReadMessageIdRef.current = latestOther._id;
+        markChatAsReadRef.current(latestOther._id).catch(() => {});
+      }
+    }
+  }, [isOpen, isLoadingMessages, allMessages]);
+
+  // 9. Lock body scroll on mobile when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      setEditingMessage(null);
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // 10. Initial scroll effect after messages are loaded and DOM rendered (Fix BUG-01)
   useEffect(() => {
     if (!isOpen || hasScrolledInitially.current) return;
     if (!isLoadingMessages && allMessages.length > 0) {
@@ -211,17 +224,37 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
 
   // 10. Compute accurate Read Horizon timestamp for other participants
   const maxOtherReadTime = useMemo(() => {
-    const timestamps: number[] = Object.entries(participantReadStates)
-      .filter(([userId]) => userId !== currentUser?._id)
-      .map(([, lastId]) => {
-        const readMsg = allMessages.find((m) => m._id === lastId);
-        return readMsg ? new Date(readMsg.createdAt).getTime() : 0;
-      });
+    const timestamps: number[] = [];
 
-    if (readState?.lastReadMessageId && readState.userId !== currentUser?._id) {
-      const readMsg = allMessages.find((m) => m._id === readState.lastReadMessageId);
-      if (readMsg) {
-        timestamps.push(new Date(readMsg.createdAt).getTime());
+    // Check real-time participant read states (persisted across browser reloads)
+    Object.entries(participantReadStates).forEach(([userId, state]) => {
+      if (userId !== currentUser?._id && state) {
+        if (state.lastReadAt) {
+          const t = new Date(state.lastReadAt).getTime();
+          if (!isNaN(t) && t > 0) timestamps.push(t);
+        }
+        if (state.lastReadMessageId) {
+          const readMsg = allMessages.find((m) => m._id === state.lastReadMessageId);
+          if (readMsg) {
+            const t = new Date(readMsg.createdAt).getTime();
+            if (!isNaN(t) && t > 0) timestamps.push(t);
+          }
+        }
+      }
+    });
+
+    // Check query read state from server on load
+    if (readState && readState.userId !== currentUser?._id) {
+      if (readState.lastReadAt) {
+        const t = new Date(readState.lastReadAt).getTime();
+        if (!isNaN(t) && t > 0) timestamps.push(t);
+      }
+      if (readState.lastReadMessageId) {
+        const readMsg = allMessages.find((m) => m._id === readState.lastReadMessageId);
+        if (readMsg) {
+          const t = new Date(readMsg.createdAt).getTime();
+          if (!isNaN(t) && t > 0) timestamps.push(t);
+        }
       }
     }
 
@@ -294,22 +327,10 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
           onScroll={handleScroll}
           className="flex-1 p-4 pt-8 pb-4 overflow-y-auto overflow-x-hidden custom-scrollbar space-y-1.5"
         >
-          {/* Older Messages Load Trigger */}
-          {hasOlderMessages && (
-            <div className="text-center py-2">
-              <button
-                type="button"
-                onClick={handleLoadOlder}
-                disabled={isFetchingOlderMessages}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs disabled:opacity-50 cursor-pointer"
-              >
-                {isFetchingOlderMessages ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
-                ) : (
-                  <ChevronUp className="w-3.5 h-3.5" />
-                )}
-                <span>{t('drawer.loadMore', 'تحميل رسائل أقدم')}</span>
-              </button>
+          {/* Subtle Spinner when fetching older messages */}
+          {isFetchingOlderMessages && (
+            <div className="flex justify-center py-2">
+              <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
             </div>
           )}
 
@@ -355,8 +376,8 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
             </div>
           )}
 
-          {/* Render Messages */}
-          {allMessages.map((msg) => {
+          {/* Render Messages with Date Separators */}
+          {allMessages.map((msg, index) => {
             const isOwner = msg.senderId === currentUser?._id;
             const isRead =
               isOwner &&
@@ -364,23 +385,43 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
               maxOtherReadTime > 0 &&
               new Date(msg.createdAt).getTime() <= maxOtherReadTime;
 
+            const prevMsg = allMessages[index - 1];
+            const isDifferentDay =
+              !prevMsg ||
+              new Date(msg.createdAt).toDateString() !==
+                new Date(prevMsg.createdAt).toDateString();
+
             return (
-              <ChatMessageBubble
-                key={msg._id || msg.clientMessageId}
-                message={msg}
-                isOwner={isOwner}
-                isRead={isRead}
-                onEdit={(messageId, content) =>
-                  setEditingMessage({ id: messageId, content })
-                }
-                onDelete={(messageId) => deleteMessage(messageId)}
-                onReact={(messageId, emoji) => reactToMessage(messageId, emoji)}
-                onRetry={(pendingMsg) => retrySendMessage(pendingMsg)}
-                onRemovePending={(localId) => removePendingMessage(localId)}
-              />
+              <React.Fragment key={msg._id || msg.clientMessageId}>
+                {isDifferentDay && <DateSeparator date={msg.createdAt} />}
+                <ChatMessageBubble
+                  message={msg}
+                  isOwner={isOwner}
+                  isRead={isRead}
+                  onEdit={(messageId, content) =>
+                    setEditingMessage({ id: messageId, content })
+                  }
+                  onDelete={(messageId) => deleteMessage(messageId)}
+                  onReact={(messageId, emoji) => reactToMessage(messageId, emoji)}
+                  onRetry={(pendingMsg) => retrySendMessage(pendingMsg)}
+                  onRemovePending={(localId) => removePendingMessage(localId)}
+                />
+              </React.Fragment>
             );
           })}
         </div>
+
+        {/* Floating Scroll To Bottom FAB */}
+        {showScrollDown && (
+          <button
+            type="button"
+            onClick={() => scrollToBottom(true)}
+            className="absolute bottom-20 end-4 z-20 w-9 h-9 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg hover:bg-amber-400 active:scale-95 transition-all animate-in fade-in duration-150 cursor-pointer select-none"
+            title={t('drawer.scrollToBottom', 'الانتقال لآخر الرسائل')}
+          >
+            <ChevronDown className="w-5 h-5" />
+          </button>
+        )}
 
         {/* Drawer Footer Input Bar */}
         <ChatInputBar

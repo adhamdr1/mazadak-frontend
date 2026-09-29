@@ -39,6 +39,7 @@ export const MessagesPage: React.FC = () => {
     page,
     setPage,
     isLoading,
+    isFetching,
     isError,
     error,
     refetch,
@@ -58,6 +59,12 @@ export const MessagesPage: React.FC = () => {
             {total > 0 && (
               <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                 {toLocalizedDigits(total, isRTL)}
+              </span>
+            )}
+            {isFetching && !isLoading && (
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 animate-pulse">
+                <RefreshCw className="w-2.5 h-2.5 animate-spin text-amber-500" />
+                <span>{t('chat:messages.syncing', 'مزامنة...')}</span>
               </span>
             )}
           </div>

@@ -13,6 +13,7 @@ export { EmojiPanel } from './components/EmojiPanel';
 export { MessageReactions } from './components/MessageReactions';
 export { ChatRoomCard } from './components/ChatRoomCard';
 export { ChatRoomsSkeleton } from './components/ChatRoomsSkeleton';
+export { DateSeparator } from './components/DateSeparator';
 
 // Hooks
 export { useChatMessages } from './hooks/useChatMessages';

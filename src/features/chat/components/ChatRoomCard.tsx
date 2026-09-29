@@ -149,13 +149,13 @@ export const ChatRoomCard: React.FC<ChatRoomCardProps> = ({ room }) => {
             {isSeller && (
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex-shrink-0">
                 <Store className="w-3 h-3" />
-                <span>{t('common:roles.seller', 'البائع')}</span>
+                <span>{t('chat:roles.seller', isRTL ? 'البائع' : 'Seller')}</span>
               </span>
             )}
             {isWinner && (
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex-shrink-0">
                 <Award className="w-3 h-3" />
-                <span>{t('common:roles.winner', 'الفائز')}</span>
+                <span>{t('chat:roles.winner', isRTL ? 'الفائز' : 'Winner')}</span>
               </span>
             )}
           </div>

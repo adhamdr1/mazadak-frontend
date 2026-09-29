@@ -5,6 +5,14 @@
     "empty": "No messages yet",
     "emptyDescription": "Start the conversation for direct communication between the seller and the winning buyer!"
   },
+  "date": {
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "roles": {
+    "seller": "Seller",
+    "winner": "Winner"
+  },
   "message": {
     "deleted": "This message was deleted",
     "edited": "(edited)",

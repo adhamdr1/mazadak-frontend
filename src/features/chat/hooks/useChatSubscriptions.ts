@@ -27,6 +27,17 @@ export interface UseChatSubscriptionsOptions {
   onNewMessage?: (msg: ChatMessageData) => void;
 }
 
+const getStoredReadStates = (
+  auctionId: string
+): Record<string, { lastReadMessageId: string | null; lastReadAt: string | null }> => {
+  try {
+    const raw = localStorage.getItem(`mazadak_chat_read_states_${auctionId}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
 export function useChatSubscriptions({
   auctionId,
   isOpen,
@@ -36,8 +47,14 @@ export function useChatSubscriptions({
   const { user: currentUser } = useAuth();
   const { subscribe } = useSocket();
   const [participantReadStates, setParticipantReadStates] = useState<
-    Record<string, string | null>
-  >({});
+    Record<string, { lastReadMessageId: string | null; lastReadAt: string | null }>
+  >(() => getStoredReadStates(auctionId));
+
+  useEffect(() => {
+    if (auctionId) {
+      setParticipantReadStates(getStoredReadStates(auctionId));
+    }
+  }, [auctionId]);
 
   const onNewMessageRef = useRef(onNewMessage);
   onNewMessageRef.current = onNewMessage;
@@ -66,18 +83,9 @@ export function useChatSubscriptions({
           queryClient.setQueryData<InfiniteData<ChatMessagesConnectionData>>(
             QUERY_KEYS.CHAT.MESSAGES(auctionId),
             (old) => {
-              // If no cache exists yet, initialize it with the incoming message
+              // If no cache exists yet (drawer not opened yet), leave cache alone so useInfiniteQuery fetches full history on open
               if (!old || !old.pages || old.pages.length === 0) {
-                return {
-                  pages: [
-                    {
-                      items: [newMsg],
-                      hasNextPage: false,
-                      endCursor: null,
-                    },
-                  ],
-                  pageParams: [undefined],
-                };
+                return old;
               }
 
               // Check if already in cache (by _id or clientMessageId)
@@ -198,10 +206,24 @@ export function useChatSubscriptions({
           const payload = data?.chatReadStatusUpdated;
           if (!payload) return;
 
-          setParticipantReadStates((prev) => ({
-            ...prev,
-            [payload.userId]: payload.lastReadMessageId,
-          }));
+          setParticipantReadStates((prev) => {
+            const updated = {
+              ...prev,
+              [payload.userId]: {
+                lastReadMessageId: payload.lastReadMessageId,
+                lastReadAt: payload.lastReadAt,
+              },
+            };
+            try {
+              localStorage.setItem(
+                `mazadak_chat_read_states_${auctionId}`,
+                JSON.stringify(updated)
+              );
+            } catch {
+              // Ignore quota
+            }
+            return updated;
+          });
 
           // Type-safe cache update for read state (preserves existing _id)
           queryClient.setQueryData<ChatReadStateData | null | undefined>(

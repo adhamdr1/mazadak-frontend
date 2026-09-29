@@ -334,11 +334,11 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
                       </button>
                     ) : isRead ? (
                       <span title={t('message.read', 'تمت القراءة')}>
-                        <CheckCheck className="w-3.5 h-3.5 text-sky-600 font-bold" />
+                        <CheckCheck className="w-3.5 h-3.5 text-blue-700 dark:text-blue-800 font-black" />
                       </span>
                     ) : (
                       <span title={t('message.delivered', 'تم التسليم')}>
-                        <CheckCheck className="w-3.5 h-3.5 text-slate-800/80" />
+                        <CheckCheck className="w-3.5 h-3.5 text-slate-800/60" />
                       </span>
                     )}
                   </span>
