@@ -142,6 +142,33 @@ export function formatBidTimestamp(
   return isRTL ? toLocalizedDigits(formatted, true) : formatted;
 }
 
+/**
+ * Formats ISO date string to localized time (HH:MM AM/PM or ١٢-ساعة ص/م) deterministically
+ */
+export function formatTime(dateString: string | Date, isRTL = false): string {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  if (isNaN(date.getTime())) return '';
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const isPM = hours >= 12;
+
+  // Convert to standard 12-hour format (1 to 12)
+  hours = hours % 12;
+  if (hours === 0) hours = 12;
+
+  const paddedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  const period = isRTL ? (isPM ? 'م' : 'ص') : (isPM ? 'PM' : 'AM');
+
+  if (isRTL) {
+    const arHours = toLocalizedDigits(hours, true);
+    const arMinutes = toLocalizedDigits(paddedMinutes, true);
+    return `${arHours}:${arMinutes} ${period}`;
+  }
+
+  return `${hours}:${paddedMinutes} ${period}`;
+}
+
 export const EGYPTIAN_BANKS_MAP: Array<{ ar: string; en: string }> = [
   { ar: 'البنك الأهلي المصري', en: 'National Bank of Egypt (NBE)' },
   { ar: 'بنك مصر', en: 'Banque Misr' },

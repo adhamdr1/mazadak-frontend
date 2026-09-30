@@ -1,0 +1,84 @@
+{
+  "drawer": {
+    "title": "Auction Chat",
+    "loadMore": "Load older messages",
+    "empty": "No messages yet",
+    "emptyDescription": "Start the conversation for direct communication between the seller and the winning buyer!"
+  },
+  "date": {
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "roles": {
+    "seller": "Seller",
+    "winner": "Winner"
+  },
+  "message": {
+    "deleted": "This message was deleted",
+    "edited": "(edited)",
+    "sending": "Sending...",
+    "retryLabel": "Retry",
+    "imageAlt": "Attached image",
+    "participant": "Participant",
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "read": "Read",
+    "uploadingImage": "Uploading image..."
+  },
+  "input": {
+    "placeholder": "Type a message...",
+    "sendLabel": "Send",
+    "attachImage": "Attach image",
+    "openEmoji": "Emojis",
+    "editingLabel": "Edit message",
+    "cancelEdit": "Cancel edit",
+    "imageCaptionPlaceholder": "Add a caption..."
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "copy": "Copy",
+    "reply": "Reply",
+    "react": "React",
+    "more": "More",
+    "close": "Close"
+  },
+  "reactions": {
+    "tooltip": "React",
+    "addReaction": "Add reaction",
+    "removeReaction": "Remove your reaction",
+    "moreEmojis": "More reactions",
+    "noEmojisFound": "No emojis found",
+    "reactedBy": "Reacted by: {{names}}"
+  },
+  "messages": {
+    "pageTitle": "Messages & Chats",
+    "chatSub": "Direct and secure communication between seller and winning buyer to coordinate delivery and inspection.",
+    "browseAuctions": "Explore Auctions",
+    "empty": "No conversations yet",
+    "emptyDescription": "When you win an auction or sell your item, direct chat channels will open here to coordinate with the other party.",
+    "lastMessage": "Last message",
+    "unread": "{{count}} new",
+    "unreadPlural": "{{count}} new messages",
+    "noMessages": "No messages yet",
+    "auctionEnded": "Auction ended",
+    "auctionActive": "Active now",
+    "errorTitle": "Unable to load conversations",
+    "errorMessage": "Please check your internet connection and try again.",
+    "banner": {
+      "title": "Direct Chat System on Mazadak",
+      "body": "Communicate directly and send photos to verify item condition and delivery details. All messages are encrypted and audited to protect both buyer and seller in case of disputes.",
+      "point1": "Complete privacy between seller and winner",
+      "point2": "Real-time updates and instant read receipts",
+      "point3": "Audited audit trail for escrow & dispute protection"
+    }
+  },
+  "errors": {
+    "CHAT_NOT_ALLOWED": "Messaging not permitted in this auction",
+    "sendFailed": "Failed to send message",
+    "editFailed": "Failed to edit message",
+    "deleteFailed": "Failed to delete message",
+    "uploadFailed": "Failed to upload image"
+  },
+  "openChat": "Open Auction Chat"
+}

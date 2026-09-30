@@ -18,13 +18,16 @@ import {
   LogOut,
   LogIn,
   UserPlus,
+  MessageSquare,
 } from 'lucide-react';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/common/Button';
 import { useAuth } from '@/hooks/useAuth';
+import { useUnreadChatRoomsCount } from '@/features/chat';
 import { ROUTES } from '@/constants/routes.constants';
+import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 
 export interface NavbarProps {
@@ -32,20 +35,22 @@ export interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ className }) => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
+  const isRTL = i18n.language?.startsWith('ar');
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
+  const { unreadRoomsCount } = useUnreadChatRoomsCount();
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Close mobile drawer whenever location/route changes
+  // Close drawer whenever location/route changes
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when drawer menu is open
   useEffect(() => {
-    if (isMobileMenuOpen) {
+    if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -53,46 +58,136 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isMobileMenuOpen]);
+  }, [isMenuOpen]);
 
-  const desktopNavLinks = [
+  // Translated Role string
+  const roleLabel =
+    user?.role === 'ADMIN'
+      ? isRTL
+        ? 'مسؤول'
+        : 'Admin'
+      : isRTL
+        ? 'مستخدم'
+        : 'User';
+
+  // Desktop top navbar links
+  const desktopTopLinks = [
     {
       to: ROUTES.HOME,
-      label: t('nav.home'),
+      label: t('nav.home', 'الرئيسية'),
       icon: Home,
       isActive: location.pathname === ROUTES.HOME,
     },
     {
       to: ROUTES.AUCTIONS,
-      label: t('nav.auctions'),
+      label: t('nav.auctions', 'المزادات'),
       icon: Gavel,
-      isActive: location.pathname === ROUTES.AUCTIONS || (location.pathname.startsWith('/auctions/') && location.pathname !== ROUTES.CREATE_AUCTION),
+      isActive:
+        location.pathname === ROUTES.AUCTIONS ||
+        (location.pathname.startsWith('/auctions/') &&
+          location.pathname !== ROUTES.CREATE_AUCTION),
+    },
+    {
+      to: ROUTES.CREATE_AUCTION,
+      label: t('nav.createAuction', 'إنشاء مزاد'),
+      icon: PlusCircle,
+      isActive: location.pathname === ROUTES.CREATE_AUCTION,
     },
     ...(isAuthenticated
       ? [
           {
             to: ROUTES.MY_AUCTIONS,
-            label: t('nav.myAuctions'),
+            label: t('nav.myAuctions', 'مزاداتي'),
+            icon: Layers,
+            isActive: location.pathname === ROUTES.MY_AUCTIONS,
+          },
+          {
+            to: ROUTES.MESSAGES,
+            label: t('nav.messages', 'الرسائل'),
+            icon: MessageSquare,
+            isActive: location.pathname.startsWith('/messages'),
+            badge: unreadRoomsCount,
+          },
+        ]
+      : []),
+  ];
+
+  // Complete unified list for the slide-over sidebar drawer (100% consistent styling)
+  const drawerLinks = [
+    {
+      to: ROUTES.HOME,
+      label: t('nav.home', 'الرئيسية'),
+      icon: Home,
+      isActive: location.pathname === ROUTES.HOME,
+    },
+    {
+      to: ROUTES.AUCTIONS,
+      label: t('nav.auctions', 'سوق المزادات'),
+      icon: Gavel,
+      isActive:
+        location.pathname === ROUTES.AUCTIONS ||
+        (location.pathname.startsWith('/auctions/') &&
+          location.pathname !== ROUTES.CREATE_AUCTION),
+    },
+    {
+      to: ROUTES.CREATE_AUCTION,
+      label: t('nav.createAuction', 'إنشاء مزاد'),
+      icon: PlusCircle,
+      isActive: location.pathname === ROUTES.CREATE_AUCTION,
+    },
+    ...(isAuthenticated
+      ? [
+          {
+            to: ROUTES.MY_AUCTIONS,
+            label: t('nav.myAuctions', 'مزاداتي'),
             icon: Layers,
             isActive: location.pathname === ROUTES.MY_AUCTIONS,
           },
           {
             to: ROUTES.MY_BIDS,
-            label: t('nav.myBids'),
+            label: t('nav.myBids', 'مزايداتي'),
             icon: TrendingUp,
             isActive: location.pathname === ROUTES.MY_BIDS,
           },
           {
             to: ROUTES.MY_ESCROWS,
-            label: t('nav.myEscrows'),
+            label: t('nav.myEscrows', 'معاملات الضمان'),
             icon: ShieldCheck,
-            isActive: location.pathname.startsWith('/my-escrows') || location.pathname.startsWith('/escrow/') || location.pathname.startsWith('/disputes/'),
+            isActive:
+              location.pathname.startsWith('/my-escrows') ||
+              location.pathname.startsWith('/escrow/') ||
+              location.pathname.startsWith('/disputes/'),
+          },
+          {
+            to: ROUTES.MESSAGES,
+            label: t('nav.messages', 'الرسائل'),
+            icon: MessageSquare,
+            isActive: location.pathname.startsWith('/messages'),
+            badge: unreadRoomsCount,
           },
           {
             to: ROUTES.WALLET,
-            label: t('nav.wallet'),
+            label: t('nav.wallet', 'المحفظة والرصيد'),
             icon: Wallet,
-            isActive: location.pathname.startsWith('/wallet'),
+            isActive: location.pathname === ROUTES.WALLET,
+          },
+          {
+            to: ROUTES.WALLET_WITHDRAWALS,
+            label: t('nav.withdrawals', 'سجل السحوبات'),
+            icon: History,
+            isActive: location.pathname === ROUTES.WALLET_WITHDRAWALS,
+          },
+          {
+            to: ROUTES.WALLET_TRANSACTIONS,
+            label: t('nav.transactions', 'سجل المعاملات'),
+            icon: Receipt,
+            isActive: location.pathname === ROUTES.WALLET_TRANSACTIONS,
+          },
+          {
+            to: ROUTES.UPDATE_PASSWORD,
+            label: t('home.updatePasswordLink', 'تغيير كلمة المرور'),
+            icon: KeyRound,
+            isActive: location.pathname === ROUTES.UPDATE_PASSWORD,
           },
         ]
       : []),
@@ -102,17 +197,17 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
     <>
       <header
         className={cn(
-          'sticky top-0 z-40 w-full backdrop-blur-xl bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800/80 transition-colors duration-200 select-none',
+          'sticky top-0 z-40 w-full backdrop-blur-xl bg-white/85 dark:bg-slate-950/85 border-b border-slate-200/90 dark:border-slate-800/80 transition-colors duration-200 select-none',
           className
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-          {/* Left: Brand Logo & Desktop Nav Links */}
+          {/* Left: Brand Logo & Desktop Top Navigation Links */}
           <div className="flex items-center gap-6">
             <BrandLogo size="md" />
 
-            <nav className="hidden md:flex items-center gap-1.5 text-xs font-semibold">
-              {desktopNavLinks.map((item) => {
+            <nav className="hidden md:flex items-center gap-1 text-xs font-semibold">
+              {desktopTopLinks.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
@@ -124,108 +219,109 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                       }
                     }}
                     className={cn(
-                      'px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all duration-150',
+                      'px-3 py-2 rounded-xl flex items-center gap-2 transition-all duration-150',
                       item.isActive
-                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold'
+                        ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     )}
                   >
-                    <Icon className="w-3.5 h-3.5" />
+                    <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
+
+                    {/* WhatsApp-style Live Unread Counter Badge */}
+                    {item.badge !== undefined && item.badge > 0 && (
+                      <span
+                        className={cn(
+                          'inline-flex items-center justify-center font-black text-[10px] leading-none',
+                          'px-1.5 py-0.5 min-w-[18px] h-[18px] rounded-full',
+                          'bg-amber-500 text-slate-950 shadow-xs shadow-amber-500/40',
+                          'animate-in zoom-in-75 duration-200 shrink-0'
+                        )}
+                        aria-label={`${item.badge} unread chats`}
+                      >
+                        {toLocalizedDigits(item.badge, isRTL)}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
             </nav>
           </div>
 
-          {/* Right: Desktop Actions & Mobile Trigger */}
+          {/* Right: Language/Theme Controls & Menu Trigger */}
           <div className="flex items-center gap-2.5">
-            {/* Create Auction CTA (Visible on Desktop & Tablet) */}
-            <Link to={ROUTES.CREATE_AUCTION} className="hidden sm:inline-block">
-              <Button
-                variant="accent"
-                size="sm"
-                leftIcon={<PlusCircle className="w-4 h-4" />}
-                className="shadow-sm shadow-amber-500/20 text-xs font-bold"
-              >
-                {t('nav.createAuction')}
-              </Button>
-            </Link>
-
-            {/* Language & Theme Controls */}
-            <div className="hidden sm:flex items-center gap-2">
+            {/* Language & Theme Controls (Desktop quick access) */}
+            <div className="hidden sm:flex items-center gap-1.5">
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
 
-            {/* Desktop Auth Controls */}
+            {/* User Account / Menu Trigger Button (Desktop & Mobile) */}
             {isAuthenticated ? (
-              <div className="hidden md:flex items-center gap-2.5">
-                <div className="flex items-center gap-2 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-slate-800 dark:text-slate-200">
-                  <User className="w-3.5 h-3.5 text-amber-500" />
-                  <span className="max-w-[120px] truncate">{user?.firstName}</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-mono font-bold">
-                    {user?.role}
-                  </span>
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(true)}
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-2xs group"
+                title={user?.firstName}
+                aria-label="Open Menu"
+              >
+                <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs font-bold">
+                  {user?.firstName?.charAt(0) || <User className="w-3.5 h-3.5" />}
                 </div>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={logout}
-                  leftIcon={<LogOut className="w-3.5 h-3.5" />}
-                  className="text-xs text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400"
-                  title={t('nav.logout')}
-                >
-                  {t('nav.logout')}
-                </Button>
-              </div>
+                <span className="hidden lg:inline-block text-xs font-bold max-w-[100px] truncate">
+                  {user?.firstName}
+                </span>
+                <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold">
+                  {roleLabel}
+                </span>
+                <Menu className="w-4 h-4 text-slate-500 group-hover:text-amber-500 transition-colors shrink-0" />
+              </button>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
-                <Link to={ROUTES.LOGIN}>
+              <div className="flex items-center gap-2">
+                <Link to={ROUTES.LOGIN} className="hidden sm:inline-block">
                   <Button variant="ghost" size="sm" leftIcon={<LogIn className="w-3.5 h-3.5" />}>
-                    {t('nav.login')}
+                    {t('nav.login', 'دخول')}
                   </Button>
                 </Link>
-                <Link to={ROUTES.REGISTER}>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    leftIcon={<UserPlus className="w-3.5 h-3.5" />}
-                  >
-                    {t('nav.register')}
+                <Link to={ROUTES.REGISTER} className="hidden sm:inline-block">
+                  <Button variant="primary" size="sm" leftIcon={<UserPlus className="w-3.5 h-3.5" />}>
+                    {t('nav.register', 'تسجيل جديد')}
                   </Button>
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsMenuOpen(true)}
+                  aria-label="Open Menu"
+                  className="sm:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
               </div>
             )}
-
-            {/* Mobile Hamburger Trigger */}
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open mobile menu"
-              className="md:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Drawer Sheet Backdrop & Container */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden animate-fadeIn">
+      {/* Slide-over Sidebar Drawer (100% Unified Design & Ordered List) */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-50 animate-in fade-in duration-200">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity"
-            onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs transition-opacity cursor-pointer"
+            onClick={() => setIsMenuOpen(false)}
+            aria-hidden="true"
           />
 
-          {/* Drawer Content */}
-          <aside className="fixed inset-y-0 end-0 w-80 max-w-[340px] bg-white dark:bg-slate-900 border-s border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col justify-between overflow-y-auto animate-slideInRight z-10 p-5">
-            {/* Top Section: Header & Navigation Links Pinned to the Top */}
+          {/* Drawer Panel */}
+          <aside
+            className={cn(
+              'fixed inset-y-0 end-0 w-80 max-w-[340px] bg-white dark:bg-slate-900 border-s border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col justify-between overflow-y-auto z-10 p-5',
+              'animate-in slide-in-from-right rtl:slide-in-from-left duration-250'
+            )}
+          >
+            {/* Top Section */}
             <div className="space-y-4">
-              {/* Top Bar: Brand Logo, Divider, Compact User Info & Close Button */}
+              {/* Drawer Top Header */}
               <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800 gap-2">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <BrandLogo size="sm" />
@@ -235,8 +331,8 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                         <span className="font-extrabold text-[11px] leading-tight text-amber-500 truncate">
                           {user?.firstName} {user?.lastName}
                         </span>
-                        <span className="px-1 py-0.2 rounded text-[8px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-mono font-bold shrink-0">
-                          {user?.role}
+                        <span className="px-1 py-0.2 rounded text-[8px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold shrink-0">
+                          {roleLabel}
                         </span>
                       </div>
                       <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono truncate block">
@@ -248,207 +344,78 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
 
                 <button
                   type="button"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0 cursor-pointer"
+                  aria-label="Close menu"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Guest Auth Banner (only shown for guests) */}
+              {/* Guest Auth Banner */}
               {!isAuthenticated && (
                 <div className="grid grid-cols-2 gap-2">
-                  <Link to={ROUTES.LOGIN} onClick={() => setIsMobileMenuOpen(false)} className="w-full">
+                  <Link to={ROUTES.LOGIN} onClick={() => setIsMenuOpen(false)} className="w-full">
                     <Button variant="outline" size="sm" fullWidth leftIcon={<LogIn className="w-3.5 h-3.5" />}>
-                      {t('nav.login')}
+                      {t('nav.login', 'دخول')}
                     </Button>
                   </Link>
-                  <Link to={ROUTES.REGISTER} onClick={() => setIsMobileMenuOpen(false)} className="w-full">
+                  <Link to={ROUTES.REGISTER} onClick={() => setIsMenuOpen(false)} className="w-full">
                     <Button variant="accent" size="sm" fullWidth leftIcon={<UserPlus className="w-3.5 h-3.5" />}>
-                      {t('nav.register')}
+                      {t('nav.register', 'تسجيل جديد')}
                     </Button>
                   </Link>
                 </div>
               )}
 
-              {/* Navigation Menu (Pinned to Top, 100% Unified Styling Pattern Across All Items) */}
+              {/* Unified Continuous List (Exact same amber active & hover styling across all links) */}
               <nav className="space-y-1">
-                {/* 1. الرئيسية */}
-                <Link
-                  to={ROUTES.HOME}
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    if (location.pathname === ROUTES.HOME) {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                  }}
-                  className={cn(
-                    'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                    location.pathname === ROUTES.HOME
-                      ? 'bg-amber-500 text-slate-950 shadow-sm'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                  )}
-                >
-                  <Home className="w-4 h-4" />
-                  <span>{t('nav.home')}</span>
-                </Link>
+                {drawerLinks.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        if (item.to === ROUTES.HOME && location.pathname === ROUTES.HOME) {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      className={cn(
+                        'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
+                        item.isActive
+                          ? 'bg-amber-500 text-slate-950 shadow-sm'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                      )}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span>{item.label}</span>
 
-                {/* 2. سوق المزادات */}
-                <Link
-                  to={ROUTES.AUCTIONS}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                    location.pathname === ROUTES.AUCTIONS || (location.pathname.startsWith('/auctions/') && location.pathname !== ROUTES.CREATE_AUCTION)
-                      ? 'bg-amber-500 text-slate-950 shadow-sm'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                  )}
-                >
-                  <Gavel className="w-4 h-4" />
-                  <span>{t('nav.auctions')}</span>
-                </Link>
-
-                {/* 3. إنشاء مزاد (Unified Pattern) */}
-                <Link
-                  to={ROUTES.CREATE_AUCTION}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                    location.pathname === ROUTES.CREATE_AUCTION
-                      ? 'bg-amber-500 text-slate-950 shadow-sm'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                  )}
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  <span>{t('nav.createAuction')}</span>
-                </Link>
-
-                {/* 4. مزاداتي */}
-                {isAuthenticated && (
-                  <Link
-                    to={ROUTES.MY_AUCTIONS}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                      location.pathname === ROUTES.MY_AUCTIONS
-                        ? 'bg-amber-500 text-slate-950 shadow-sm'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    )}
-                  >
-                    <Layers className="w-4 h-4" />
-                    <span>{t('nav.myAuctions')}</span>
-                  </Link>
-                )}
-
-                {/* 5. مزايداتي */}
-                {isAuthenticated && (
-                  <Link
-                    to={ROUTES.MY_BIDS}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                      location.pathname === ROUTES.MY_BIDS
-                        ? 'bg-amber-500 text-slate-950 shadow-sm'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    )}
-                  >
-                    <TrendingUp className="w-4 h-4" />
-                    <span>{t('nav.myBids')}</span>
-                  </Link>
-                )}
-
-                {/* 6. معاملات الضمان */}
-                {isAuthenticated && (
-                  <Link
-                    to={ROUTES.MY_ESCROWS}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                      location.pathname.startsWith('/my-escrows') || location.pathname.startsWith('/escrow/') || location.pathname.startsWith('/disputes/')
-                        ? 'bg-amber-500 text-slate-950 shadow-sm'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    )}
-                  >
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>{t('nav.myEscrows')}</span>
-                  </Link>
-                )}
-
-                {/* 7. المحفظة والرصيد */}
-                {isAuthenticated && (
-                  <Link
-                    to={ROUTES.WALLET}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                      location.pathname === ROUTES.WALLET
-                        ? 'bg-amber-500 text-slate-950 shadow-sm'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    )}
-                  >
-                    <Wallet className="w-4 h-4" />
-                    <span>{t('nav.wallet')}</span>
-                  </Link>
-                )}
-
-                {/* 7. سجل السحوبات */}
-                {isAuthenticated && (
-                  <Link
-                    to={ROUTES.WALLET_WITHDRAWALS}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                      location.pathname === ROUTES.WALLET_WITHDRAWALS
-                        ? 'bg-amber-500 text-slate-950 shadow-sm'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    )}
-                  >
-                    <History className="w-4 h-4" />
-                    <span>{t('nav.withdrawals')}</span>
-                  </Link>
-                )}
-
-                {/* 8. سجل المعاملات */}
-                {isAuthenticated && (
-                  <Link
-                    to={ROUTES.WALLET_TRANSACTIONS}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                      location.pathname === ROUTES.WALLET_TRANSACTIONS
-                        ? 'bg-amber-500 text-slate-950 shadow-sm'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    )}
-                  >
-                    <Receipt className="w-4 h-4" />
-                    <span>{t('nav.transactions')}</span>
-                  </Link>
-                )}
-
-                {/* 9. تغيير كلمة المرور */}
-                {isAuthenticated && (
-                  <Link
-                    to={ROUTES.UPDATE_PASSWORD}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
-                      location.pathname === ROUTES.UPDATE_PASSWORD
-                        ? 'bg-amber-500 text-slate-950 shadow-sm'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
-                    )}
-                  >
-                    <KeyRound className="w-4 h-4" />
-                    <span>{t('home.updatePasswordLink')}</span>
-                  </Link>
-                )}
+                      {/* Live Counter Badge inside Drawer List */}
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span
+                          className={cn(
+                            'ms-auto inline-flex items-center justify-center font-black text-[10px] px-2 py-0.5 rounded-full',
+                            item.isActive
+                              ? 'bg-slate-950 text-amber-400'
+                              : 'bg-amber-500 text-slate-950 shadow-xs'
+                          )}
+                        >
+                          {toLocalizedDigits(item.badge, isRTL)}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
 
-            {/* Bottom Controls: Language & Theme & Logout */}
+            {/* Bottom Controls: Language, Theme & Logout */}
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 mt-auto">
               <div className="flex items-center justify-between gap-3 p-2 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ps-1">
-                  {t('themeAndLanguage')}
+                  {t('themeAndLanguage', 'المظهر واللغة')}
                 </span>
                 <div className="flex items-center gap-2">
                   <LanguageSwitcher />
@@ -465,7 +432,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   leftIcon={<LogOut className="w-4 h-4 text-red-500" />}
                   className="text-red-600 dark:text-red-400 hover:bg-red-500/10 font-bold text-xs"
                 >
-                  {t('nav.logout')}
+                  {t('nav.logout', 'تسجيل الخروج')}
                 </Button>
               )}
             </div>

@@ -13,14 +13,11 @@ export interface SocketClientOptions {
 }
 
 /**
- * Creates or retrieves the singleton GraphQL WebSocket client.
- * Recreates the client only if the authentication token actually changes (e.g. login/logout).
+ * Creates or retrieves the singleton GraphQL WebSocket client with continuous auto-reconnect.
  */
 export function getSocketClient(accessToken?: string | null): Client {
-  // If accessToken is undefined, fallback to currently stored token rather than null
   const token = accessToken !== undefined ? (accessToken ?? null) : authStorage.getAccessToken();
 
-  // Re-instantiate only if token changed or client not created yet
   if (!wsClient || currentToken !== token) {
     if (wsClient) {
       try {
@@ -42,15 +39,16 @@ export function getSocketClient(accessToken?: string | null): Client {
           Authorization: `Bearer ${activeToken}`,
         };
       },
-      shouldRetry: () => true,
-      retryAttempts: 5,
+      shouldRetry: () => true, // Always reconnect automatically if connection drops
+      retryAttempts: Infinity,
       retryWait: async (retries) => {
-        // Exponential backoff with max 5s
+        // Fast reconnect: 1s → 2s → 3s, max 5s
         await new Promise((resolve) =>
-          setTimeout(resolve, Math.min(1000 * Math.pow(2, retries), 5000))
+          setTimeout(resolve, Math.min(1000 * Math.pow(1.3, retries), 5000))
         );
       },
-      lazy: true, // Connects only on first subscription
+      lazy: false,
+      keepAlive: 10_000,
     });
   }
 

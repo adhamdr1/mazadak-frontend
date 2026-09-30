@@ -1,0 +1,545 @@
+/**
+ * AuctionChatDrawer Component
+ * Full-featured real-time slide-over Chat Drawer for Auction Details Page
+ * Integrates cursor pagination, 3 GraphQL subscriptions, optimistic updates, reactions & read receipts.
+ */
+
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  MessageSquare,
+  X,
+  Loader2,
+  ChevronDown,
+  Radio,
+} from 'lucide-react';
+import { cn } from '@/utils/cn';
+import { useAuth } from '@/hooks/useAuth';
+import { useChatMessages } from '../hooks/useChatMessages';
+import { useChatActions } from '../hooks/useChatActions';
+import {
+  useChatSubscriptions,
+  getStoredOtherReadHorizon,
+} from '../hooks/useChatSubscriptions';
+import { ChatMessageBubble } from './ChatMessageBubble';
+import { ChatInputBar } from './ChatInputBar';
+import { DateSeparator } from './DateSeparator';
+import type { ChatMessageData, PendingMessage } from '../types/chat.types';
+
+export interface AuctionChatDrawerProps {
+  auctionId: string;
+  auctionTitle?: string;
+  isAuctionActive?: boolean;
+  auctionStatus?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  className?: string;
+}
+
+export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
+  auctionId,
+  auctionTitle,
+  isAuctionActive,
+  auctionStatus,
+  isOpen,
+  onClose,
+  className,
+}) => {
+  const { t } = useTranslation('chat');
+  const { user: currentUser } = useAuth();
+  const isCurrentlyActive = isAuctionActive ?? (auctionStatus === 'ACTIVE');
+
+  const [editingMessage, setEditingMessage] = useState<{
+    id: string;
+    content: string;
+  } | null>(null);
+
+  const [showScrollDown, setShowScrollDown] = useState(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
+  const hasScrolledInitially = useRef(false);
+
+  // 1. Fetch Paginated Messages & Read State
+  const {
+    messages,
+    hasOlderMessages,
+    isFetchingOlderMessages,
+    fetchOlderMessages,
+    isLoading: isLoadingMessages,
+    readState,
+    readStates,
+    refetchMessages,
+    refetchReadStates,
+  } = useChatMessages({
+    auctionId,
+    enabled: isOpen && !!auctionId,
+  });
+
+  // 2. Chat Actions & Optimistic State
+  const {
+    pendingMessages,
+    sendMessage,
+    retrySendMessage,
+    removePendingMessage,
+    isSending,
+    editMessage,
+    deleteMessage,
+    reactToMessage,
+    markChatAsRead,
+  } = useChatActions({ auctionId });
+
+  // 3. Scroll to bottom handler
+  const scrollToBottom = useCallback((smooth = false) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: smooth ? 'smooth' : 'auto',
+        block: 'end',
+      });
+    }
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, []);
+
+  // Handler for new incoming messages from subscription
+  const handleNewMessage = useCallback(() => {
+    if (isNearBottomRef.current) {
+      setTimeout(() => scrollToBottom(true), 40);
+    }
+  }, [scrollToBottom]);
+
+  // 4. Real-time Subscriptions with Strict Cleanup
+  const { participantReadStates } = useChatSubscriptions({
+    auctionId,
+    isOpen,
+    onNewMessage: handleNewMessage,
+  });
+
+  // 6. Automatic load older on top scroll with Scroll Anchor
+  const handleLoadOlder = useCallback(async () => {
+    if (!messagesContainerRef.current || isFetchingOlderMessages || !hasOlderMessages) return;
+    const container = messagesContainerRef.current;
+    const previousScrollHeight = container.scrollHeight;
+    const previousScrollTop = container.scrollTop;
+
+    await fetchOlderMessages();
+
+    requestAnimationFrame(() => {
+      if (messagesContainerRef.current) {
+        const heightDiff = messagesContainerRef.current.scrollHeight - previousScrollHeight;
+        messagesContainerRef.current.scrollTop = previousScrollTop + heightDiff;
+      }
+    });
+  }, [fetchOlderMessages, hasOlderMessages, isFetchingOlderMessages]);
+
+  // 5. Detect scroll position, toggle scroll-to-bottom FAB & auto-load older on top scroll
+  const handleScroll = useCallback(() => {
+    if (!messagesContainerRef.current) return;
+    // Strictly ignore scroll events until initial scroll to bottom has fully settled
+    if (!hasScrolledInitially.current) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+    isNearBottomRef.current = distanceFromBottom < 80;
+    setShowScrollDown(distanceFromBottom > 150);
+
+    // Auto-fetch older messages when user deliberately scrolls near top
+    if (scrollTop < 60 && hasOlderMessages && !isFetchingOlderMessages) {
+      handleLoadOlder();
+    }
+  }, [hasOlderMessages, isFetchingOlderMessages, handleLoadOlder]);
+
+  const messagesRef = useRef(messages);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  const currentUserRef = useRef(currentUser);
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
+  const markChatAsReadRef = useRef(markChatAsRead);
+  useEffect(() => {
+    markChatAsReadRef.current = markChatAsRead;
+  }, [markChatAsRead]);
+
+  const scrollToBottomRef = useRef(scrollToBottom);
+  useEffect(() => {
+    scrollToBottomRef.current = scrollToBottom;
+  }, [scrollToBottom]);
+
+  // 7. Memoize sorted combined messages with pending deduplication (Fix BUG-05)
+  const allMessages = useMemo<(ChatMessageData | PendingMessage)[]>(() => {
+    const realClientIds = new Set(
+      messages.map((m) => m.clientMessageId).filter(Boolean)
+    );
+    const activePending = pendingMessages.filter(
+      (p) => !realClientIds.has(p.clientMessageId)
+    );
+    const combined = [...messages, ...activePending];
+    return combined.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }, [messages, pendingMessages]);
+
+  // 8. Re-fetch fresh messages and read states immediately upon drawer open (0ms sync)
+  useEffect(() => {
+    if (isOpen && auctionId) {
+      refetchMessages();
+      refetchReadStates();
+    }
+  }, [isOpen, auctionId, refetchMessages, refetchReadStates]);
+
+  // 9. Mark latest other participant message as read on open & when messages load
+  const lastMarkedReadMessageIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      hasScrolledInitially.current = false;
+      isNearBottomRef.current = true;
+      setShowScrollDown(false);
+      return;
+    }
+
+    if (!isLoadingMessages && allMessages.length > 0) {
+      const otherMsgs = allMessages.filter(
+        (m) =>
+          m.senderId !== currentUserRef.current?._id &&
+          m._id &&
+          !m._id.startsWith('pending-')
+      );
+      const latestOther = otherMsgs[otherMsgs.length - 1];
+      if (
+        latestOther?._id &&
+        latestOther._id !== lastMarkedReadMessageIdRef.current
+      ) {
+        lastMarkedReadMessageIdRef.current = latestOther._id;
+        markChatAsReadRef.current(latestOther._id).catch(() => { });
+      }
+    }
+  }, [isOpen, isLoadingMessages, allMessages]);
+
+  // 9. Lock body scroll on mobile when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      setEditingMessage(null);
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // 10. Initial scroll effect: Always pin to bottom when opening drawer (Fix initial open scroll)
+  useEffect(() => {
+    if (!isOpen) {
+      hasScrolledInitially.current = false;
+      isNearBottomRef.current = true;
+      setShowScrollDown(false);
+      return;
+    }
+
+    if (!isLoadingMessages && allMessages.length > 0 && !hasScrolledInitially.current) {
+      // Force scroll immediately & across animation frames
+      scrollToBottomRef.current(false);
+      const raf = requestAnimationFrame(() => scrollToBottomRef.current(false));
+      const t1 = setTimeout(() => scrollToBottomRef.current(false), 50);
+      const t2 = setTimeout(() => scrollToBottomRef.current(false), 150);
+      const t3 = setTimeout(() => {
+        scrollToBottomRef.current(false);
+        hasScrolledInitially.current = true;
+        isNearBottomRef.current = true;
+        setShowScrollDown(false);
+      }, 300);
+
+      return () => {
+        cancelAnimationFrame(raf);
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
+    }
+  }, [isOpen, isLoadingMessages, allMessages.length]);
+
+  // 11. Keep pinned to bottom on message list updates if user is at bottom
+  useEffect(() => {
+    if (isOpen && allMessages.length > 0 && isNearBottomRef.current) {
+      scrollToBottomRef.current(false);
+    }
+  }, [isOpen, allMessages.length]);
+
+  // 10. Compute accurate Read Horizon timestamp for other participants
+  const maxOtherReadTime = useMemo(() => {
+    const timestamps: number[] = [];
+
+    // 1. If any message exists from another participant, all prior messages are guaranteed to be read
+    const otherMessages = allMessages.filter(
+      (m) =>
+        m.senderId !== currentUser?._id &&
+        m._id &&
+        !m._id.startsWith('pending-')
+    );
+    if (otherMessages.length > 0) {
+      const latestOtherMsg = otherMessages[otherMessages.length - 1];
+      const otherMsgTime = new Date(latestOtherMsg.createdAt).getTime();
+      if (!isNaN(otherMsgTime) && otherMsgTime > 0) {
+        timestamps.push(otherMsgTime);
+      }
+    }
+
+    // 2. Persisted other participant read horizon from localStorage (persists across reloads/F5)
+    const storedHorizon = getStoredOtherReadHorizon(auctionId);
+    if (storedHorizon > 0) {
+      timestamps.push(storedHorizon);
+    }
+
+    // 3. Real-time participant read states (updated live via WebSocket)
+    Object.entries(participantReadStates).forEach(([userId, state]) => {
+      if (userId !== currentUser?._id && state) {
+        if (state.lastReadAt) {
+          const t = new Date(state.lastReadAt).getTime();
+          if (!isNaN(t) && t > 0) timestamps.push(t);
+        }
+        if (state.lastReadMessageId) {
+          const readMsg = allMessages.find((m) => m._id === state.lastReadMessageId);
+          if (readMsg) {
+            const t = new Date(readMsg.createdAt).getTime();
+            if (!isNaN(t) && t > 0) timestamps.push(t);
+          }
+        }
+      }
+    });
+
+    // 4. Server read states for both participants from DB (official chatReadStates query — 100% accurate across F5)
+    const otherParticipantState = readStates.find((s) => s.userId !== currentUser?._id);
+    if (otherParticipantState) {
+      if (otherParticipantState.lastReadAt) {
+        const t = new Date(otherParticipantState.lastReadAt).getTime();
+        if (!isNaN(t) && t > 0) timestamps.push(t);
+      }
+      if (otherParticipantState.lastReadMessageId) {
+        const readMsg = allMessages.find((m) => m._id === otherParticipantState.lastReadMessageId);
+        if (readMsg) {
+          const t = new Date(readMsg.createdAt).getTime();
+          if (!isNaN(t) && t > 0) timestamps.push(t);
+        }
+      }
+    }
+
+    // 5. Server read state from legacy query (if returned for other user)
+    if (readState && readState.userId !== currentUser?._id) {
+      if (readState.lastReadAt) {
+        const t = new Date(readState.lastReadAt).getTime();
+        if (!isNaN(t) && t > 0) timestamps.push(t);
+      }
+      if (readState.lastReadMessageId) {
+        const readMsg = allMessages.find((m) => m._id === readState.lastReadMessageId);
+        if (readMsg) {
+          const t = new Date(readMsg.createdAt).getTime();
+          if (!isNaN(t) && t > 0) timestamps.push(t);
+        }
+      }
+    }
+
+    return timestamps.length > 0 ? Math.max(...timestamps) : 0;
+  }, [participantReadStates, readState, readStates, currentUser?._id, allMessages, auctionId]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end animate-in fade-in duration-200">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity cursor-pointer"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Slide-over Drawer Panel */}
+      <aside
+        className={cn(
+          'relative z-10 w-full sm:max-w-md lg:max-w-lg h-full bg-slate-50 dark:bg-slate-900 shadow-2xl flex flex-col border-l rtl:border-r rtl:border-l-0 border-slate-200 dark:border-slate-800 animate-in slide-in-from-right rtl:slide-in-from-left duration-250',
+          className
+        )}
+        aria-label={t('drawer.title', 'شات المزاد')}
+      >
+        {/* Drawer Header */}
+        <header className="px-4 py-3.5 bg-white dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/20">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h2 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                  {t('drawer.title', 'شات المزاد')}
+                </h2>
+                {isCurrentlyActive ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
+                    <Radio className="w-2.5 h-2.5 animate-pulse text-emerald-500" />
+                    <span>{t('messages.auctionActive', 'مباشر')}</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center text-[10px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full shrink-0">
+                    {t('messages.auctionEnded', 'منتهي')}
+                  </span>
+                )}
+              </div>
+              {auctionTitle && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-xs">
+                  {auctionTitle}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Close Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-colors shrink-0 cursor-pointer"
+            title={t('actions.close', 'إغلاق')}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </header>
+
+        {/* Drawer Messages Stream Body */}
+        <div
+          ref={messagesContainerRef}
+          onScroll={handleScroll}
+          className="flex-1 p-4 pt-8 pb-4 overflow-y-auto overflow-x-hidden custom-scrollbar space-y-1.5"
+        >
+          {/* Subtle Spinner when fetching older messages */}
+          {isFetchingOlderMessages && (
+            <div className="flex justify-center py-2">
+              <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+            </div>
+          )}
+
+          {/* Initial Loading Skeleton */}
+          {isLoadingMessages && messages.length === 0 && (
+            <div className="space-y-4 py-8">
+              {[1, 2, 3, 4].map((n) => (
+                <div
+                  key={n}
+                  className={cn(
+                    'flex flex-col space-y-1',
+                    n % 2 === 0 ? 'items-end' : 'items-start'
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'h-12 rounded-2xl animate-pulse bg-slate-200 dark:bg-slate-800',
+                      n % 2 === 0 ? 'w-48' : 'w-56'
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!isLoadingMessages && allMessages.length === 0 && (
+            <div className="py-24 text-center space-y-3">
+              <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto border border-amber-500/20">
+                <MessageSquare className="w-8 h-8 opacity-80" />
+              </div>
+              <div className="space-y-1 max-w-xs mx-auto">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  {t('drawer.empty', 'لا توجد رسائل بعد')}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {t(
+                    'drawer.emptyDescription',
+                    'ابدأ المحادثة للتواصل المباشر بين البائع والمشاركين والفائز!'
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Render Messages with Date Separators */}
+          {allMessages.map((msg, index) => {
+            const isOwner = msg.senderId === currentUser?._id;
+            const isRead =
+              isOwner &&
+              !msg._id.startsWith('pending-') &&
+              maxOtherReadTime > 0 &&
+              new Date(msg.createdAt).getTime() <= maxOtherReadTime;
+
+            const prevMsg = allMessages[index - 1];
+            const isDifferentDay =
+              !prevMsg ||
+              new Date(msg.createdAt).toDateString() !==
+              new Date(prevMsg.createdAt).toDateString();
+
+            return (
+              <React.Fragment key={msg._id || msg.clientMessageId}>
+                {isDifferentDay && <DateSeparator date={msg.createdAt} />}
+                <ChatMessageBubble
+                  message={msg}
+                  isOwner={isOwner}
+                  isRead={isRead}
+                  onEdit={(messageId, content) =>
+                    setEditingMessage({ id: messageId, content })
+                  }
+                  onDelete={(messageId) => deleteMessage(messageId)}
+                  onReact={(messageId, emoji) => reactToMessage(messageId, emoji)}
+                  onRetry={(pendingMsg) => retrySendMessage(pendingMsg)}
+                  onRemovePending={(localId) => removePendingMessage(localId)}
+                />
+              </React.Fragment>
+            );
+          })}
+
+          {/* Bottom Sentinel to guarantee 100% accurate pin to bottom */}
+          <div ref={messagesEndRef} className="h-px w-full shrink-0" aria-hidden="true" />
+        </div>
+
+        {/* Floating Scroll To Bottom FAB */}
+        {showScrollDown && (
+          <button
+            type="button"
+            onClick={() => scrollToBottom(true)}
+            className="absolute bottom-20 end-4 z-20 w-9 h-9 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg hover:bg-amber-400 active:scale-95 transition-all animate-in fade-in duration-150 cursor-pointer select-none"
+            title={t('drawer.scrollToBottom', 'الانتقال لآخر الرسائل')}
+          >
+            <ChevronDown className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Drawer Footer Input Bar */}
+        <ChatInputBar
+          auctionId={auctionId}
+          isReadOnly={isCurrentlyActive}
+          readOnlyReason={
+            isCurrentlyActive
+              ? t(
+                'input.auctionActiveReadOnly',
+                'المحادثة تتاح بعد انتهاء المزاد وتحديد الفائز'
+              )
+              : undefined
+          }
+          onSendMessage={(content, type = 'TEXT', mediaUrls) => {
+            sendMessage(content, type, mediaUrls);
+            setTimeout(() => scrollToBottom(true), 30);
+          }}
+          isSending={isSending}
+          editingMessage={editingMessage}
+          onSaveEdit={(messageId, newContent) => {
+            editMessage(messageId, newContent);
+            setEditingMessage(null);
+          }}
+          onCancelEdit={() => setEditingMessage(null)}
+        />
+      </aside>
+    </div>
+  );
+};
+
+export default AuctionChatDrawer;
