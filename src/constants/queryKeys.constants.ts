@@ -39,6 +39,7 @@ export const QUERY_KEYS = {
   CHAT: {
     MESSAGES: (auctionId: string) => ['chat', auctionId] as const,
     READ_STATE: (auctionId: string) => ['chat', 'read-state', auctionId] as const,
+    READ_STATES: (auctionId: string) => ['chat', 'read-states', auctionId] as const,
     MY_ROOMS: (page?: number) => ['chat', 'rooms', page] as const,
   },
   REVIEWS: {

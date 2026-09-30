@@ -93,3 +93,11 @@ export interface ChatRoomsPageData {
   totalPages: number;
   hasNextPage: boolean;
 }
+
+export interface ChatRoomUpdatedPayload {
+  auctionId: string;
+  unreadCount: number;
+  totalUnreadRooms: number;
+  lastMessageAt: string;
+  lastMessage: ChatMessageData;
+}

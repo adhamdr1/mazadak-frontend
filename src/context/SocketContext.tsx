@@ -95,9 +95,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         complete?: () => void;
       }
     ) => {
-      return subscribeToSubscription<TData>(payload, handlers, accessToken);
+      return subscribeToSubscription<TData>(payload, handlers);
     },
-    [accessToken]
+    []
   );
 
   const contextValue = useMemo<SocketContextType>(

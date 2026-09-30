@@ -47,7 +47,8 @@ export function getSocketClient(accessToken?: string | null): Client {
           setTimeout(resolve, Math.min(1000 * Math.pow(1.3, retries), 5000))
         );
       },
-      lazy: true,
+      lazy: false,
+      keepAlive: 10_000,
     });
   }
 

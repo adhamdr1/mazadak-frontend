@@ -21,6 +21,7 @@ export { useChatActions } from './hooks/useChatActions';
 export { useChatSubscriptions } from './hooks/useChatSubscriptions';
 export { useImageUpload } from './hooks/useImageUpload';
 export { useMyRooms } from './hooks/useMyRooms';
+export { useUnreadChatRoomsCount } from './hooks/useUnreadChatRoomsCount';
 
 // Services
 export { chatService } from './services/chat.service';
@@ -39,4 +40,5 @@ export type {
   ChatRoomData,
   ChatRoomsPageData,
   ChatRoomAuction,
+  ChatRoomUpdatedPayload,
 } from './types/chat.types';

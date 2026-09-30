@@ -13,6 +13,7 @@ import type {
   ChatMessagesConnectionData,
   ChatMessageType,
   PendingMessage,
+  ChatRoomsPageData,
 } from '../types/chat.types';
 
 export interface UseChatActionsOptions {
@@ -379,10 +380,27 @@ export function useChatActions({ auctionId }: UseChatActionsOptions) {
     mutationFn: (lastReadMessageId: string) =>
       chatService.markChatAsRead(auctionId, lastReadMessageId),
     onSuccess: () => {
-      // Invalidate read state only
+      // 1. Invalidate read state for active auction
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.CHAT.READ_STATE(auctionId),
       });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.CHAT.READ_STATES(auctionId),
+      });
+
+      // 2. Optimistically clear unread count for this auction across all room caches in 0ms
+      queryClient.setQueriesData<ChatRoomsPageData>(
+        { queryKey: ['chat', 'rooms'] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            items: old.items.map((r) =>
+              r.auctionId === auctionId ? { ...r, unreadCount: 0 } : r
+            ),
+          };
+        }
+      );
     },
   });
 

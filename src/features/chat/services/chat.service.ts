@@ -13,6 +13,7 @@ import type {
   ChatReadStateUpdatedPayload,
   SendMessageInput,
   ChatRoomsPageData,
+  ChatRoomUpdatedPayload,
 } from '../types/chat.types';
 
 // ----------------------------------------------------
@@ -55,6 +56,18 @@ const CHAT_MESSAGES_QUERY = `
 const CHAT_READ_STATE_QUERY = `
   query GetChatReadState($auctionId: ID!) {
     chatReadState(auctionId: $auctionId) {
+      _id
+      auctionId
+      userId
+      lastReadMessageId
+      lastReadAt
+    }
+  }
+`;
+
+const CHAT_READ_STATES_QUERY = `
+  query GetChatReadStates($auctionId: ID!) {
+    chatReadStates(auctionId: $auctionId) {
       _id
       auctionId
       userId
@@ -163,6 +176,21 @@ export const ON_CHAT_READ_STATUS_UPDATED_SUBSCRIPTION = `
   }
 `;
 
+export const ON_MY_CHAT_ROOM_UPDATED_SUBSCRIPTION = `
+  ${CHAT_MESSAGE_FIELDS_FRAGMENT}
+  subscription OnMyChatRoomUpdated {
+    myChatRoomUpdated {
+      auctionId
+      unreadCount
+      totalUnreadRooms
+      lastMessageAt
+      lastMessage {
+        ...ChatMessageFields
+      }
+    }
+  }
+`;
+
 // ----------------------------------------------------
 // Chat Service Methods
 // ----------------------------------------------------
@@ -184,7 +212,7 @@ export const chatService = {
   },
 
   /**
-   * Fetch read state for a specific auction
+   * Fetch read state for current user
    */
   getChatReadState: async (auctionId: string): Promise<ChatReadStateData | null> => {
     const data = await executeGraphQL<{ chatReadState: ChatReadStateData | null }>(
@@ -192,6 +220,17 @@ export const chatService = {
       { auctionId }
     );
     return data.chatReadState;
+  },
+
+  /**
+   * Fetch read states for all participants in the auction room (solves F5 reload checkmarks)
+   */
+  getChatReadStates: async (auctionId: string): Promise<ChatReadStateData[]> => {
+    const data = await executeGraphQL<{ chatReadStates: ChatReadStateData[] }>(
+      CHAT_READ_STATES_QUERY,
+      { auctionId }
+    );
+    return data.chatReadStates || [];
   },
 
   /**
@@ -335,6 +374,25 @@ export const chatService = {
       {
         query: ON_CHAT_READ_STATUS_UPDATED_SUBSCRIPTION,
         variables: { auctionId },
+      },
+      handlers,
+      token
+    );
+
+  },
+  /**
+   * Subscribe to user-level chat room updates across the whole platform (Navbar badge & Inbox)
+   */
+  subscribeToMyChatRoomUpdated: (
+    handlers: {
+      next: (data: { myChatRoomUpdated: ChatRoomUpdatedPayload }) => void;
+      error?: (err: unknown) => void;
+    },
+    token?: string | null
+  ): (() => void) => {
+    return subscribeToSubscription<{ myChatRoomUpdated: ChatRoomUpdatedPayload }>(
+      {
+        query: ON_MY_CHAT_ROOM_UPDATED_SUBSCRIPTION,
       },
       handlers,
       token

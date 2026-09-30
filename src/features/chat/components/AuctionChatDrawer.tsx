@@ -17,7 +17,10 @@ import { cn } from '@/utils/cn';
 import { useAuth } from '@/hooks/useAuth';
 import { useChatMessages } from '../hooks/useChatMessages';
 import { useChatActions } from '../hooks/useChatActions';
-import { useChatSubscriptions } from '../hooks/useChatSubscriptions';
+import {
+  useChatSubscriptions,
+  getStoredOtherReadHorizon,
+} from '../hooks/useChatSubscriptions';
 import { ChatMessageBubble } from './ChatMessageBubble';
 import { ChatInputBar } from './ChatInputBar';
 import { DateSeparator } from './DateSeparator';
@@ -53,6 +56,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
 
   const [showScrollDown, setShowScrollDown] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
   const hasScrolledInitially = useRef(false);
 
@@ -64,6 +68,9 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     fetchOlderMessages,
     isLoading: isLoadingMessages,
     readState,
+    readStates,
+    refetchMessages,
+    refetchReadStates,
   } = useChatMessages({
     auctionId,
     enabled: isOpen && !!auctionId,
@@ -83,12 +90,15 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
   } = useChatActions({ auctionId });
 
   // 3. Scroll to bottom handler
-  const scrollToBottom = useCallback((smooth = true) => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTo({
-        top: messagesContainerRef.current.scrollHeight,
+  const scrollToBottom = useCallback((smooth = false) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
         behavior: smooth ? 'smooth' : 'auto',
+        block: 'end',
       });
+    }
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, []);
 
@@ -126,12 +136,15 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
   // 5. Detect scroll position, toggle scroll-to-bottom FAB & auto-load older on top scroll
   const handleScroll = useCallback(() => {
     if (!messagesContainerRef.current) return;
+    // Strictly ignore scroll events until initial scroll to bottom has fully settled
+    if (!hasScrolledInitially.current) return;
+
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-    isNearBottomRef.current = distanceFromBottom < 120;
-    setShowScrollDown(distanceFromBottom > 200);
+    isNearBottomRef.current = distanceFromBottom < 80;
+    setShowScrollDown(distanceFromBottom > 150);
 
-    // Auto-fetch older messages when user scrolls near top
+    // Auto-fetch older messages when user deliberately scrolls near top
     if (scrollTop < 60 && hasOlderMessages && !isFetchingOlderMessages) {
       handleLoadOlder();
     }
@@ -171,12 +184,22 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     );
   }, [messages, pendingMessages]);
 
-  // 8. Mark latest other participant message as read on open & when messages load
+  // 8. Re-fetch fresh messages and read states immediately upon drawer open (0ms sync)
+  useEffect(() => {
+    if (isOpen && auctionId) {
+      refetchMessages();
+      refetchReadStates();
+    }
+  }, [isOpen, auctionId, refetchMessages, refetchReadStates]);
+
+  // 9. Mark latest other participant message as read on open & when messages load
   const lastMarkedReadMessageIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
       hasScrolledInitially.current = false;
+      isNearBottomRef.current = true;
+      setShowScrollDown(false);
       return;
     }
 
@@ -193,7 +216,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
         latestOther._id !== lastMarkedReadMessageIdRef.current
       ) {
         lastMarkedReadMessageIdRef.current = latestOther._id;
-        markChatAsReadRef.current(latestOther._id).catch(() => {});
+        markChatAsReadRef.current(latestOther._id).catch(() => { });
       }
     }
   }, [isOpen, isLoadingMessages, allMessages]);
@@ -211,22 +234,70 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     };
   }, [isOpen]);
 
-  // 10. Initial scroll effect after messages are loaded and DOM rendered (Fix BUG-01)
+  // 10. Initial scroll effect: Always pin to bottom when opening drawer (Fix initial open scroll)
   useEffect(() => {
-    if (!isOpen || hasScrolledInitially.current) return;
-    if (!isLoadingMessages && allMessages.length > 0) {
-      hasScrolledInitially.current = true;
-      requestAnimationFrame(() => {
+    if (!isOpen) {
+      hasScrolledInitially.current = false;
+      isNearBottomRef.current = true;
+      setShowScrollDown(false);
+      return;
+    }
+
+    if (!isLoadingMessages && allMessages.length > 0 && !hasScrolledInitially.current) {
+      // Force scroll immediately & across animation frames
+      scrollToBottomRef.current(false);
+      const raf = requestAnimationFrame(() => scrollToBottomRef.current(false));
+      const t1 = setTimeout(() => scrollToBottomRef.current(false), 50);
+      const t2 = setTimeout(() => scrollToBottomRef.current(false), 150);
+      const t3 = setTimeout(() => {
         scrollToBottomRef.current(false);
-      });
+        hasScrolledInitially.current = true;
+        isNearBottomRef.current = true;
+        setShowScrollDown(false);
+      }, 300);
+
+      return () => {
+        cancelAnimationFrame(raf);
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
     }
   }, [isOpen, isLoadingMessages, allMessages.length]);
+
+  // 11. Keep pinned to bottom on message list updates if user is at bottom
+  useEffect(() => {
+    if (isOpen && allMessages.length > 0 && isNearBottomRef.current) {
+      scrollToBottomRef.current(false);
+    }
+  }, [isOpen, allMessages.length]);
 
   // 10. Compute accurate Read Horizon timestamp for other participants
   const maxOtherReadTime = useMemo(() => {
     const timestamps: number[] = [];
 
-    // Check real-time participant read states (persisted across browser reloads)
+    // 1. If any message exists from another participant, all prior messages are guaranteed to be read
+    const otherMessages = allMessages.filter(
+      (m) =>
+        m.senderId !== currentUser?._id &&
+        m._id &&
+        !m._id.startsWith('pending-')
+    );
+    if (otherMessages.length > 0) {
+      const latestOtherMsg = otherMessages[otherMessages.length - 1];
+      const otherMsgTime = new Date(latestOtherMsg.createdAt).getTime();
+      if (!isNaN(otherMsgTime) && otherMsgTime > 0) {
+        timestamps.push(otherMsgTime);
+      }
+    }
+
+    // 2. Persisted other participant read horizon from localStorage (persists across reloads/F5)
+    const storedHorizon = getStoredOtherReadHorizon(auctionId);
+    if (storedHorizon > 0) {
+      timestamps.push(storedHorizon);
+    }
+
+    // 3. Real-time participant read states (updated live via WebSocket)
     Object.entries(participantReadStates).forEach(([userId, state]) => {
       if (userId !== currentUser?._id && state) {
         if (state.lastReadAt) {
@@ -243,7 +314,23 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
       }
     });
 
-    // Check query read state from server on load
+    // 4. Server read states for both participants from DB (official chatReadStates query — 100% accurate across F5)
+    const otherParticipantState = readStates.find((s) => s.userId !== currentUser?._id);
+    if (otherParticipantState) {
+      if (otherParticipantState.lastReadAt) {
+        const t = new Date(otherParticipantState.lastReadAt).getTime();
+        if (!isNaN(t) && t > 0) timestamps.push(t);
+      }
+      if (otherParticipantState.lastReadMessageId) {
+        const readMsg = allMessages.find((m) => m._id === otherParticipantState.lastReadMessageId);
+        if (readMsg) {
+          const t = new Date(readMsg.createdAt).getTime();
+          if (!isNaN(t) && t > 0) timestamps.push(t);
+        }
+      }
+    }
+
+    // 5. Server read state from legacy query (if returned for other user)
     if (readState && readState.userId !== currentUser?._id) {
       if (readState.lastReadAt) {
         const t = new Date(readState.lastReadAt).getTime();
@@ -259,7 +346,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
     }
 
     return timestamps.length > 0 ? Math.max(...timestamps) : 0;
-  }, [participantReadStates, readState, currentUser?._id, allMessages]);
+  }, [participantReadStates, readState, readStates, currentUser?._id, allMessages, auctionId]);
 
   if (!isOpen) return null;
 
@@ -389,7 +476,7 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
             const isDifferentDay =
               !prevMsg ||
               new Date(msg.createdAt).toDateString() !==
-                new Date(prevMsg.createdAt).toDateString();
+              new Date(prevMsg.createdAt).toDateString();
 
             return (
               <React.Fragment key={msg._id || msg.clientMessageId}>
@@ -409,6 +496,9 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
               </React.Fragment>
             );
           })}
+
+          {/* Bottom Sentinel to guarantee 100% accurate pin to bottom */}
+          <div ref={messagesEndRef} className="h-px w-full shrink-0" aria-hidden="true" />
         </div>
 
         {/* Floating Scroll To Bottom FAB */}
@@ -430,9 +520,9 @@ export const AuctionChatDrawer: React.FC<AuctionChatDrawerProps> = ({
           readOnlyReason={
             isCurrentlyActive
               ? t(
-                  'input.auctionActiveReadOnly',
-                  'المحادثة تتاح بعد انتهاء المزاد وتحديد الفائز'
-                )
+                'input.auctionActiveReadOnly',
+                'المحادثة تتاح بعد انتهاء المزاد وتحديد الفائز'
+              )
               : undefined
           }
           onSendMessage={(content, type = 'TEXT', mediaUrls) => {

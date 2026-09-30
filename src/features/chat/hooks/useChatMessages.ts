@@ -29,19 +29,29 @@ export function useChatMessages({
       return lastPage.hasNextPage && lastPage.endCursor ? lastPage.endCursor : undefined;
     },
     enabled: !!auctionId && enabled,
-    staleTime: 60_000, // 1 minute
+    staleTime: 0,
     refetchOnWindowFocus: false,
-    refetchOnMount: true, // Always ensure fresh messages when opening drawer
+    refetchOnMount: 'always', // Always ensure fresh messages when opening drawer
   });
 
-  // 2. Chat Read State Query
+  // 2. Chat Read State Query (current user)
   const readStateQuery = useQuery({
     queryKey: QUERY_KEYS.CHAT.READ_STATE(auctionId),
     queryFn: () => chatService.getChatReadState(auctionId),
     enabled: !!auctionId && enabled,
-    staleTime: 30_000,
+    staleTime: 0,
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
+    refetchOnMount: 'always',
+  });
+
+  // 3. Chat Read States Query (both participants from DB — solves F5 reload blue checkmarks)
+  const readStatesQuery = useQuery({
+    queryKey: QUERY_KEYS.CHAT.READ_STATES(auctionId),
+    queryFn: () => chatService.getChatReadStates(auctionId),
+    enabled: !!auctionId && enabled,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: 'always',
   });
 
   const pages = messagesQuery.data?.pages || [];
@@ -65,7 +75,9 @@ export function useChatMessages({
     error: messagesQuery.error,
     refetchMessages: messagesQuery.refetch,
     readState: readStateQuery.data ?? null,
-    isLoadingReadState: readStateQuery.isLoading,
+    readStates: readStatesQuery.data ?? [],
+    isLoadingReadState: readStateQuery.isLoading || readStatesQuery.isLoading,
     refetchReadState: readStateQuery.refetch,
+    refetchReadStates: readStatesQuery.refetch,
   };
 }
