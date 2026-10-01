@@ -1,0 +1,163 @@
+{
+  "dropdown": {
+    "bellLabel": "Notifications",
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "loading": "Loading notifications...",
+    "emptyTitle": "No notifications yet",
+    "emptySubtitle": "All live alerts and updates will appear here",
+    "viewAll": "View all notifications"
+  },
+  "page": {
+    "title": "Notifications",
+    "subtitle": "Track all auction updates, financial transactions, and escrows in real-time",
+    "unreadCount": "You have {{count}} unread notification(s)",
+    "allRead": "All notifications are read",
+    "markAllRead": "Mark all as read",
+    "unreadOnly": "Unread",
+    "tabs": {
+      "all": "All",
+      "auctions": "Auctions",
+      "financial": "Financial",
+      "escrow": "Escrow",
+      "system": "System"
+    },
+    "empty": {
+      "all": {
+        "title": "No notifications yet",
+        "description": "All updates regarding your auctions, finances, and account will appear here"
+      },
+      "AUCTIONS": {
+        "title": "No auction notifications",
+        "description": "You haven't received any bidding or auction alerts yet"
+      },
+      "FINANCIAL": {
+        "title": "No financial notifications",
+        "description": "No recent deposit or withdrawal notifications recorded"
+      },
+      "ESCROW": {
+        "title": "No escrow notifications",
+        "description": "No updates regarding escrow holds or item deliveries right now"
+      },
+      "SYSTEM": {
+        "title": "No system notifications",
+        "description": "No new chat messages or platform administrative alerts"
+      },
+      "unread": {
+        "title": "All notifications read",
+        "description": "Great! You have caught up with all your notifications"
+      }
+    },
+    "pagination": {
+      "showing": "Showing {{from}} to {{to}} of {{total}} notifications"
+    }
+  },
+  "categories": {
+    "AUCTIONS": "Auctions",
+    "FINANCIAL": "Financial",
+    "ESCROW": "Escrow",
+    "SYSTEM": "System"
+  },
+  "types": {
+    "OUTBID": {
+      "title": "You Have Been Outbid",
+      "body": "Another bidder placed a higher bid on the auction. Place a higher bid to regain the lead"
+    },
+    "AUCTION_WON": {
+      "title": "Auction Won",
+      "body": "Congratulations! You won the auction. Escrow and delivery procedures are in progress",
+      "bodyWithAmount": "Congratulations! You won the auction for {{amount}}. Escrow and delivery procedures are in progress"
+    },
+    "AUCTION_ENDED_SELLER": {
+      "title": "Your Auction Has Ended",
+      "body": "Your auction has successfully ended and was sold to the highest bidder",
+      "bodyWithDetails": "Your auction has successfully ended, sold to {{buyerName}} for {{amount}}",
+      "bodyWithAmount": "Your auction has successfully ended, sold for {{amount}}"
+    },
+    "DEPOSIT_SUCCESSFUL": {
+      "title": "Deposit Successful",
+      "body": "Deposit has been credited successfully to your available wallet balance",
+      "bodyWithAmount": "A deposit of {{amount}} was successfully credited to your wallet balance"
+    },
+    "WITHDRAWAL_COMPLETED": {
+      "title": "Withdrawal Completed",
+      "body": "Your withdrawal payout has been successfully transferred to your payment method",
+      "bodyWithAmount": "Your withdrawal of {{amount}} has been successfully transferred"
+    },
+    "WITHDRAWAL_REQUESTED": {
+      "title": "Withdrawal Requested",
+      "body": "Your withdrawal request has been received and is currently being processed",
+      "bodyWithAmount": "A withdrawal request for {{amount}} was received and is being processed"
+    },
+    "WITHDRAWAL_REJECTED": {
+      "title": "Withdrawal Rejected",
+      "body": "Your withdrawal request could not be processed and funds were returned to your available wallet balance"
+    },
+    "AUCTION_STARTED": {
+      "title": "Auction Started",
+      "body": "The auction has started and is now open for bidding"
+    },
+    "WELCOME": {
+      "title": "Welcome to Mazadak",
+      "body": "Welcome to Mazadak platform! Browse thousands of auctions and trade safely"
+    },
+    "NEW_BID": {
+      "title": "New Bid Placed",
+      "body": "A bidder placed a new bid on your auction",
+      "bodyWithAmount": "A new bid of {{amount}} was placed on your auction"
+    },
+    "AUCTION_CANCELLED": {
+      "title": "Auction Cancelled",
+      "body": "The auction has been cancelled and any held bidder funds were released"
+    },
+    "AUCTION_CANCELLED_BY_ADMIN": {
+      "title": "Auction Cancelled by Admin",
+      "body": "The auction was cancelled by platform administration"
+    },
+    "NEW_CHAT_MESSAGE": {
+      "title": "New Chat Message",
+      "body": "You received a new message in auction chat"
+    },
+    "REVIEW_RECEIVED": {
+      "title": "New Review Received",
+      "body": "The other party left a review for your auction transaction"
+    },
+    "REVIEW_REPLIED": {
+      "title": "Reply to Your Review",
+      "body": "The seller replied to your review"
+    },
+    "AUTO_BID_PLACED": {
+      "title": "Auto-Bid Placed",
+      "body": "An auto-bid was placed on your behalf to keep you in the lead",
+      "bodyWithAmount": "An auto-bid of {{amount}} was placed to keep you in the lead"
+    },
+    "AUTO_BID_EXHAUSTED": {
+      "title": "Auto-Bid Ceiling Reached",
+      "body": "Auction bids have exceeded your auto-bid ceiling. You can increase your limit to continue"
+    },
+    "ESCROW_CREATED": {
+      "title": "Escrow Transaction Created",
+      "body": "Escrow hold was created and payment secured safely pending inspection and delivery"
+    },
+    "ESCROW_RELEASED": {
+      "title": "Escrow Funds Released",
+      "body": "Escrow funds have been released and credited to the seller successfully"
+    },
+    "ESCROW_REFUNDED": {
+      "title": "Escrow Refunded",
+      "body": "Escrow funds have been refunded back to the buyer's wallet"
+    },
+    "DISPUTE_OPENED": {
+      "title": "Dispute Opened",
+      "body": "A formal dispute has been opened and is currently under review by platform administration"
+    },
+    "DISPUTE_RESOLVED": {
+      "title": "Dispute Resolved",
+      "body": "Platform administration has resolved the dispute and executed financial settlements"
+    },
+    "DISPUTE_CANCELLED": {
+      "title": "Dispute Cancelled",
+      "body": "The dispute was cancelled and the escrow transaction resumed normally"
+    }
+  }
+}

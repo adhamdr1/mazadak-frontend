@@ -19,6 +19,7 @@ import {
   LogIn,
   UserPlus,
   MessageSquare,
+  Bell,
 } from 'lucide-react';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
@@ -26,6 +27,8 @@ import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/common/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadChatRoomsCount } from '@/features/chat';
+import { NotificationDropdown } from '@/features/notifications/components/NotificationDropdown';
+import { useUnreadNotificationsCount } from '@/features/notifications/hooks/useUnreadNotificationsCount';
 import { ROUTES } from '@/constants/routes.constants';
 import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
@@ -40,6 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const { unreadRoomsCount } = useUnreadChatRoomsCount();
+  const { unreadCount: unreadNotificationsCount } = useUnreadNotificationsCount();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -95,20 +99,20 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
     },
     ...(isAuthenticated
       ? [
-          {
-            to: ROUTES.MY_AUCTIONS,
-            label: t('nav.myAuctions', 'مزاداتي'),
-            icon: Layers,
-            isActive: location.pathname === ROUTES.MY_AUCTIONS,
-          },
-          {
-            to: ROUTES.MESSAGES,
-            label: t('nav.messages', 'الرسائل'),
-            icon: MessageSquare,
-            isActive: location.pathname.startsWith('/messages'),
-            badge: unreadRoomsCount,
-          },
-        ]
+        {
+          to: ROUTES.MY_AUCTIONS,
+          label: t('nav.myAuctions', 'مزاداتي'),
+          icon: Layers,
+          isActive: location.pathname === ROUTES.MY_AUCTIONS,
+        },
+        {
+          to: ROUTES.MESSAGES,
+          label: t('nav.messages', 'الرسائل'),
+          icon: MessageSquare,
+          isActive: location.pathname.startsWith('/messages'),
+          badge: unreadRoomsCount,
+        },
+      ]
       : []),
   ];
 
@@ -137,59 +141,66 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
     },
     ...(isAuthenticated
       ? [
-          {
-            to: ROUTES.MY_AUCTIONS,
-            label: t('nav.myAuctions', 'مزاداتي'),
-            icon: Layers,
-            isActive: location.pathname === ROUTES.MY_AUCTIONS,
-          },
-          {
-            to: ROUTES.MY_BIDS,
-            label: t('nav.myBids', 'مزايداتي'),
-            icon: TrendingUp,
-            isActive: location.pathname === ROUTES.MY_BIDS,
-          },
-          {
-            to: ROUTES.MY_ESCROWS,
-            label: t('nav.myEscrows', 'معاملات الضمان'),
-            icon: ShieldCheck,
-            isActive:
-              location.pathname.startsWith('/my-escrows') ||
-              location.pathname.startsWith('/escrow/') ||
-              location.pathname.startsWith('/disputes/'),
-          },
-          {
-            to: ROUTES.MESSAGES,
-            label: t('nav.messages', 'الرسائل'),
-            icon: MessageSquare,
-            isActive: location.pathname.startsWith('/messages'),
-            badge: unreadRoomsCount,
-          },
-          {
-            to: ROUTES.WALLET,
-            label: t('nav.wallet', 'المحفظة والرصيد'),
-            icon: Wallet,
-            isActive: location.pathname === ROUTES.WALLET,
-          },
-          {
-            to: ROUTES.WALLET_WITHDRAWALS,
-            label: t('nav.withdrawals', 'سجل السحوبات'),
-            icon: History,
-            isActive: location.pathname === ROUTES.WALLET_WITHDRAWALS,
-          },
-          {
-            to: ROUTES.WALLET_TRANSACTIONS,
-            label: t('nav.transactions', 'سجل المعاملات'),
-            icon: Receipt,
-            isActive: location.pathname === ROUTES.WALLET_TRANSACTIONS,
-          },
-          {
-            to: ROUTES.UPDATE_PASSWORD,
-            label: t('home.updatePasswordLink', 'تغيير كلمة المرور'),
-            icon: KeyRound,
-            isActive: location.pathname === ROUTES.UPDATE_PASSWORD,
-          },
-        ]
+        {
+          to: ROUTES.MY_AUCTIONS,
+          label: t('nav.myAuctions', 'مزاداتي'),
+          icon: Layers,
+          isActive: location.pathname === ROUTES.MY_AUCTIONS,
+        },
+        {
+          to: ROUTES.MY_BIDS,
+          label: t('nav.myBids', 'مزايداتي'),
+          icon: TrendingUp,
+          isActive: location.pathname === ROUTES.MY_BIDS,
+        },
+        {
+          to: ROUTES.MY_ESCROWS,
+          label: t('nav.myEscrows', 'معاملات الضمان'),
+          icon: ShieldCheck,
+          isActive:
+            location.pathname.startsWith('/my-escrows') ||
+            location.pathname.startsWith('/escrow/') ||
+            location.pathname.startsWith('/disputes/'),
+        },
+        {
+          to: ROUTES.MESSAGES,
+          label: t('nav.messages', 'الرسائل'),
+          icon: MessageSquare,
+          isActive: location.pathname.startsWith('/messages'),
+          badge: unreadRoomsCount,
+        },
+        {
+          to: ROUTES.NOTIFICATIONS,
+          label: t('nav.notifications', 'الإشعارات'),
+          icon: Bell,
+          isActive: location.pathname.startsWith('/notifications'),
+          badge: unreadNotificationsCount,
+        },
+        {
+          to: ROUTES.WALLET,
+          label: t('nav.wallet', 'المحفظة والرصيد'),
+          icon: Wallet,
+          isActive: location.pathname === ROUTES.WALLET,
+        },
+        {
+          to: ROUTES.WALLET_WITHDRAWALS,
+          label: t('nav.withdrawals', 'سجل السحوبات'),
+          icon: History,
+          isActive: location.pathname === ROUTES.WALLET_WITHDRAWALS,
+        },
+        {
+          to: ROUTES.WALLET_TRANSACTIONS,
+          label: t('nav.transactions', 'سجل المعاملات'),
+          icon: Receipt,
+          isActive: location.pathname === ROUTES.WALLET_TRANSACTIONS,
+        },
+        {
+          to: ROUTES.UPDATE_PASSWORD,
+          label: t('home.updatePasswordLink', 'تغيير كلمة المرور'),
+          icon: KeyRound,
+          isActive: location.pathname === ROUTES.UPDATE_PASSWORD,
+        },
+      ]
       : []),
   ];
 
@@ -255,6 +266,9 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
+
+            {/* Notifications Dropdown (Bell icon with live pulsing badge) */}
+            {isAuthenticated && <NotificationDropdown />}
 
             {/* User Account / Menu Trigger Button (Desktop & Mobile) */}
             {isAuthenticated ? (

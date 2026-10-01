@@ -218,11 +218,23 @@ export const escrowService = {
    * Fetch escrow by associated auction ID (nullable if auction has no finalized escrow)
    */
   getEscrowByAuction: async (auctionId: string): Promise<EscrowData | null> => {
-    const data = await executeGraphQL<{ escrowByAuction: EscrowData | null }>(
-      ESCROW_BY_AUCTION_QUERY,
-      { auctionId }
-    );
-    return data.escrowByAuction;
+    try {
+      const data = await executeGraphQL<{ escrowByAuction: EscrowData | null }>(
+        ESCROW_BY_AUCTION_QUERY,
+        { auctionId }
+      );
+      return data.escrowByAuction;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '';
+      if (
+        message.includes('ESCROW_UNAUTHORIZED') ||
+        message.includes('UNAUTHORIZED') ||
+        message.includes('FORBIDDEN')
+      ) {
+        return null;
+      }
+      throw err;
+    }
   },
 
   /**

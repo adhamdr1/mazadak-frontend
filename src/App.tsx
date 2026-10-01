@@ -20,8 +20,8 @@ const queryClient = new QueryClient({
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <SocketProvider>
-        <ToastProvider>
+      <ToastProvider>
+        <SocketProvider>
           <BrowserRouter
             future={{
               v7_startTransition: true,
@@ -33,8 +33,8 @@ export const App: React.FC = () => {
               <ToastContainer />
             </ErrorBoundary>
           </BrowserRouter>
-        </ToastProvider>
-      </SocketProvider>
+        </SocketProvider>
+      </ToastProvider>
     </QueryClientProvider>
   );
 };

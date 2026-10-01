@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { stripEmojis } from '@/features/notifications/utils/notificationLocalization.utils';
 import type { ToastItem } from './toast.context';
 
 export interface ToastProps {
@@ -47,6 +48,9 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
   const { id, type, title, message, duration = 4000, action } = toast;
   const variant = TOAST_VARIANTS[type] || TOAST_VARIANTS.info;
   const Icon = variant.icon;
+
+  const sanitizedTitle = title ? stripEmojis(title) : undefined;
+  const sanitizedMessage = message ? stripEmojis(message) : '';
 
   const [isPaused, setIsPaused] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -113,14 +117,14 @@ export const Toast: React.FC<ToastProps> = ({ toast, onDismiss }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          {title && (
+        <div className="flex-1 min-w-0 text-start" dir="auto">
+          {sanitizedTitle && (
             <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-0.5">
-              {title}
+              <bdi>{sanitizedTitle}</bdi>
             </h4>
           )}
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed break-words">
-            {message}
+            <bdi>{sanitizedMessage}</bdi>
           </p>
 
           {/* Action Button (Optional) */}

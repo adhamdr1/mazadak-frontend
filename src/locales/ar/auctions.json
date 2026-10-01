@@ -95,7 +95,7 @@
     "nextPage": "التالي"
   },
   "feed": {
-    "newAuctionToast": "🏷️ مزاد جديد متاح: {{title}}",
+    "newAuctionToast": "مزاد جديد متاح: {{title}}",
     "newAuctionOne": "يوجد مزاد جديد متاح",
     "newAuctionTwo": "يوجد مزادان جديدان متاحان",
     "newAuctionFew": "يوجد {{count}} مزادات جديدة متاحة",

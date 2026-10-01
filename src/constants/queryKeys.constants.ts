@@ -34,7 +34,13 @@ export const QUERY_KEYS = {
   },
   NOTIFICATIONS: {
     ALL: ['notifications'] as const,
-    UNREAD_COUNT: ['notifications', 'unread-count'] as const,
+    LIST: (page?: number, limit?: number, filter?: Record<string, unknown>) =>
+      ['notifications', 'list', page, limit, filter] as const,
+    UNREAD_TOTAL: ['notifications', 'unread-total'] as const,
+    UNREAD_COUNT: (category?: string) =>
+      category
+        ? (['notifications', 'unread-category', category] as const)
+        : (['notifications', 'unread-total'] as const),
   },
   CHAT: {
     MESSAGES: (auctionId: string) => ['chat', auctionId] as const,
