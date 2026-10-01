@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { Client, SubscribePayload } from 'graphql-ws';
 import { useQueryClient } from '@tanstack/react-query';
 import { SocketContext, type SocketContextType } from './socket.context';
@@ -9,11 +9,31 @@ import {
 } from '@/services/websocket/socketClient';
 import { useAuth } from '@/hooks/useAuth';
 import { walletService } from '@/features/wallet';
+import { notificationsService } from '@/features/notifications/services/notifications.service';
+import type { InAppNotificationsPage } from '@/features/notifications/types/notifications.types';
+import { useToast } from '@/components/feedback/useToast';
+import { useTranslation } from 'react-i18next';
+import {
+  getLocalizedNotification,
+  stripEmojis,
+} from '@/features/notifications/utils/notificationLocalization.utils';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { accessToken, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { t: tNotifications, i18n } = useTranslation('notifications');
+  const isRTL = i18n.language?.startsWith('ar');
+
+  const isRTLRef = useRef(isRTL);
+  const tNotificationsRef = useRef(tNotifications);
+
+  useEffect(() => {
+    isRTLRef.current = isRTL;
+    tNotificationsRef.current = tNotifications;
+  }, [isRTL, tNotifications]);
+
   const [client, setClient] = useState<Client | null>(() => getSocketClient(accessToken));
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -64,6 +84,115 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       unsubscribe();
     };
   }, [isAuthenticated, accessToken, queryClient]);
+
+  // Synchronize live in-app notifications globally across the app
+  useEffect(() => {
+    if (!isAuthenticated || !accessToken) return;
+
+    const unsubscribeAdded = notificationsService.subscribeToNotificationAdded(
+      {
+        next: (data) => {
+          if (!data?.notificationAdded) return;
+          const newNotif = data.notificationAdded;
+
+          // Increment global unread count
+          queryClient.setQueriesData<number>(
+            { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT() },
+            (old = 0) => old + 1
+          );
+
+          // Increment category unread count if applicable
+          if (newNotif.category) {
+            queryClient.setQueriesData<number>(
+              { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT(newNotif.category) },
+              (old = 0) => old + 1
+            );
+          }
+
+          // Prepend to cached list queries
+          queryClient.setQueriesData<InAppNotificationsPage>(
+            { queryKey: ['notifications', 'list'] },
+            (old) => {
+              if (!old) return old;
+              if (old.items.some((item) => item._id === newNotif._id)) return old;
+              return {
+                ...old,
+                total: old.total + 1,
+                items: [newNotif, ...old.items],
+              };
+            }
+          );
+
+          // Trigger in-app toast alert with fully localized title, body, and zero emojis
+          const localized = getLocalizedNotification(
+            newNotif,
+            !!isRTLRef.current,
+            tNotificationsRef.current
+          );
+          toast.info(stripEmojis(localized.body || localized.title), {
+            title: stripEmojis(localized.title),
+            duration: 4500,
+          });
+        },
+        error: (err) => {
+          console.warn('WebSocket notificationAdded subscription error:', err);
+        },
+      },
+      accessToken
+    );
+
+    const unsubscribeRead = notificationsService.subscribeToNotificationReadStatusUpdated(
+      {
+        next: (data) => {
+          if (!data?.notificationReadStatusUpdated) return;
+          const { notificationId, unreadCount, category } = data.notificationReadStatusUpdated;
+
+          // Set exact unread count from server
+          queryClient.setQueriesData<number>(
+            { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT() },
+            () => unreadCount
+          );
+
+          // Invalidate category count if applicable
+          if (category) {
+            queryClient.invalidateQueries({
+              queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT(category),
+            });
+          }
+
+          // Update read state across cached lists
+          queryClient.setQueriesData<InAppNotificationsPage>(
+            { queryKey: ['notifications', 'list'] },
+            (old) => {
+              if (!old) return old;
+              if (notificationId) {
+                return {
+                  ...old,
+                  items: old.items.map((item) =>
+                    item._id === notificationId ? { ...item, isRead: true } : item
+                  ),
+                };
+              }
+              // Mark all as read
+              return {
+                ...old,
+                items: old.items.map((item) => ({ ...item, isRead: true })),
+              };
+            }
+          );
+        },
+        error: (err) => {
+          console.warn('WebSocket notificationReadStatusUpdated subscription error:', err);
+        },
+      },
+      accessToken
+    );
+
+    return () => {
+      unsubscribeAdded();
+      unsubscribeRead();
+    };
+  }, [isAuthenticated, accessToken, queryClient, toast]);
 
   // Clean up when auth expires
   useEffect(() => {

@@ -115,7 +115,12 @@ export const AuctionDetailPage: React.FC = () => {
       {!isLoading && auction && (
         <>
           {/* Top Real-time Escrow & Dispute Status Banner */}
-          <EscrowBanner auctionId={auction._id} />
+          <EscrowBanner
+            auctionId={auction._id}
+            auctionStatus={effectiveStatus || auction.status}
+            sellerId={auction.sellerId}
+            winnerId={auction.winnerId}
+          />
 
           {/* Main 2-Column Responsive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">

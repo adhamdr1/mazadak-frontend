@@ -17,24 +17,48 @@ import { useEscrowSubscription } from '@/features/escrow/hooks/useEscrowSubscrip
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { ROUTES } from '@/constants/routes.constants';
 import { formatPrice, formatRelativeTime } from '@/utils/formatters';
+import type { AuctionStatus } from '@/features/auctions/types/auctions.types';
 import { cn } from '@/utils/cn';
 
 export interface EscrowBannerProps {
   auctionId: string;
+  auctionStatus?: AuctionStatus;
+  sellerId?: string;
+  winnerId?: string | null;
   className?: string;
 }
 
-export const EscrowBanner: React.FC<EscrowBannerProps> = ({ auctionId, className }) => {
+export const EscrowBanner: React.FC<EscrowBannerProps> = ({
+  auctionId,
+  auctionStatus,
+  sellerId,
+  winnerId,
+  className,
+}) => {
   const { t, i18n } = useTranslation(['escrow', 'common']);
   const isRTL = i18n.language?.startsWith('ar');
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+
+  const currentUserId = user?._id;
+  const isAdmin = user?.role === 'ADMIN';
+  const isSeller = Boolean(currentUserId && sellerId && currentUserId === sellerId);
+  const isWinner = Boolean(currentUserId && winnerId && currentUserId === winnerId);
+  const isEnded = auctionStatus ? auctionStatus === 'ENDED' : true;
+
+  // Escrow transactions only exist for ENDED auctions and are strictly restricted to seller, winner, or admin
+  const isEligible = Boolean(
+    isAuthenticated &&
+    isEnded &&
+    (!sellerId || isSeller || isWinner || isAdmin)
+  );
 
   // 1. Fetch Escrow for this Auction
   const { data: escrow, isLoading } = useQuery({
     queryKey: QUERY_KEYS.ESCROW.BY_AUCTION(auctionId),
     queryFn: () => escrowService.getEscrowByAuction(auctionId),
-    enabled: Boolean(auctionId),
+    enabled: Boolean(auctionId && isEligible),
     staleTime: 1000 * 30, // 30s
+    retry: false,
   });
 
   // 2. Real-time Live Subscription
@@ -45,10 +69,9 @@ export const EscrowBanner: React.FC<EscrowBannerProps> = ({ auctionId, className
     return null;
   }
 
-  const currentUserId = user?._id;
   const isBuyer = Boolean(currentUserId && escrow.buyerId === currentUserId);
-  const isSeller = Boolean(currentUserId && escrow.sellerId === currentUserId);
-  const isParticipant = isBuyer || isSeller;
+  const isEscrowSeller = Boolean(currentUserId && (escrow.sellerId === currentUserId || isSeller));
+  const isParticipant = isBuyer || isEscrowSeller || isAdmin;
 
   const isHeld = escrow.status === 'HELD';
   const isReleased = escrow.status === 'RELEASED';
@@ -129,7 +152,7 @@ export const EscrowBanner: React.FC<EscrowBannerProps> = ({ auctionId, className
               <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
                 {isBuyer
                   ? t('card.securedAmount', isRTL ? 'أموالك محتجزة بأمان في الضمان' : 'Funds Secured in Escrow')
-                  : isSeller
+                  : isEscrowSeller
                     ? t('card.roleSeller', isRTL ? 'مبلغ المزاد محتجز بضمان مؤكد' : 'Auction Amount Secured')
                     : t('detail.protectionType', isRTL ? 'معاملة محمية بنظام الضمان المالي' : 'Secured Escrow Transaction')}
               </span>
@@ -147,7 +170,7 @@ export const EscrowBanner: React.FC<EscrowBannerProps> = ({ auctionId, className
                     ? 'أموالك محتجزة بأمان حتى تفحص وتستلم السلعة. يمكنك تأكيد الاستلام أو فتح نزاع.'
                     : 'Funds are securely held in escrow until you inspect and accept the delivered item.'
                 )
-                : isSeller
+                : isEscrowSeller
                   ? t(
                     'detail.sellerSubtitle',
                     isRTL

@@ -95,7 +95,7 @@
     "nextPage": "Next"
   },
   "feed": {
-    "newAuctionToast": "🏷️ New auction available: {{title}}",
+    "newAuctionToast": "New auction available: {{title}}",
     "newAuctionOne": "1 new auction available",
     "newAuctionPlural": "{{count}} new auctions available",
     "clickToRefresh": "Click to refresh",
