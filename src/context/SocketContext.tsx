@@ -97,14 +97,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
           // Increment global unread count
           queryClient.setQueriesData<number>(
-            { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT() },
+            { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_TOTAL, exact: true },
             (old = 0) => old + 1
           );
 
           // Increment category unread count if applicable
           if (newNotif.category) {
             queryClient.setQueriesData<number>(
-              { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT(newNotif.category) },
+              { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT(newNotif.category), exact: true },
               (old = 0) => old + 1
             );
           }
@@ -149,7 +149,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
           // Set exact unread count from server
           queryClient.setQueriesData<number>(
-            { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT() },
+            { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_TOTAL, exact: true },
             () => unreadCount
           );
 
@@ -158,6 +158,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             queryClient.invalidateQueries({
               queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT(category),
             });
+          } else if (!notificationId) {
+            // Mark all as read: zero out all category counters
+            queryClient.setQueriesData<number>(
+              { queryKey: ['notifications', 'unread-category'] },
+              () => 0
+            );
           }
 
           // Update read state across cached lists

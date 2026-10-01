@@ -12,6 +12,11 @@ export * from './hooks/useNotificationActions';
 // Components
 export * from './components/NotificationItem';
 export * from './components/NotificationDropdown';
+export * from './components/NotificationFilters';
+export * from './components/NotificationSkeleton';
+
+// Pages
+export * from './pages/NotificationsPage';
 
 // Utils
 export * from './utils/notificationLocalization.utils';

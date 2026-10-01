@@ -31,7 +31,11 @@ export function useNotificationActions() {
     onSuccess: () => {
       // Zero out all unread count queries immediately
       queryClient.setQueriesData<number>(
-        { queryKey: ['notifications', 'unread-count'] },
+        { queryKey: ['notifications', 'unread-total'] },
+        () => 0
+      );
+      queryClient.setQueriesData<number>(
+        { queryKey: ['notifications', 'unread-category'] },
         () => 0
       );
 
@@ -53,13 +57,13 @@ export function useNotificationActions() {
     // Only optimistically decrement unread counter if item was unread
     if (!notification.isRead) {
       queryClient.setQueriesData<number>(
-        { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT() },
+        { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_TOTAL, exact: true },
         (old = 1) => Math.max(0, old - 1)
       );
 
       if (notification.category) {
         queryClient.setQueriesData<number>(
-          { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT(notification.category) },
+          { queryKey: QUERY_KEYS.NOTIFICATIONS.UNREAD_COUNT(notification.category), exact: true },
           (old = 1) => Math.max(0, old - 1)
         );
       }
@@ -85,7 +89,11 @@ export function useNotificationActions() {
   const markAllAsRead = () => {
     // Optimistic reset
     queryClient.setQueriesData<number>(
-      { queryKey: ['notifications', 'unread-count'] },
+      { queryKey: ['notifications', 'unread-total'] },
+      () => 0
+    );
+    queryClient.setQueriesData<number>(
+      { queryKey: ['notifications', 'unread-category'] },
       () => 0
     );
 

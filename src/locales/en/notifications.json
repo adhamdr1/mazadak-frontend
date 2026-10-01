@@ -9,22 +9,44 @@
     "viewAll": "View all notifications"
   },
   "page": {
-    "title": "Notification Center",
+    "title": "Notifications",
     "subtitle": "Track all auction updates, financial transactions, and escrows in real-time",
     "unreadCount": "You have {{count}} unread notification(s)",
     "allRead": "All notifications are read",
     "markAllRead": "Mark all as read",
-    "unreadOnly": "Unread only",
+    "unreadOnly": "Unread",
     "tabs": {
       "all": "All",
       "auctions": "Auctions",
       "financial": "Financial",
-      "escrow": "Escrow & Disputes",
-      "system": "System & Chat"
+      "escrow": "Escrow",
+      "system": "System"
     },
     "empty": {
-      "title": "No notifications in this tab",
-      "description": "There are no new alerts matching your selected filter"
+      "all": {
+        "title": "No notifications yet",
+        "description": "All updates regarding your auctions, finances, and account will appear here"
+      },
+      "AUCTIONS": {
+        "title": "No auction notifications",
+        "description": "You haven't received any bidding or auction alerts yet"
+      },
+      "FINANCIAL": {
+        "title": "No financial notifications",
+        "description": "No recent deposit or withdrawal notifications recorded"
+      },
+      "ESCROW": {
+        "title": "No escrow notifications",
+        "description": "No updates regarding escrow holds or item deliveries right now"
+      },
+      "SYSTEM": {
+        "title": "No system notifications",
+        "description": "No new chat messages or platform administrative alerts"
+      },
+      "unread": {
+        "title": "All notifications read",
+        "description": "Great! You have caught up with all your notifications"
+      }
     },
     "pagination": {
       "showing": "Showing {{from}} to {{to}} of {{total}} notifications"

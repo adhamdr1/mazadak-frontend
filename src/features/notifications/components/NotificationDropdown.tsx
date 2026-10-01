@@ -81,7 +81,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ clas
             className={cn(
               'absolute -top-1 -end-1 inline-flex items-center justify-center font-black text-[9px] leading-none',
               'px-1 min-w-[17px] h-[17px] rounded-full',
-              'bg-rose-500 text-white shadow-xs shadow-rose-500/50',
+              'bg-amber-500 text-slate-950 shadow-xs shadow-amber-500/40',
               'animate-in zoom-in-75 duration-200'
             )}
           >
