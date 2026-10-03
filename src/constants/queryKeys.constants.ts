@@ -49,8 +49,23 @@ export const QUERY_KEYS = {
     MY_ROOMS: (page?: number) => ['chat', 'rooms', page] as const,
   },
   REVIEWS: {
-    USER_REVIEWS: (userId: string) => ['reviews', 'user', userId] as const,
+    ALL: ['reviews'] as const,
+    USER_REVIEWS: (
+      userId: string,
+      page?: number,
+      limit?: number,
+      filter?: unknown,
+      sort?: unknown
+    ) => ['reviews', 'user', userId, page, limit, filter, sort] as const,
+    USER_STATS: (userId: string) => ['reviews', 'stats', userId] as const,
     CAN_REVIEW: (auctionId: string) => ['reviews', 'can-review', auctionId] as const,
+    MY_WRITTEN: (
+      page?: number,
+      limit?: number,
+      filter?: unknown,
+      sort?: unknown
+    ) => ['reviews', 'my-written', page, limit, filter, sort] as const,
+    DETAIL: (id: string) => ['reviews', 'detail', id] as const,
   },
   ADMIN: {
     STATS: ['admin', 'stats'] as const,

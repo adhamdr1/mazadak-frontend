@@ -1670,50 +1670,202 @@ mutation {
 ### 10.1 فحص إمكانية التقييم (canReviewAuction) — محمي
 
 ```graphql
-query {
-  canReviewAuction(auctionId: ID!) {
+query CanReviewAuction($auctionId: ID!) {
+  canReviewAuction(auctionId: $auctionId) {
     canReview    # Boolean
-    reason       # سبب عدم الإمكانية لو canReview = false
+    reason       # سبب عدم الإمكانية لو canReview = false (مثل: عدم انتهاء المزاد، عدم المشاركة، انتهاء المهلة، سبق التقييم)
   }
 }
 ```
 
-> **استخدم هذا Query أولاً** قبل ما تعرض زر التقييم.
+> **استخدم هذا Query أولاً** قبل عرض زر أو بانر التقييم (`staleTime: 0`).
 
 ---
 
 ### 10.2 إنشاء تقييم (createReview) — محمي
 
 ```graphql
-mutation {
+mutation CreateReview($input: CreateReviewInput!) {
   createReview(input: {
     auctionId: String!
-    overallRating: Int!      # من 1 إلى 5
-    criteria: {
+    overallRating: Int!      # من 1 إلى 5 (إلزامي)
+    criteria: {              # اختياري
       itemAccuracy: Int      # من 1 إلى 5
-      communication: Int
-      packaging: Int
-      smoothExperience: Int
+      communication: Int     # من 1 إلى 5
+      packaging: Int         # من 1 إلى 5
+      smoothExperience: Int  # من 1 إلى 5
     }
-    comment: String
-  }) { _id  overallRating  status  createdAt }
+    comment: String          # حد أقصى 500 حرف
+  }) {
+    _id
+    auctionId
+    reviewerId
+    reviewedUserId
+    type
+    status
+    overallRating
+    criteria { itemAccuracy communication packaging smoothExperience }
+    comment
+    createdAt
+  }
 }
 ```
 
 **الأخطاء:**
-| كود الخطأ | المعنى |
-|:---|:---|
-| `REVIEW_ALREADY_EXISTS` | قيّمت بالفعل |
-| `REVIEW_WINDOW_EXPIRED` | انتهت فترة التقييم |
-| `CANNOT_REVIEW_YOURSELF` | لا يمكن تقييم نفسك |
+| كود الخطأ | HTTP Status | المعنى |
+|:---|:---|:---|
+| `REVIEW_ALREADY_EXISTS` | 409 Conflict | قيّمت هذا المزاد بالفعل |
+| `REVIEW_WINDOW_EXPIRED` | 400 Bad Request | انتهت فترة الـ 14 يوماً المسموحة للتقييم بعد انتهاء المزاد |
+| `CANNOT_REVIEW_YOURSELF` | 400 Bad Request | لا يمكن تقييم نفسك |
+| `AUCTION_NOT_ELIGIBLE_FOR_REVIEW` | 400 Bad Request | المزاد ليس في حالة مؤهلة للتقييم (لم ينتهِ أو معلق) |
+| `NOT_AUCTION_PARTICIPANT` | 403 Forbidden | المستخدم ليس المشتري الفائز ولا البائع |
+| `REVIEW_NOT_FOUND` | 404 Not Found | التقييم المطلوب غير موجود |
 
 ---
 
-### 10.3 الرد على تقييم (replyToReview) — محمي (البائع فقط)
+### 10.3 الرد على تقييم (replyToReview) — محمي (الطرف المُقيَّم فقط)
 
 ```graphql
-mutation {
-  replyToReview(input: { reviewId: String!  reply: String! }) { _id  reply  repliedAt }
+mutation ReplyToReview($input: ReplyReviewInput!) {
+  replyToReview(input: {
+    reviewId: String!
+    reply: String!           # نص الرد (من 2 إلى 500 حرف)
+  }) {
+    _id
+    reply
+    repliedAt
+  }
+}
+```
+
+**الأخطاء:**
+| كود الخطأ | HTTP Status | المعنى |
+|:---|:---|:---|
+| `REPLY_ALREADY_EXISTS` | 409 Conflict | تم الرد على هذا التقييم مسبقاً (الرد لمرة واحدة فقط) |
+| `REVIEW_REPLY_FORBIDDEN` | 403 Forbidden | لست الشخص المُقيَّم المخول بالرد |
+| `REVIEW_NOT_FOUND` | 404 Not Found | التقييم غير موجود |
+
+---
+
+### 10.4 استعلام تقييمات المستخدم (userReviews) — عام / محمي
+
+```graphql
+query UserReviews(
+  $userId: ID!
+  $input: PaginationInput
+  $filter: ReviewsFilterInput
+  $sort: ReviewsSortInput
+) {
+  userReviews(userId: $userId, input: $input, filter: $filter, sort: $sort) {
+    total
+    totalPages
+    hasNextPage
+    items {
+      _id
+      auctionId
+      reviewerId
+      reviewedUserId
+      type
+      status
+      overallRating
+      criteria { itemAccuracy communication packaging smoothExperience }
+      comment
+      reply
+      repliedAt
+      publishedAt
+      createdAt
+      reviewer { id firstName lastName city ratingStats { averageRating totalReviews } }
+      auction { _id title images currentPrice }
+    }
+  }
+}
+```
+
+> **ملاحظة معمارية:** يعيد التقييمات المنشورة `PUBLISHED` فقط لجميع الزوار لضمان كفاءة كاش Redis SWR السريع.
+
+---
+
+### 10.5 إحصائيات تقييم المستخدم وتوزيع النجوم (userRatingStats) — عام / محمي
+
+```graphql
+query UserRatingStats($userId: ID!) {
+  userRatingStats(userId: $userId) {
+    averageRating
+    totalReviews
+    asSellerAverageRating
+    asSellerTotalReviews
+    asBuyerAverageRating
+    asBuyerTotalReviews
+    breakdown {
+      oneStar
+      twoStar
+      threeStar
+      fourStar
+      fiveStar
+    }
+  }
+}
+```
+
+---
+
+### 10.6 تقييماتي المكتوبة (myWrittenReviews) — محمي
+
+```graphql
+query MyWrittenReviews(
+  $input: PaginationInput
+  $filter: ReviewsFilterInput
+  $sort: ReviewsSortInput
+) {
+  myWrittenReviews(input: $input, filter: $filter, sort: $sort) {
+    total
+    totalPages
+    hasNextPage
+    items {
+      _id
+      auctionId
+      reviewedUserId
+      type
+      status
+      overallRating
+      criteria { itemAccuracy communication packaging smoothExperience }
+      comment
+      reply
+      repliedAt
+      createdAt
+      reviewedUser { id firstName lastName city }
+      auction { _id title images currentPrice }
+    }
+  }
+}
+```
+
+> **ملاحظة معمارية:** يعيد كافة تقييمات المستخدم بما فيها `PENDING` (نظام التقييم الأعمى Blind Review) لعرض شارة "قيد المراجعة".
+
+---
+
+### 10.7 تفاصيل تقييم مفرد (review) — عام / محمي
+
+```graphql
+query GetReview($id: ID!) {
+  review(id: $id) {
+    _id
+    auctionId
+    reviewerId
+    reviewedUserId
+    type
+    status
+    overallRating
+    criteria { itemAccuracy communication packaging smoothExperience }
+    comment
+    reply
+    repliedAt
+    publishedAt
+    createdAt
+    reviewer { id firstName lastName city }
+    reviewedUser { id firstName lastName city }
+    auction { _id title images currentPrice }
+  }
 }
 ```
 
@@ -1904,6 +2056,53 @@ subscription {
 ```
 
 > **ملاحظة أمنية:** البث يصل حصراً لأطراف النزاع (المدعي والمدعى عليه) أو الأدمن.
+
+---
+
+### 11.11 إضافة تقييم جديد للمستخدم (reviewAddedToUser) — عام / محمي
+
+```graphql
+subscription OnReviewAddedToUser($userId: ID!) {
+  reviewAddedToUser(userId: $userId) {
+    reviewedUserId
+    review {
+      _id
+      auctionId
+      reviewerId
+      reviewedUserId
+      type
+      status
+      overallRating
+      criteria { itemAccuracy communication packaging smoothExperience }
+      comment
+      reply
+      repliedAt
+      publishedAt
+      createdAt
+      reviewer { id firstName lastName city }
+      auction { _id title currentPrice }
+    }
+    updatedRatingStats {
+      averageRating
+      totalReviews
+      asSellerAverageRating
+      asSellerTotalReviews
+      asBuyerAverageRating
+      asBuyerTotalReviews
+      breakdown {
+        oneStar
+        twoStar
+        threeStar
+        fourStar
+        fiveStar
+      }
+    }
+  }
+}
+```
+
+> 🌟 **ملاحظة معمارية (Blind Review & Live Sync):**
+> نظراً لتطبيق نظام التقييم الأعمى (Blind Review)، يُبث هذا الحدث حصراً عند تحول التقييم إلى `PUBLISHED` (سواء عند اكتمال تقييم الطرفين متبادلاً أو عند انقضاء مهلة الـ 14 يوماً) لضمان سرية التقييم قبل نشره، ويحمل الإحصائيات المحدثة `updatedRatingStats` لتحديث صفحة البروفايل لحظياً بـ 0ms.
 
 ---
 
@@ -2155,6 +2354,369 @@ subscription {
 | `WITHDRAWAL_NOT_REJECTABLE` | الطلب مكتمل بالفعل (`COMPLETED`) أو ملغي ولا يمكن رفضه |
 | `AMOUNT_MUST_BE_POSITIVE` | مبلغ تعديل الرصيد اليدوي بواسطة الأدمن يجب أن يكون أكبر من الصفر |
 | `REASON_REQUIRED` / `REASON_TOO_SHORT` | سبب التعديل المالي اليدوي للأدمن إلزامي ولا يقل عن 10 أحرف لضمان التوثيق المالي |
+
+---
+
+## 10. موديول التقييمات والمراجعات (Reviews & Ratings Module)
+
+> **الحالة:** جاهز بنسبة 100% (Production-Ready)  
+> **البث اللحظي:** مدعوم عبر اشتراك GraphQL WebSocket `reviewAddedToUser`.  
+> **سياسة التقييم:** نظام التقييم الأعمى المتبادل (Mutual Blind Review) بمهلة 14 يوماً من انتهاء المزاد.
+
+### 10.1 الأنواع والـ Enums الأساسية
+
+```graphql
+enum ReviewType {
+  BUYER_TO_SELLER
+  SELLER_TO_BUYER
+}
+
+enum ReviewStatus {
+  PENDING      # معلق (أعمى) بانتظار تقييم الطرف الآخر أو انتهاء مهلة الـ 14 يوماً
+  PUBLISHED    # منشور علناً ومحتسب في الإحصائيات
+  HIDDEN       # مخفي بواسطة الإدارة
+}
+
+enum ReviewsSortField {
+  CREATED_AT
+  RATING
+}
+
+type RatingBreakdown {
+  oneStar: Int!
+  twoStar: Int!
+  threeStar: Int!
+  fourStar: Int!
+  fiveStar: Int!
+}
+
+type UserRatingStats {
+  averageRating: Float!
+  totalReviews: Int!
+  asSellerAverageRating: Float!
+  asSellerTotalReviews: Int!
+  asBuyerAverageRating: Float!
+  asBuyerTotalReviews: Int!
+  breakdown: RatingBreakdown!
+}
+
+type ReviewCriteria {
+  itemAccuracy: Int
+  communication: Int
+  packaging: Int
+  smoothExperience: Int
+}
+
+type Review {
+  _id: ID!
+  auctionId: ID!
+  reviewerId: ID!
+  reviewedUserId: ID!
+  type: ReviewType!
+  status: ReviewStatus!
+  overallRating: Float!
+  criteria: ReviewCriteria
+  comment: String
+  reply: String
+  repliedAt: DateTime
+  publishedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reviewer: PublicProfile
+  reviewedUser: PublicProfile
+  auction: Auction
+}
+
+type ReviewsPage {
+  items: [Review!]!
+  total: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+}
+
+type CanReviewAuctionResponse {
+  canReview: Boolean!
+  reason: String
+}
+
+type ReviewAddedPayload {
+  reviewedUserId: ID!
+  review: Review!
+  updatedRatingStats: UserRatingStats!
+}
+```
+
+---
+
+### 10.2 الاستعلامات (Queries)
+
+#### 1. استعلام تقييمات المستخدم العامة (`userReviews`) [Public]
+> استعلام عام محمي بكاش Redis SWR، يعيد **فقط التقييمات بحالة `PUBLISHED`** لجميع الزوار وصاحب الحساب.
+
+```graphql
+query UserReviews(
+  $userId: ID!
+  $input: PaginationInput
+  $filter: ReviewsFilterInput
+  $sort: ReviewsSortInput
+) {
+  userReviews(userId: $userId, input: $input, filter: $filter, sort: $sort) {
+    total
+    totalPages
+    hasNextPage
+    items {
+      _id
+      auctionId
+      reviewerId
+      reviewedUserId
+      type
+      status
+      overallRating
+      criteria {
+        itemAccuracy
+        communication
+        packaging
+        smoothExperience
+      }
+      comment
+      reply
+      repliedAt
+      publishedAt
+      createdAt
+      reviewer {
+        id
+        firstName
+        lastName
+        city
+        ratingStats {
+          averageRating
+          totalReviews
+        }
+      }
+      auction {
+        _id
+        title
+        images
+        currentPrice
+      }
+    }
+  }
+}
+```
+
+#### 2. استعلام التقييمات التي كتبها المستخدم الحالي (`myWrittenReviews`) [Protected]
+> يعيد جميع التقييمات التي كتبها المستخدم الحالي بكافة الحالات (`PENDING`, `PUBLISHED`, `HIDDEN`) مع دعم كامل للفلترة والترتيب.
+
+```graphql
+query MyWrittenReviews(
+  $input: PaginationInput
+  $filter: ReviewsFilterInput
+  $sort: ReviewsSortInput
+) {
+  myWrittenReviews(input: $input, filter: $filter, sort: $sort) {
+    total
+    totalPages
+    hasNextPage
+    items {
+      _id
+      auctionId
+      reviewedUserId
+      type
+      status
+      overallRating
+      criteria {
+        itemAccuracy
+        communication
+        packaging
+        smoothExperience
+      }
+      comment
+      reply
+      repliedAt
+      publishedAt
+      createdAt
+      reviewedUser {
+        id
+        firstName
+        lastName
+        city
+      }
+      auction {
+        _id
+        title
+        images
+        currentPrice
+      }
+    }
+  }
+}
+```
+
+#### 3. إحصائيات تقييم المستخدم وتوزيع النجوم (`userRatingStats`) [Public]
+
+```graphql
+query UserRatingStats($userId: ID!) {
+  userRatingStats(userId: $userId) {
+    averageRating
+    totalReviews
+    asSellerAverageRating
+    asSellerTotalReviews
+    asBuyerAverageRating
+    asBuyerTotalReviews
+    breakdown {
+      oneStar
+      twoStar
+      threeStar
+      fourStar
+      fiveStar
+    }
+  }
+}
+```
+
+#### 4. فحص أهلية تقييم المزاد مسبقاً (`canReviewAuction`) [Protected]
+
+```graphql
+query CanReviewAuction($auctionId: ID!) {
+  canReviewAuction(auctionId: $auctionId) {
+    canReview
+    reason
+  }
+}
+```
+
+#### 5. جلب تقييم محدد بالمعرف (`review`) [Public]
+
+```graphql
+query GetReview($id: ID!) {
+  review(id: $id) {
+    _id
+    overallRating
+    comment
+    reply
+    status
+    createdAt
+    reviewer { id firstName lastName }
+    reviewedUser { id firstName lastName }
+    auction { _id title }
+  }
+}
+```
+
+---
+
+### 10.3 الطفرات (Mutations)
+
+#### 1. إنشاء تقييم جديد لمزاد مكتمل (`createReview`) [Protected]
+
+```graphql
+mutation CreateReview($input: CreateReviewInput!) {
+  createReview(input: $input) {
+    _id
+    auctionId
+    type
+    status
+    overallRating
+    comment
+    criteria {
+      itemAccuracy
+      communication
+      packaging
+      smoothExperience
+    }
+    createdAt
+  }
+}
+
+# Variables Example:
+# {
+#   "input": {
+#     "auctionId": "660abc123456789",
+#     "overallRating": 5,
+#     "criteria": {
+#       "itemAccuracy": 5,
+#       "communication": 5,
+#       "packaging": 4,
+#       "smoothExperience": 5
+#     },
+#     "comment": "البائع ممتاز والسلعة مطابقة للوصف تماماً!"
+#   }
+# }
+```
+
+#### 2. الرد على تقييم منشور (`replyToReview`) [Protected]
+> متاح فقط للطرف المُقيَّم وعلى تقييم منشور `PUBLISHED` ولم يسبق الرد عليه.
+
+```graphql
+mutation ReplyToReview($input: ReplyReviewInput!) {
+  replyToReview(input: $input) {
+    _id
+    reply
+    repliedAt
+  }
+}
+
+# Variables Example:
+# {
+#   "input": {
+#     "reviewId": "660def987654321",
+#     "reply": "شكراً جزيلاً، تشرفت بالتعامل معك!"
+#   }
+# }
+```
+
+---
+
+### 10.4 الاشتراكات اللحظية (Subscriptions)
+
+#### اشتراك التقييمات المنشورة لحظياً للمستخدم (`reviewAddedToUser`) [Public]
+> يُطلق الحدث فور نشر أي تقييم (`PUBLISHED`) للمستخدم المحدد، لتحديث بطاقات التقييم وإحصائيات النجوم في صفحة البروفايل لحظياً وبدون Refresh.
+
+```graphql
+subscription OnReviewAddedToUser($userId: ID!) {
+  reviewAddedToUser(userId: $userId) {
+    reviewedUserId
+    review {
+      _id
+      overallRating
+      type
+      comment
+      createdAt
+      reviewer {
+        id
+        firstName
+        lastName
+      }
+    }
+    updatedRatingStats {
+      averageRating
+      totalReviews
+      breakdown {
+        oneStar
+        twoStar
+        threeStar
+        fourStar
+        fiveStar
+      }
+    }
+  }
+}
+```
+
+---
+
+### 10.5 جدول كودات الأخطاء المعتمدة (Error Codes)
+
+| كود الخطأ | HTTP | المتريغر | الوصف للمستخدم |
+|:---|:---:|:---|:---|
+| `AUCTION_NOT_ELIGIBLE_FOR_REVIEW` | 400 | `createReview` | المزاد ليس بحالة `ENDED` أو لا يوجد فائز معتمد |
+| `NOT_AUCTION_PARTICIPANT` | 403 | `createReview` | المستخدم ليس المشتري الفائز ولا البائع في هذا المزاد |
+| `CANNOT_REVIEW_YOURSELF` | 400 | `createReview` | لا يمكن تقييم النفس (في حال كان البائع والمشتري نفس الحساب) |
+| `REVIEW_WINDOW_EXPIRED` | 400 | `createReview` | انتهت مهلة التقييم المسموحة (14 يوماً من نهاية المزاد) |
+| `REVIEW_ALREADY_EXISTS` | 409 | `createReview` | تم إرسال تقييم مسبقاً لهذا المزاد من قبل هذا المستخدم |
+| `REPLY_ALREADY_EXISTS` | 409 | `replyToReview` | التقييم يحتوي على رد مسبق بالفعل ولا يمكن تعديله |
+| `REVIEW_NOT_FOUND` | 404 | `replyToReview` / `review` | معرف التقييم غير موجود |
+| `REVIEW_REPLY_FORBIDDEN` | 403 | `replyToReview` | المستخدم ليس صاحب التقييم المعني أو التقييم غير منشور |
 
 ---
 

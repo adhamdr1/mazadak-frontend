@@ -10,6 +10,7 @@ import arWallet from '@/locales/ar/wallet.json';
 import arEscrow from '@/locales/ar/escrow.json';
 import arChat from '@/locales/ar/chat.json';
 import arNotifications from '@/locales/ar/notifications.json';
+import arReviews from '@/locales/ar/reviews.json';
 import enCommon from '@/locales/en/common.json';
 import enAuth from '@/locales/en/auth.json';
 import enAuctions from '@/locales/en/auctions.json';
@@ -18,6 +19,7 @@ import enWallet from '@/locales/en/wallet.json';
 import enEscrow from '@/locales/en/escrow.json';
 import enChat from '@/locales/en/chat.json';
 import enNotifications from '@/locales/en/notifications.json';
+import enReviews from '@/locales/en/reviews.json';
 
 export const defaultNS = 'common';
 export const resources = {
@@ -30,6 +32,7 @@ export const resources = {
     escrow: arEscrow,
     chat: arChat,
     notifications: arNotifications,
+    reviews: arReviews,
   },
   en: {
     common: enCommon,
@@ -40,6 +43,7 @@ export const resources = {
     escrow: enEscrow,
     chat: enChat,
     notifications: enNotifications,
+    reviews: enReviews,
   },
 } as const;
 
