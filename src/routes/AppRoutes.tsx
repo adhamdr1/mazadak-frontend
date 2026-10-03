@@ -51,7 +51,10 @@ const MessagesPage = lazy(() => import('@/features/chat/pages/MessagesPage').the
 // 7. Notifications Module Pages
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 
-// 8. General Platform Pages
+// 8. Users Module Pages
+const ProfilePage = lazy(() => import('@/features/users/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+
+// 9. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
@@ -86,8 +89,13 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.DISPUTE_DETAIL()} element={<DisputeDetailPage />} />
               <Route path={ROUTES.MESSAGES} element={<MessagesPage />} />
               <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
+              <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
               <Route path={ROUTES.UPDATE_PASSWORD} element={<UpdatePasswordPage />} />
             </Route>
+
+            {/* Error Fallback Routes (Rendered inside global AppLayout with Navbar & Footer) */}
+            <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           {/* 2. Guest Only Auth Routes (Login / Register / Google Completion) */}
@@ -110,10 +118,6 @@ export const AppRoutes: React.FC = () => {
           <Route path={ROUTES.REACTIVATE} element={<ReactivatePage />} />
           <Route path={ROUTES.CONFIRM_REACTIVATION} element={<ReactivatePage />} />
           <Route path={ROUTES.CONFIRM_REACTIVATION_ALT} element={<ReactivatePage />} />
-
-          {/* 4. Error Fallback Routes */}
-          <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
-          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </>

@@ -137,8 +137,8 @@ export const Footer: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to={ROUTES.UPDATE_PASSWORD} className="hover:text-amber-500 transition-colors">
-                      {t('footer.updatePassword')}
+                    <Link to={ROUTES.PROFILE} className="hover:text-amber-500 transition-colors">
+                      {t('nav.profile')}
                     </Link>
                   </li>
                 </>

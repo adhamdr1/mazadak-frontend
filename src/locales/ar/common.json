@@ -55,7 +55,8 @@
     "transactions": "سجل المعاملات",
     "messages": "الرسائل",
     "notifications": "الإشعارات",
-    "availableBalance": "الرصيد المتاح"
+    "availableBalance": "الرصيد المتاح",
+    "profile": "الملف الشخصي والإعدادات"
   },
   "rightsReserved": "جميع الحقوق محفوظة.",
   "footerCopyright": "منصة مزادك. جميع الحقوق محفوظة.",

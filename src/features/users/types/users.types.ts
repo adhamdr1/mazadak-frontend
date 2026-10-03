@@ -100,5 +100,5 @@ export interface UserAuctionsPage {
 // Tab Types
 // ----------------------------------------------------
 
-export type ProfileTabType = 'personal' | 'security' | 'reputation' | 'danger';
+export type ProfileTabType = 'personal' | 'security' | 'reputation';
 export type PublicProfileTabType = 'active' | 'completed' | 'reviews';

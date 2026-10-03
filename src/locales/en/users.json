@@ -12,8 +12,7 @@
     "tabs": {
       "personal": "Personal Info",
       "security": "Security & Password",
-      "reputation": "Reputation & Reviews",
-      "danger": "Account Management"
+      "reputation": "Reviews"
     }
   },
   "personal": {
@@ -25,7 +24,7 @@
     "emailHelp": "Email address cannot be changed directly for security and verification reasons.",
     "phoneNumber": "Phone Number",
     "dateOfBirth": "Date of Birth",
-    "addressTitle": "Registered Address & Delivery Location",
+    "addressTitle": "Your Address & Delivery Location",
     "city": "City / Governorate",
     "street": "Street & Neighborhood / Detailed Address",
     "saveChanges": "Save Changes",
@@ -42,12 +41,10 @@
     "changePasswordButton": "Change Password",
     "googleTitle": "Google Verified Account",
     "googleDesc": "You are signed in via secure Google Single Sign-On (SSO). You do not need a separate Mazadak password.",
-    "googleSecured": "Secure Google Authentication",
-    "twoFactorTitle": "Two-Factor Authentication",
-    "twoFactorSoon": "Coming Soon — Enhanced 2FA Security"
+    "googleSecured": "Secure Google Authentication"
   },
   "reputation": {
-    "title": "Reputation & Review History",
+    "title": "Review History",
     "description": "Overview of your ratings and feedback received from previous transactions",
     "viewAllReviews": "View All My Reviews",
     "asSeller": "Performance as Seller",

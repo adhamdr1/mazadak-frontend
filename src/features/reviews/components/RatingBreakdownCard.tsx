@@ -73,7 +73,7 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
 
   return (
     <div
-      className={`bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all duration-200 ${className}`}
+      className={`bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 lg:p-9 border border-slate-200/80 dark:border-slate-800 shadow-xs transition-all duration-200 ${className}`}
     >
       {/* Header with Segmented Role Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800/80">
@@ -153,16 +153,18 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
         </div>
 
         {/* Right Column: 5-Star Distribution Bars */}
-        <div className="md:col-span-8 space-y-2.5">
+        <div className="md:col-span-8 space-y-3">
           {starTiers.map(({ stars, count }) => {
             const percentage = calculateBreakdownPercentage(count, totalReviewsCount);
 
             return (
               <div key={stars} className="flex items-center gap-3 text-xs">
-                {/* Star Tier Label */}
-                <div className="flex items-center gap-1 w-12 font-medium text-slate-600 dark:text-slate-300 shrink-0">
-                  <span className="tabular-nums">{toLocalizedDigits(stars, isRTL)}</span>
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                {/* Star Tier Label - Centered fixed width for precise vertical column */}
+                <div className="flex items-center gap-1.5 w-12 shrink-0 font-bold text-slate-700 dark:text-slate-300 select-none">
+                  <span className="w-4 text-center tabular-nums inline-block shrink-0">
+                    {toLocalizedDigits(stars, isRTL)}
+                  </span>
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
                 </div>
 
                 {/* Progress Bar Container */}
@@ -178,9 +180,9 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
                 </div>
 
                 {/* Percentage & Raw Count */}
-                <div className="w-16 text-end text-slate-500 dark:text-slate-400 tabular-nums shrink-0 font-medium">
-                  {toLocalizedDigits(`${percentage}%`, isRTL)}
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 ms-1">
+                <div className="w-20 text-end text-slate-500 dark:text-slate-400 tabular-nums shrink-0 font-medium text-xs">
+                  <span>{toLocalizedDigits(`${percentage}%`, isRTL)}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 ms-1.5 inline-block">
                     ({toLocalizedDigits(count, isRTL)})
                   </span>
                 </div>
