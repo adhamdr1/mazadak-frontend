@@ -1,0 +1,104 @@
+{
+  "title": "Reviews & Feedback",
+  "subtitle": "Trusted reviews and experiences from buyers and sellers",
+  "overview": {
+    "ratingSummary": "Overall Rating Summary",
+    "basedOn": "Based on {{count}} reviews",
+    "asSeller": "As Seller",
+    "asBuyer": "As Buyer",
+    "all": "All",
+    "stars": "stars",
+    "star": "star",
+    "outOf5": "out of 5"
+  },
+  "criteria": {
+    "title": "Detailed Criteria",
+    "itemAccuracy": "Item Accuracy",
+    "itemAccuracyDesc": "How accurately the received item matched auction photos and specifications",
+    "communication": "Communication & Responsiveness",
+    "communicationDesc": "Speed, professionalism, and clarity during correspondence",
+    "packaging": "Packaging & Shipping",
+    "packagingDesc": "Quality of packaging and safe condition upon arrival",
+    "smoothExperience": "Overall Experience",
+    "smoothExperienceDesc": "Ease of transaction completion without friction or unnecessary delays"
+  },
+  "filters": {
+    "allTypes": "All Reviews",
+    "buyerToSeller": "From Buyers",
+    "sellerToBuyer": "From Sellers",
+    "minRating": "Minimum Rating",
+    "allRatings": "All Ratings",
+    "starsAndAbove": "{{count}}+ Stars",
+    "sortBy": "Sort By",
+    "newest": "Newest First",
+    "oldest": "Oldest First",
+    "highestRated": "Highest Rated",
+    "lowestRated": "Lowest Rated",
+    "reset": "Reset Filters"
+  },
+  "card": {
+    "verified": "Verified Auction Transaction",
+    "sellerReply": "Seller's Official Reply",
+    "repliedAt": "Replied on {{date}}",
+    "buyerReview": "Buyer Review",
+    "sellerReview": "Seller Review",
+    "replyButton": "Reply to Review",
+    "auctionTitle": "Associated Auction:",
+    "pendingBadge": "Under Review (Blind Review)",
+    "publishedBadge": "Published",
+    "hiddenBadge": "Hidden",
+    "blindNotice": "This review is in mutual blind review and will be automatically published once the other party submits their review or after the 14-day window."
+  },
+  "myWritten": {
+    "title": "My Submitted Reviews",
+    "subtitle": "Feedback you have shared with other auction participants",
+    "empty": "You have not submitted any reviews yet.",
+    "reviewedUser": "Reviewed User:"
+  },
+  "empty": {
+    "noReviewsTitle": "No Reviews Yet",
+    "noReviewsDesc": "This user has not received any verified reviews yet.",
+    "noFilteredResultsTitle": "No Matching Results",
+    "noFilteredResultsDesc": "Try adjusting your filter options to view available reviews."
+  },
+  "banner": {
+    "title": "Share your auction experience!",
+    "description": "Your transaction has completed successfully. Your review helps build a safer, more transparent community.",
+    "rateButton": "Rate Experience Now",
+    "daysRemaining": "{{days}} days left to submit review"
+  },
+  "modal": {
+    "writeTitle": "Write a Transaction Review",
+    "writeSubtitle": "Rate your experience with the other party accurately and transparently",
+    "overallRating": "Overall Experience Rating",
+    "detailedCriteria": "Detailed Criteria (Optional)",
+    "commentLabel": "Your Feedback & Details",
+    "commentPlaceholder": "Share honest feedback to help fellow community members (up to 500 characters)...",
+    "charCount": "{{count}}/500 chars",
+    "finalNotice": "Important notice: Reviews are final and cannot be edited after submission. They are protected under the blind review policy.",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "replyTitle": "Reply to Review",
+    "replySubtitle": "You may submit an official response to this published review once.",
+    "originalReview": "Original Review:",
+    "replyLabel": "Official Reply Message",
+    "replyPlaceholder": "Write your respectful and professional response (2 to 500 characters)...",
+    "submitReply": "Publish Reply",
+    "cancel": "Cancel"
+  },
+  "messages": {
+    "reviewCreatedSuccess": "Your review has been submitted successfully! It will be published once the other party reviews or after 14 days.",
+    "replyCreatedSuccess": "Your reply has been published successfully."
+  },
+  "errors": {
+    "REVIEW_ALREADY_EXISTS": "You have already submitted a review for this auction.",
+    "REVIEW_WINDOW_EXPIRED": "The 14-day review window for this transaction has expired.",
+    "CANNOT_REVIEW_YOURSELF": "You cannot review your own account.",
+    "AUCTION_NOT_ELIGIBLE_FOR_REVIEW": "This auction is not currently eligible for review.",
+    "NOT_AUCTION_PARTICIPANT": "Reviews are restricted to confirmed auction participants (seller and winning buyer).",
+    "REPLY_ALREADY_EXISTS": "You have already responded to this review.",
+    "REVIEW_NOT_FOUND": "The requested review could not be found.",
+    "REVIEW_REPLY_FORBIDDEN": "You are not authorized to reply to this review.",
+    "DEFAULT_ERROR": "An unexpected error occurred while processing your review. Please try again later."
+  }
+}
