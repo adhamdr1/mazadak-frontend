@@ -9,7 +9,14 @@ export const QUERY_KEYS = {
     MY_WON: ['auctions', 'won'] as const,
   },
   USERS: {
+    ALL: ['users'] as const,
     PUBLIC_PROFILE: (userId: string) => ['users', 'public', userId] as const,
+    USER_AUCTIONS: (
+      userId: string,
+      page?: number,
+      limit?: number,
+      filter?: unknown
+    ) => ['users', 'auctions', userId, page, limit, filter] as const,
   },
   BIDS: {
     BY_AUCTION: (auctionId: string) => ['bids', auctionId] as const,

@@ -28,16 +28,16 @@
 
 | الأولوية | الموديول | الـ Branch | الحالة |
 |:---:|:---|:---|:---:|
-| 1 | Foundation (Setup + AppShell + Routing + Theme + i18n) | `feature/foundation-setup` | **مكتمل 100%** |
-| 2 | Auth Module (Login, Register, Google Auth, Verify, Reset, Reactivate) | `feature/auth-module` | **مكتمل 100%** |
-| 3 | Auctions Module (Browse, Detail, Create Wizard, Edit, My Auctions, WebSocket) | `feature/auctions-module` | **مكتمل 100%** |
-| 4 | Bids Module (Live Bidding Box, Auto-bid Modal, My Bids) | `feature/bids-module` | **مكتمل 100%** |
-| 5 | Wallet Module (Balance, Deposit REST, Withdraw, Withdrawals, Transactions) | `feature/wallet-module` | **مكتمل — Batch 1-4 (Batch 5 قيد التنفيذ)** |
-| 6 | Escrow Module (My Escrows, Escrow Detail, Open Dispute, Dispute Detail) | `feature/escrow-module` | **المرحلة القادمة** |
-| 7 | Chat Module (Auction Chat Drawer, Direct Messages) | `feature/chat-module` | قيد الانتظار |
-| 8 | Notifications Module (Dropdown + Center) | `feature/notifications-module` | قيد الانتظار |
-| 9 | Reviews Module (Write Review, Reply) | `feature/reviews-module` | قيد الانتظار |
-| 10 | Users Module (Profile Settings, Public User Page) | `feature/users-module` | قيد الانتظار |
+| 1 | Foundation (Setup + AppShell + Routing + Theme + i18n) | `feature/foundation-setup` | **مكتمل 100% ومدمج في main** |
+| 2 | Auth Module (Login, Register, Google Auth, Verify, Reset, Reactivate) | `feature/auth-module` | **مكتمل 100% ومدمج في main** |
+| 3 | Auctions Module (Browse, Detail, Create Wizard, Edit, My Auctions, WebSocket) | `feature/auctions-module` | **مكتمل 100% ومدمج في main** |
+| 4 | Bids Module (Live Bidding Box, Auto-bid Modal, My Bids) | `feature/bids-module` | **مكتمل 100% ومدمج في main** |
+| 5 | Wallet Module (Balance, Deposit REST, Withdraw, Withdrawals, Transactions) | `feature/wallet-module` | **مكتمل 100% ومدمج في main** |
+| 6 | Escrow Module (My Escrows, Escrow Detail, Open Dispute, Dispute Detail) | `feature/escrow-module` | **مكتمل 100% ومدمج في main** |
+| 7 | Chat Module (Auction Chat Drawer, Direct Messages) | `feature/chat-module` | **مكتمل 100% ومدمج في main** |
+| 8 | Notifications Module (Dropdown + Center) | `feature/notifications-module` | **مكتمل 100% ومدمج في main** |
+| 9 | Reviews Module (Write Review, Reply) | `feature/reviews-module` | **مكتمل جزئياً (Batch 1 مُنجزة ومُجمدة مؤقتاً لصالح Users)** |
+| 10 | Users Module (Profile Settings, Public User Page) | `feature/users-module` | **المرحلة الحالية — جاهز للتنفيذ (10/10 Gold Standard)** |
 | 11 | Admin Module (Dashboard, Users, Auctions, Disputes, Financials) | `feature/admin-module` | قيد الانتظار |
 
 ---

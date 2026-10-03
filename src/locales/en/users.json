@@ -1,0 +1,97 @@
+{
+  "profile": {
+    "title": "Profile & Settings",
+    "subtitle": "Manage your account information, security preferences, and Mazadak activity",
+    "viewPublicProfile": "View Public Profile",
+    "editProfile": "Edit Profile",
+    "memberSince": "Member since {{date}}",
+    "verifiedUser": "Verified User",
+    "unverifiedUser": "Unverified",
+    "adminBadge": "Platform Admin",
+    "userBadge": "Mazadak Member",
+    "tabs": {
+      "personal": "Personal Info",
+      "security": "Security & Password",
+      "reputation": "Reputation & Reviews",
+      "danger": "Account Management"
+    }
+  },
+  "personal": {
+    "title": "Personal Information",
+    "description": "Update your essential profile details and registered delivery address",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email Address",
+    "emailHelp": "Email address cannot be changed directly for security and verification reasons.",
+    "phoneNumber": "Phone Number",
+    "dateOfBirth": "Date of Birth",
+    "addressTitle": "Registered Address & Delivery Location",
+    "city": "City / Governorate",
+    "street": "Street & Neighborhood / Detailed Address",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "updateSuccess": "Your personal profile has been updated successfully!",
+    "updateError": "Failed to update profile. Please try again."
+  },
+  "security": {
+    "title": "Security & Login Settings",
+    "description": "Manage your password and review your authentication methods",
+    "passwordStatusTitle": "Password",
+    "passwordStatusDesc": "Regularly updating your password helps keep your account secure.",
+    "changePasswordButton": "Change Password",
+    "googleTitle": "Google Verified Account",
+    "googleDesc": "You are signed in via secure Google Single Sign-On (SSO). You do not need a separate Mazadak password.",
+    "googleSecured": "Secure Google Authentication",
+    "twoFactorTitle": "Two-Factor Authentication",
+    "twoFactorSoon": "Coming Soon — Enhanced 2FA Security"
+  },
+  "reputation": {
+    "title": "Reputation & Review History",
+    "description": "Overview of your ratings and feedback received from previous transactions",
+    "viewAllReviews": "View All My Reviews",
+    "asSeller": "Performance as Seller",
+    "asBuyer": "Performance as Buyer",
+    "noReviewsYet": "No reviews recorded yet."
+  },
+  "danger": {
+    "title": "Danger Zone & Account Cancellation",
+    "description": "Deactivate your account and soft-delete your data from the platform",
+    "deleteAccountTitle": "Soft Delete Account",
+    "deleteAccountWarning": "Deleting your account will cancel pending auctions and hide your profile from other users. You can restore your account within the legal grace period via the reactivation page.",
+    "deleteButton": "Delete Mazadak Account",
+    "confirmModalTitle": "Confirm Account Deletion",
+    "confirmModalPrompt": "This is a sensitive action! To confirm the deletion of your account, please type \"DELETE\" in the field below:",
+    "confirmKeyword": "DELETE",
+    "confirmPlaceholder": "Type: DELETE",
+    "confirmDeleteButton": "Confirm Permanent Deletion",
+    "deleting": "Deleting...",
+    "cancel": "Cancel",
+    "deleteSuccess": "Your account has been deactivated successfully. We hope to see you again soon.",
+    "deleteError": "An error occurred while attempting to delete the account."
+  },
+  "public": {
+    "title": "Public Profile",
+    "memberSince": "Joined in {{date}}",
+    "auctionsCount": "Auctions",
+    "activeAuctions": "Active Auctions",
+    "completedAuctions": "Completed Auctions",
+    "reviewsTab": "Reviews & Feedback",
+    "activeCount": "{{count}} active auction",
+    "completedCount": "{{count}} completed auction",
+    "noActiveAuctions": "No active auctions for this user at this moment.",
+    "noCompletedAuctions": "No completed auctions recorded for this user.",
+    "notFoundTitle": "User Not Found",
+    "notFoundMessage": "Sorry, we could not find the requested account, or it may have been deleted.",
+    "backToAuctions": "Back to Marketplace"
+  },
+  "validation": {
+    "firstNameMin": "First name must be at least 2 characters long",
+    "lastNameMin": "Last name must be at least 2 characters long",
+    "cityRequired": "Please specify your city",
+    "streetRequired": "Please enter your street address",
+    "dateRequired": "Please select your date of birth",
+    "invalidPhone": "Invalid phone number (must be a valid Egyptian phone number)",
+    "phoneExists": "This phone number is already registered to another account."
+  }
+}
