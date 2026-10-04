@@ -53,6 +53,7 @@ const NotificationsPage = lazy(() => import('@/features/notifications/pages/Noti
 
 // 8. Users Module Pages
 const ProfilePage = lazy(() => import('@/features/users/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const PublicUserPage = lazy(() => import('@/features/users/pages/PublicUserPage').then(m => ({ default: m.PublicUserPage })));
 
 // 9. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -71,6 +72,7 @@ export const AppRoutes: React.FC = () => {
             <Route path={ROUTES.HOME} element={<HomePage />} />
             <Route path={ROUTES.AUCTIONS} element={<AuctionListPage />} />
             <Route path={ROUTES.AUCTION_DETAIL()} element={<AuctionDetailPage />} />
+            <Route path={ROUTES.USER_PUBLIC()} element={<PublicUserPage />} />
 
             {/* Authenticated / Protected Routes */}
             <Route element={<ProtectedRoute />}>

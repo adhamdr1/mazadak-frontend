@@ -4,6 +4,8 @@
     "subtitle": "إدارة معلومات حسابك، تفضيلات الأمان، وسجل نشاطك في مزادك",
     "viewPublicProfile": "معاينة ملفي العام",
     "editProfile": "تعديل الملف الشخصي",
+    "yourAccount": "حسابك",
+    "editProfileHint": "تعديل ملفك الشخصي وإعداداتك",
     "memberSince": "عضو منذ {{date}}",
     "verifiedUser": "حساب موثق",
     "unverifiedUser": "غير موثق",

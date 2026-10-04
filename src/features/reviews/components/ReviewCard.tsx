@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   MessageSquare,
@@ -18,6 +19,8 @@ import {
   toLocalizedDigits,
   formatPrice,
 } from '@/utils/formatters';
+import { ROUTES } from '@/constants/routes.constants';
+import { UserAvatar } from '@/features/users';
 import type { Review, ReviewCriteria } from '../types/reviews.types';
 
 export interface ReviewCardProps {
@@ -81,16 +84,40 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       {/* Top Bar: Reviewer Info + Badges + Date */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800/60">
         <div className="flex items-center gap-3">
-          {/* Avatar with luxury gradient */}
-          <div className="w-11 h-11 rounded-full bg-linear-to-br from-amber-500 to-amber-600 text-white font-bold text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
-            {reviewerInitials || 'MZ'}
-          </div>
+          {/* Avatar with luxury gradient or UserAvatar */}
+          {review.reviewer?.id ? (
+            <Link
+              to={ROUTES.USER_PUBLIC(review.reviewer.id)}
+              className="shrink-0 hover:scale-105 transition-transform"
+              title={reviewerName}
+            >
+              <UserAvatar
+                firstName={review.reviewer.firstName}
+                lastName={review.reviewer.lastName}
+                userId={review.reviewer.id}
+                size="md"
+              />
+            </Link>
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white font-bold text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
+              {reviewerInitials || 'MZ'}
+            </div>
+          )}
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
-                {reviewerName}
-              </h4>
+              {review.reviewer?.id ? (
+                <Link
+                  to={ROUTES.USER_PUBLIC(review.reviewer.id)}
+                  className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base hover:text-amber-500 transition-colors"
+                >
+                  {reviewerName}
+                </Link>
+              ) : (
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
+                  {reviewerName}
+                </h4>
+              )}
               {review.reviewer?.city && (
                 <span className="text-xs text-slate-400 dark:text-slate-500">
                   • {review.reviewer.city}

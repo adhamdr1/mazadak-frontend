@@ -123,6 +123,16 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             }
           );
 
+          // Invalidate reviews and user public profile queries on review notifications
+          if (newNotif.type === 'REVIEW_RECEIVED' || newNotif.type === 'REVIEW_REPLIED') {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REVIEWS.ALL });
+            if (newNotif.referenceId) {
+              queryClient.invalidateQueries({
+                queryKey: QUERY_KEYS.USERS.PUBLIC_PROFILE(newNotif.referenceId),
+              });
+            }
+          }
+
           // Trigger in-app toast alert with fully localized title, body, and zero emojis
           const localized = getLocalizedNotification(
             newNotif,

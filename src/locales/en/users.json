@@ -4,6 +4,8 @@
     "subtitle": "Manage your account information, security preferences, and Mazadak activity",
     "viewPublicProfile": "View Public Profile",
     "editProfile": "Edit Profile",
+    "yourAccount": "Your Account",
+    "editProfileHint": "Edit your profile settings",
     "memberSince": "Member since {{date}}",
     "verifiedUser": "Verified User",
     "unverifiedUser": "Unverified",

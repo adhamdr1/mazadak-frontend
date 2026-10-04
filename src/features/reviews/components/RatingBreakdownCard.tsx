@@ -75,24 +75,24 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
     <div
       className={`bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 lg:p-9 border border-slate-200/80 dark:border-slate-800 shadow-xs transition-all duration-200 ${className}`}
     >
-      {/* Header with Segmented Role Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800/80">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400">
+      {/* Header with Segmented Role Switcher in single row */}
+      <div className="flex flex-row items-center justify-between gap-3 pb-5 border-b border-slate-100 dark:border-slate-800/80 flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 shrink-0">
             <Award className="w-5 h-5" />
           </div>
-          <div>
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-lg">
+          <div className="min-w-0">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">
               {t('reviews:overview.ratingSummary')}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
               {t('reviews:subtitle')}
             </p>
           </div>
         </div>
 
         {onRoleChange && (
-          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/50 self-start sm:self-auto">
+          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/50 shrink-0">
             <button
               type="button"
               onClick={() => onRoleChange('ALL')}
@@ -130,45 +130,53 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
         )}
       </div>
 
-      {/* Main Stats Grid: Big Score + Bars Breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center pt-6">
+      {/* Main Stats Grid: Big Score + Bars Breakdown — Stays in single row even on split screen */}
+      <div className="grid grid-cols-12 gap-3 sm:gap-6 lg:gap-8 items-center pt-6">
         {/* Left Column: Big Overall Score */}
-        <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-radial from-amber-500/5 via-slate-50 to-transparent dark:from-amber-500/10 dark:via-slate-800/40 dark:to-transparent border border-slate-100 dark:border-slate-800/60 text-center">
-          <div className="text-5xl font-black tracking-tight text-slate-900 dark:text-slate-50 tabular-nums">
+        <div className="col-span-5 sm:col-span-4 flex flex-col items-center justify-center p-3.5 sm:p-6 rounded-2xl bg-radial from-amber-500/5 via-slate-50 to-transparent dark:from-amber-500/10 dark:via-slate-800/40 dark:to-transparent border border-slate-100 dark:border-slate-800/60 text-center">
+          <div className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-slate-50 tabular-nums">
             {toLocalizedDigits(currentAverage.toFixed(1), isRTL)}
           </div>
-          <div className="mt-2.5">
-            <StarRating rating={currentAverage} size="lg" />
+          <div className="mt-1.5 sm:mt-2.5">
+            <StarRating rating={currentAverage} size="md" />
           </div>
-          <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-            {t('reviews:overview.basedOn', {
-              count: toLocalizedDigits(currentTotal, isRTL),
-            })}
+          <p className="mt-1.5 text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 line-clamp-1">
+            {currentTotal > 0
+              ? t('reviews:overview.basedOn', {
+                  count: toLocalizedDigits(currentTotal, isRTL),
+                })
+              : t('reviews:overview.noReviewsYet', 'لا توجد تقييمات بعد')}
           </p>
 
-          <div className="mt-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{t('reviews:card.verified')}</span>
-          </div>
+          {currentTotal > 0 ? (
+            <div className="mt-2.5 sm:mt-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>{t('reviews:card.verified')}</span>
+            </div>
+          ) : (
+            <div className="mt-2.5 sm:mt-4 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+              <span>{t('reviews:overview.newAccount', 'حساب جديد')}</span>
+            </div>
+          )}
         </div>
 
         {/* Right Column: 5-Star Distribution Bars */}
-        <div className="md:col-span-8 space-y-3">
+        <div className="col-span-7 sm:col-span-8 space-y-2 sm:space-y-3">
           {starTiers.map(({ stars, count }) => {
             const percentage = calculateBreakdownPercentage(count, totalReviewsCount);
 
             return (
-              <div key={stars} className="flex items-center gap-3 text-xs">
-                {/* Star Tier Label - Centered fixed width for precise vertical column */}
-                <div className="flex items-center gap-1.5 w-12 shrink-0 font-bold text-slate-700 dark:text-slate-300 select-none">
-                  <span className="w-4 text-center tabular-nums inline-block shrink-0">
+              <div key={stars} className="flex items-center gap-2 sm:gap-3 text-xs">
+                {/* Star Tier Label */}
+                <div className="flex items-center gap-1 sm:gap-1.5 w-9 sm:w-12 shrink-0 font-bold text-slate-700 dark:text-slate-300 select-none text-[11px] sm:text-xs">
+                  <span className="w-3 sm:w-4 text-center tabular-nums inline-block shrink-0">
                     {toLocalizedDigits(stars, isRTL)}
                   </span>
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                  <Star className="w-3 sm:w-3.5 h-3 sm:h-3.5 fill-amber-400 text-amber-400 shrink-0" />
                 </div>
 
                 {/* Progress Bar Container */}
-                <div className="flex-1 h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 sm:h-2.5 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden border border-slate-200/40 dark:border-slate-700/30">
                   <div
                     className="h-full bg-linear-to-r from-amber-500 to-amber-400 dark:from-amber-600 dark:to-amber-400 rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${percentage}%` }}
@@ -180,9 +188,9 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
                 </div>
 
                 {/* Percentage & Raw Count */}
-                <div className="w-20 text-end text-slate-500 dark:text-slate-400 tabular-nums shrink-0 font-medium text-xs">
+                <div className="w-16 sm:w-20 text-end text-slate-500 dark:text-slate-400 tabular-nums shrink-0 font-medium text-[10px] sm:text-xs">
                   <span>{toLocalizedDigits(`${percentage}%`, isRTL)}</span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 ms-1.5 inline-block">
+                  <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 ms-1 inline-block">
                     ({toLocalizedDigits(count, isRTL)})
                   </span>
                 </div>

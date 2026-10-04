@@ -113,6 +113,7 @@
     "sellerAuctions": "{{count}} مزاد منشور",
     "contactSeller": "محادثة البائع",
     "defaultSellerName": "بائع موثوق",
+    "viewProfile": "عرض الملف الشخصي للبائع",
     "noReviewsYet": "لا توجد تقييمات بعد (بائع جديد)",
     "contactSellerAlert": "بدء محادثة فورية مع البائع: {{name}} (ID: {{id}})",
     "description": "تفاصيل ومواصفات المنتج",
