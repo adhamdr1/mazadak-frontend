@@ -19,7 +19,7 @@
     "communicationDesc": "Speed, professionalism, and clarity during correspondence",
     "packaging": "Packaging & Shipping",
     "packagingDesc": "Quality of packaging and safe condition upon arrival",
-    "smoothExperience": "Overall Experience",
+    "smoothExperience": "Transaction Smoothness",
     "smoothExperienceDesc": "Ease of transaction completion without friction or unnecessary delays"
   },
   "filters": {
@@ -65,17 +65,29 @@
     "title": "Share your auction experience!",
     "description": "Your transaction has completed successfully. Your review helps build a safer, more transparent community.",
     "rateButton": "Rate Experience Now",
-    "daysRemaining": "{{days}} days left to submit review"
+    "daysRemaining": "{{days}} days left to submit review",
+    "alreadyReviewedTitle": "You have already reviewed this transaction",
+    "alreadyReviewedDesc": "Your review for this transaction has been securely recorded. Thank you for contributing to platform trust.",
+    "windowExpiredTitle": "14-Day Review Window Expired",
+    "windowExpiredDesc": "Per platform policy, reviews can only be submitted within 14 days of auction completion to maintain feedback freshness.",
+    "disputedTitle": "Reviews Suspended Due to Active Dispute",
+    "disputedDesc": "Reviews cannot be submitted while this transaction is under active dispute review.",
+    "heldTitle": "Review Available After Escrow Release",
+    "heldDesc": "Transaction funds are currently secured in escrow. You will be able to submit your review once item delivery is confirmed and funds are released."
   },
   "modal": {
     "writeTitle": "Write a Transaction Review",
     "writeSubtitle": "Rate your experience with the other party accurately and transparently",
-    "overallRating": "Overall Experience Rating",
+    "overallRating": "Overall Rating",
     "detailedCriteria": "Detailed Criteria (Optional)",
-    "commentLabel": "Your Feedback & Details",
+    "commentLabel": "Your Feedback & Details (Optional)",
     "commentPlaceholder": "Share honest feedback to help fellow community members (up to 500 characters)...",
     "charCount": "{{count}}/500 chars",
     "finalNotice": "Important notice: Reviews are final and cannot be edited after submission. They are protected under the blind review policy.",
+    "ratingRequired": "Please select an overall rating using the stars",
+    "ratingMin": "Rating must be at least 1 star",
+    "ratingMax": "Maximum rating is 5 stars",
+    "commentTooLong": "Comment must not exceed 500 characters",
     "submit": "Submit Review",
     "submitting": "Submitting...",
     "replyTitle": "Reply to Review",
@@ -86,11 +98,20 @@
     "submitReply": "Publish Reply",
     "cancel": "Cancel"
   },
+  "verbal": {
+    "exceptional": "Exceptional — Highly reliable and outstanding experience",
+    "veryGood": "Very Good — Smooth and great transaction",
+    "acceptable": "Acceptable — Fair and standard experience",
+    "poor": "Poor — Encountered unsatisfying issues",
+    "veryPoor": "Very Poor — Completely unsatisfactory experience",
+    "selectPrompt": "Click on the stars to rate your overall experience"
+  },
   "messages": {
     "reviewCreatedSuccess": "Your review has been submitted successfully! It will be published once the other party reviews or after 14 days.",
     "replyCreatedSuccess": "Your reply has been published successfully."
   },
   "errors": {
+    "auctionIdRequired": "Auction ID is required to submit a review.",
     "REVIEW_ALREADY_EXISTS": "You have already submitted a review for this auction.",
     "REVIEW_WINDOW_EXPIRED": "The 14-day review window for this transaction has expired.",
     "CANNOT_REVIEW_YOURSELF": "You cannot review your own account.",

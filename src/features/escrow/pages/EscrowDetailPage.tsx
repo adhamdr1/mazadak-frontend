@@ -24,6 +24,7 @@ import { useConfirmDelivery } from '../hooks/useConfirmDelivery';
 import { useEscrowSubscription } from '../hooks/useEscrowSubscription';
 import { getLocalizedErrorMessage } from '@/utils/errorHandler';
 import { ROUTES } from '@/constants/routes.constants';
+import { ReviewEligibilityBanner } from '@/features/reviews';
 
 export const EscrowDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -201,6 +202,20 @@ export const EscrowDetailPage: React.FC = () => {
 
       {/* 2. Top / 1st: Total Held Amount Card (Full Width Horizontal Command Center) */}
       <EscrowInfoCard escrow={escrow} />
+
+      {/* 2.5: Review Eligibility / Status Banner */}
+      <ReviewEligibilityBanner
+        auctionId={escrow.auctionId || escrow.auction?._id || ''}
+        auctionTitle={escrow.auction?.title}
+        escrowStatus={escrow.status}
+        isDisputed={escrow.status === 'DISPUTED'}
+        showPendingNoticeWhenHeld={true}
+        reviewedUserName={
+          counterpartyProfile
+            ? `${counterpartyProfile.firstName} ${counterpartyProfile.lastName}`
+            : undefined
+        }
+      />
 
       {/* 3. 2nd: Inspection Period Countdown (Full Width when HELD) */}
       {isHeld && escrow.inspectionPeriodEndsAt && (

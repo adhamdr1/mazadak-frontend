@@ -17,6 +17,7 @@ import { AuctionBidHistory } from '@/features/bids/components/AuctionBidHistory'
 import { AuctionChatDrawer } from '@/features/chat';
 import { Button } from '@/components/common/Button';
 import { EscrowBanner } from '@/components/common/EscrowBanner';
+import { ReviewEligibilityBanner, WriteReviewModal } from '@/features/reviews';
 import { ROUTES } from '@/constants/routes.constants';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -29,6 +30,19 @@ export const AuctionDetailPage: React.FC = () => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isAutoBidModalOpen, setIsAutoBidModalOpen] = useState(false);
   const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
+  const [isReviewModalDirectOpen, setIsReviewModalDirectOpen] = useState(false);
+
+  const isReviewParam = searchParams.get('review') === 'true';
+  const isReviewModalOpen = isReviewModalDirectOpen || isReviewParam;
+
+  const handleCloseReviewModal = () => {
+    setIsReviewModalDirectOpen(false);
+    if (searchParams.get('review')) {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('review');
+      setSearchParams(nextParams, { replace: true });
+    }
+  };
 
   const {
     auction,
@@ -121,6 +135,14 @@ export const AuctionDetailPage: React.FC = () => {
             sellerId={auction.sellerId}
             winnerId={auction.winnerId}
           />
+
+          {/* Contextual Review Eligibility Banner (Auto-suppressed when auction has an active dispute) */}
+          {(effectiveStatus || auction.status) === 'ENDED' && (
+            <ReviewEligibilityBanner
+              auctionId={auction._id}
+              auctionTitle={auction.title}
+            />
+          )}
 
           {/* Main 2-Column Responsive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -261,6 +283,16 @@ export const AuctionDetailPage: React.FC = () => {
               isAuctionActive={(effectiveStatus || auction.status) === 'ACTIVE'}
               isOpen={isChatDrawerOpen}
               onClose={() => setIsChatDrawerOpen(false)}
+            />
+          )}
+
+          {/* Direct or Query-Param Triggered Write Review Modal */}
+          {isReviewModalOpen && (
+            <WriteReviewModal
+              isOpen={isReviewModalOpen}
+              auctionId={auction._id}
+              auctionTitle={auction.title}
+              onClose={handleCloseReviewModal}
             />
           )}
         </>

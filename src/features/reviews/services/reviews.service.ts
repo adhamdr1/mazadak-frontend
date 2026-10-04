@@ -11,6 +11,8 @@ import type {
   PaginationInput,
   ReviewsFilterInput,
   ReviewsSortInput,
+  CanReviewAuctionResponse,
+  CreateReviewInput,
 } from '../types/reviews.types';
 
 // ----------------------------------------------------
@@ -110,8 +112,26 @@ const GET_REVIEW_QUERY = `
   }
 `;
 
+const CAN_REVIEW_AUCTION_QUERY = `
+  query CanReviewAuction($auctionId: ID!) {
+    canReviewAuction(auctionId: $auctionId) {
+      canReview
+      reason
+    }
+  }
+`;
+
+const CREATE_REVIEW_MUTATION = `
+  ${REVIEW_FIELDS_FRAGMENT}
+  mutation CreateReview($input: CreateReviewInput!) {
+    createReview(input: $input) {
+      ...ReviewFields
+    }
+  }
+`;
+
 // ----------------------------------------------------
-// Reviews Service Implementation (Core)
+// Reviews Service Implementation (Core & Mutations)
 // ----------------------------------------------------
 
 export const reviewsService = {
@@ -156,5 +176,27 @@ export const reviewsService = {
       { id }
     );
     return data.review;
+  },
+
+  /**
+   * Check if current authenticated user is eligible to review an auction
+   */
+  async canReviewAuction(auctionId: string): Promise<CanReviewAuctionResponse> {
+    const data = await executeGraphQL<{ canReviewAuction: CanReviewAuctionResponse }>(
+      CAN_REVIEW_AUCTION_QUERY,
+      { auctionId }
+    );
+    return data.canReviewAuction;
+  },
+
+  /**
+   * Create a new review for a completed auction transaction
+   */
+  async createReview(input: CreateReviewInput): Promise<Review> {
+    const data = await executeGraphQL<{ createReview: Review }>(
+      CREATE_REVIEW_MUTATION,
+      { input }
+    );
+    return data.createReview;
   },
 };

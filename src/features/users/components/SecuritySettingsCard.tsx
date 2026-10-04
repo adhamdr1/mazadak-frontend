@@ -40,7 +40,7 @@ export const SecuritySettingsCard: React.FC<SecuritySettingsCardProps> = ({
 
         {isGoogle ? (
           /* Google SSO Verified Card */
-          <div className="rounded-2xl bg-linear-to-r from-blue-500/10 via-indigo-500/5 to-transparent border border-blue-500/20 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent border border-blue-500/20 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-2xs">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

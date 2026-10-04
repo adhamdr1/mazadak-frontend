@@ -187,17 +187,13 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
           )}
 
           {activeTimerStatus === 'ENDED' && isAuctionWithBids && (
-            <div className="pt-2 border-t border-amber-500/20 space-y-2.5">
-              <p className="text-[11px] text-amber-900 dark:text-amber-300 leading-relaxed font-medium">
-                {t('detail.sellerWinnerInstructions')}
-              </p>
-              <Link
-                to={ROUTES.ESCROW_DETAIL(auction._id)}
-                className="flex items-center justify-center gap-2 w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all cursor-pointer"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{t('detail.sellerProceedToEscrow')}</span>
-              </Link>
+            <div className="pt-2 border-t border-amber-500/20">
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-900 dark:text-amber-300 leading-relaxed font-medium">
+                  {t('detail.sellerWinnerInstructions')}
+                </p>
+              </div>
             </div>
           )}
 
@@ -224,12 +220,6 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
           <p className="text-xs leading-relaxed text-emerald-800 dark:text-emerald-400">
             {t('detail.wonBannerMessage')}
           </p>
-          <Link
-            to={ROUTES.ESCROW_DETAIL(auction._id)}
-            className="flex items-center justify-center w-full mt-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs py-2 px-3.5 rounded-xl shadow-md shadow-amber-500/20 text-center transition-all cursor-pointer"
-          >
-            <span>{t('detail.proceedToEscrow')}</span>
-          </Link>
         </div>
       )}
 

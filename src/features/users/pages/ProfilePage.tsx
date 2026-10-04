@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserAvatar } from '../components/UserAvatar';
 import { ProfileInfoForm } from '../components/ProfileInfoForm';
 import { SecuritySettingsCard } from '../components/SecuritySettingsCard';
-import { RatingBreakdownCard } from '@/features/reviews';
+import { RatingBreakdownCard, useUserRatingStats } from '@/features/reviews';
 import { ROUTES } from '@/constants/routes.constants';
 import { formatDateTime } from '@/utils/formatters';
 import type { ProfileTabType } from '../types/users.types';
@@ -25,6 +25,14 @@ export const ProfilePage: React.FC = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = (searchParams.get('tab') as ProfileTabType) || 'personal';
+
+  // Always fetch fresh live rating stats for the profile owner
+  const { data: freshStats, isLoading: isStatsLoading } = useUserRatingStats({
+    userId: user?._id || '',
+    enabled: Boolean(user?._id),
+  });
+
+  const effectiveStats = freshStats || user?.ratingStats || undefined;
 
   const handleTabChange = (tab: ProfileTabType) => {
     setSearchParams({ tab });
@@ -166,8 +174,8 @@ export const ProfilePage: React.FC = () => {
               </Link>
             </div>
 
-            {/* Rating Breakdown Card */}
-            <RatingBreakdownCard stats={user.ratingStats || undefined} />
+            {/* Rating Breakdown Card with fresh live data */}
+            <RatingBreakdownCard stats={effectiveStats} isLoading={isStatsLoading} />
           </div>
         )}
       </div>
