@@ -53,6 +53,20 @@
     box-shadow: none;
   }
 
+  /* Eliminate browser native focus outlines and flicker across all form inputs */
+  input, textarea, select {
+    -webkit-tap-highlight-color: transparent;
+  }
+  input:focus,
+  input:focus-visible,
+  textarea:focus,
+  textarea:focus-visible,
+  select:focus,
+  select:focus-visible {
+    outline: none !important;
+    outline-offset: 0 !important;
+  }
+
   /* =================================================== */
   /* Modern Custom Scrollbar (Globally Applied)          */
   /* =================================================== */

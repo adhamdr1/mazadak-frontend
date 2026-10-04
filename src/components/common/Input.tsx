@@ -68,13 +68,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             spellCheck={false}
             className={cn(
-              'w-full text-sm rounded-xl border bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-all duration-150',
+              'w-full text-sm rounded-xl border bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors duration-100 outline-none focus:outline-none focus-visible:outline-none ring-0',
               'py-2.5 px-3.5',
               leftIcon && 'ps-10',
               (rightIcon || isPasswordType) && 'pe-10',
               error
                 ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
-                : 'border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20',
+                : 'border-slate-300 dark:border-slate-700 focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 focus:ring-offset-0',
               'disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400 disabled:cursor-not-allowed',
               className
             )}

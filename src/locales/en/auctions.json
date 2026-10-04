@@ -110,6 +110,7 @@
     "sellerAuctions": "{{count}} listed auctions",
     "contactSeller": "Chat with Seller",
     "defaultSellerName": "Verified Seller",
+    "viewProfile": "View Seller Profile",
     "noReviewsYet": "No reviews yet (New Seller)",
     "contactSellerAlert": "Starting live chat with seller: {{name}} (ID: {{id}})",
     "description": "Item Description & Specifications",

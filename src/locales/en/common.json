@@ -55,7 +55,8 @@
     "transactions": "Transactions",
     "messages": "Messages",
     "notifications": "Notifications",
-    "availableBalance": "Available Balance"
+    "availableBalance": "Available Balance",
+    "profile": "Profile & Settings"
   },
   "rightsReserved": "All rights reserved.",
   "footerCopyright": "Mazadak Platform. All rights reserved.",

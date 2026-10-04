@@ -11,6 +11,7 @@ import arEscrow from '@/locales/ar/escrow.json';
 import arChat from '@/locales/ar/chat.json';
 import arNotifications from '@/locales/ar/notifications.json';
 import arReviews from '@/locales/ar/reviews.json';
+import arUsers from '@/locales/ar/users.json';
 import enCommon from '@/locales/en/common.json';
 import enAuth from '@/locales/en/auth.json';
 import enAuctions from '@/locales/en/auctions.json';
@@ -20,6 +21,7 @@ import enEscrow from '@/locales/en/escrow.json';
 import enChat from '@/locales/en/chat.json';
 import enNotifications from '@/locales/en/notifications.json';
 import enReviews from '@/locales/en/reviews.json';
+import enUsers from '@/locales/en/users.json';
 
 export const defaultNS = 'common';
 export const resources = {
@@ -33,6 +35,7 @@ export const resources = {
     chat: arChat,
     notifications: arNotifications,
     reviews: arReviews,
+    users: arUsers,
   },
   en: {
     common: enCommon,
@@ -44,6 +47,7 @@ export const resources = {
     chat: enChat,
     notifications: enNotifications,
     reviews: enReviews,
+    users: enUsers,
   },
 } as const;
 

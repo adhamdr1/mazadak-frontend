@@ -13,7 +13,6 @@ import {
   Wallet,
   Receipt,
   History,
-  KeyRound,
   User,
   LogOut,
   LogIn,
@@ -32,6 +31,7 @@ import { useUnreadNotificationsCount } from '@/features/notifications/hooks/useU
 import { ROUTES } from '@/constants/routes.constants';
 import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
+import { UserAvatar } from '@/features/users';
 
 export interface NavbarProps {
   className?: string;
@@ -195,10 +195,10 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
           isActive: location.pathname === ROUTES.WALLET_TRANSACTIONS,
         },
         {
-          to: ROUTES.UPDATE_PASSWORD,
-          label: t('home.updatePasswordLink', 'تغيير كلمة المرور'),
-          icon: KeyRound,
-          isActive: location.pathname === ROUTES.UPDATE_PASSWORD,
+          to: ROUTES.PROFILE,
+          label: t('nav.profile', 'الملف الشخصي والإعدادات'),
+          icon: User,
+          isActive: location.pathname === ROUTES.PROFILE,
         },
       ]
       : []),
@@ -279,9 +279,12 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                 title={user?.firstName}
                 aria-label="Open Menu"
               >
-                <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs font-bold">
-                  {user?.firstName?.charAt(0) || <User className="w-3.5 h-3.5" />}
-                </div>
+                <UserAvatar
+                  firstName={user?.firstName}
+                  lastName={user?.lastName}
+                  userId={user?._id}
+                  size="xs"
+                />
                 <span className="hidden lg:inline-block text-xs font-bold max-w-[100px] truncate">
                   {user?.firstName}
                 </span>
@@ -340,19 +343,25 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <BrandLogo size="sm" />
                   {isAuthenticated && (
-                    <div className="flex flex-col border-s-2 border-amber-500/40 ps-2.5 min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-extrabold text-[11px] leading-tight text-amber-500 truncate">
-                          {user?.firstName} {user?.lastName}
-                        </span>
-                        <span className="px-1 py-0.2 rounded text-[8px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold shrink-0">
-                          {roleLabel}
+                    <Link
+                      to={ROUTES.PROFILE}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 border-s-2 border-amber-500/40 ps-2.5 min-w-0 flex-1 hover:opacity-85 transition-opacity group"
+                    >
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="font-extrabold text-[11px] leading-tight text-amber-500 truncate group-hover:text-amber-400 transition-colors">
+                            {user?.firstName} {user?.lastName}
+                          </span>
+                          <span className="px-1 py-0.2 rounded text-[8px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold shrink-0">
+                            {roleLabel}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono truncate block">
+                          {user?.email}
                         </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono truncate block">
-                        {user?.email}
-                      </span>
-                    </div>
+                    </Link>
                   )}
                 </div>
 
