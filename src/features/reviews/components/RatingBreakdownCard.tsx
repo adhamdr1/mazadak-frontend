@@ -82,11 +82,11 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
             <Award className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">
-              {t('reviews:overview.ratingSummary')}
-            </h3>
+            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base truncate">
+              {t('reviews:overview.ratingSummary', 'ملخص التقييم العام')}
+            </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-              {t('reviews:subtitle')}
+              {t('reviews:overview.basedOn', { count: toLocalizedDigits(currentTotal, isRTL) })}
             </p>
           </div>
         </div>
@@ -178,7 +178,7 @@ export const RatingBreakdownCard: React.FC<RatingBreakdownCardProps> = ({
                 {/* Progress Bar Container */}
                 <div className="flex-1 h-2 sm:h-2.5 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden border border-slate-200/40 dark:border-slate-700/30">
                   <div
-                    className="h-full bg-linear-to-r from-amber-500 to-amber-400 dark:from-amber-600 dark:to-amber-400 rounded-full transition-all duration-500 ease-out"
+                    className="h-full bg-amber-500 bg-gradient-to-r from-amber-500 to-amber-400 dark:from-amber-500 dark:to-amber-400 rounded-full transition-all duration-500 ease-out shadow-xs"
                     style={{ width: `${percentage}%` }}
                     role="progressbar"
                     aria-valuenow={percentage}

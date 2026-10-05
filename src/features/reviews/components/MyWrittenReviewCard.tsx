@@ -2,10 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  MessageSquare,
+  ShieldAlert,
   CornerDownLeft,
   CornerDownRight,
-  ShieldCheck,
   Package,
 } from 'lucide-react';
 import { StarRating } from './StarRating';
@@ -23,44 +22,24 @@ import { ROUTES } from '@/constants/routes.constants';
 import { UserAvatar } from '@/features/users';
 import type { Review, ReviewCriteria } from '../types/reviews.types';
 
-export interface ReviewCardProps {
+export interface MyWrittenReviewCardProps {
   review: Review;
-  currentUserId?: string;
-  onReplyClick?: (review: Review) => void;
-  showAuctionInfo?: boolean;
   className?: string;
 }
 
-export const ReviewCard: React.FC<ReviewCardProps> = ({
+export const MyWrittenReviewCard: React.FC<MyWrittenReviewCardProps> = ({
   review,
-  currentUserId,
-  onReplyClick,
-  showAuctionInfo = true,
   className = '',
 }) => {
   const { t, i18n } = useTranslation(['reviews', 'common']);
   const isRTL = i18n.language?.startsWith('ar');
 
-  const reviewerName = review.reviewer
-    ? `${review.reviewer.firstName} ${review.reviewer.lastName}`.trim()
+  const reviewedUserName = review.reviewedUser
+    ? `${review.reviewedUser.firstName} ${review.reviewedUser.lastName}`.trim()
     : t('common:user', 'مستخدم مزادك');
-
-  const reviewerInitials = reviewerName
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase();
 
   const typeLabel = getReviewTypeLabel(review.type, t);
   const statusBadge = getReviewStatusBadgeProps(review.status, t);
-
-  const canReply =
-    Boolean(currentUserId) &&
-    currentUserId === review.reviewedUserId &&
-    !review.reply &&
-    review.status === 'PUBLISHED' &&
-    Boolean(onReplyClick);
 
   // Criteria entries
   const criteriaList: Array<{ key: keyof ReviewCriteria; score: number }> = [];
@@ -79,54 +58,51 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
 
   return (
     <article
-      className={`bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md transition-all duration-200 ${className}`}
+      className={`bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md transition-all duration-200 space-y-4 ${className}`}
     >
-      {/* Top Bar: Reviewer Info + Badges + Date */}
+      {/* Top Bar: Reviewed User Info + Badges + Date */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800/60">
         <div className="flex items-center gap-3">
-          {/* Avatar with luxury gradient or UserAvatar */}
-          {review.reviewer?.id ? (
+          {review.reviewedUser?.id ? (
             <Link
-              to={ROUTES.USER_PUBLIC(review.reviewer.id)}
+              to={ROUTES.USER_PUBLIC(review.reviewedUser.id)}
               className="shrink-0 hover:scale-105 transition-transform"
-              title={reviewerName}
+              title={reviewedUserName}
             >
               <UserAvatar
-                firstName={review.reviewer.firstName}
-                lastName={review.reviewer.lastName}
-                userId={review.reviewer.id}
+                firstName={review.reviewedUser.firstName}
+                lastName={review.reviewedUser.lastName}
+                userId={review.reviewedUser.id}
                 size="md"
               />
             </Link>
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white font-bold text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
-              {reviewerInitials || 'MZ'}
+            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-400 shrink-0">
+              MZ
             </div>
           )}
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              {review.reviewer?.id ? (
+              <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                {t('reviews:myWritten.reviewedUser', 'المستخدم المُقيَّم:')}
+              </span>
+              {review.reviewedUser?.id ? (
                 <Link
-                  to={ROUTES.USER_PUBLIC(review.reviewer.id)}
+                  to={ROUTES.USER_PUBLIC(review.reviewedUser.id)}
                   className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base hover:text-amber-500 transition-colors"
                 >
-                  {reviewerName}
+                  {reviewedUserName}
                 </Link>
               ) : (
-                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
-                  {reviewerName}
-                </h4>
-              )}
-              {review.reviewer?.city && (
-                <span className="text-xs text-slate-400 dark:text-slate-500">
-                  • {review.reviewer.city}
+                <span className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base">
+                  {reviewedUserName}
                 </span>
               )}
             </div>
 
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="inline-flex items-center text-[11px] font-medium text-slate-500 dark:text-slate-400">
+              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                 {typeLabel}
               </span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -137,16 +113,14 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           </div>
         </div>
 
-        {/* Right side: Overall Star Rating + Optional Status Badge */}
+        {/* Rating and Status Badge */}
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
-          {review.status !== 'PUBLISHED' && (
-            <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusBadge.colorClass}`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dotClass}`} />
-              {statusBadge.label}
-            </span>
-          )}
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusBadge.colorClass}`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dotClass}`} />
+            {statusBadge.label}
+          </span>
 
           <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-amber-500/15 px-2.5 py-1 rounded-xl border border-amber-500/20">
             <StarRating rating={review.overallRating} size="xs" />
@@ -157,11 +131,21 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </div>
       </div>
 
-      {/* Optional Blind Review Notice for PENDING state */}
+      {/* Blind Review Notice for PENDING state */}
       {review.status === 'PENDING' && (
-        <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2">
-          <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{t('reviews:card.blindNotice')}</span>
+        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2.5">
+          <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-bold">
+              {t('reviews:card.pendingBadge', 'قيد المراجعة (نظام التقييم الأعمى)')}
+            </p>
+            <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-300">
+              {t(
+                'reviews:card.blindNotice',
+                'التقييم في مرحلة المراجعة المتبادلة وسيتم نشره تلقائياً فور تقييم الطرف الآخر أو انقضاء الـ 14 يوماً.'
+              )}
+            </p>
+          </div>
         </div>
       )}
 
@@ -169,19 +153,19 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       {review.comment ? (
         <p
           dir="auto"
-          className="mt-4 text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line text-start"
+          className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line text-start"
         >
           {review.comment}
         </p>
       ) : (
-        <p className="mt-4 text-xs italic text-slate-400 dark:text-slate-500">
-          {t('reviews:overview.ratingSummary')} ({toLocalizedDigits(review.overallRating, isRTL)} / 5)
+        <p className="text-xs italic text-slate-400 dark:text-slate-500">
+          {t('reviews:overview.ratingSummary', 'تقييم بالنجوم دون تعليق')} ({toLocalizedDigits(review.overallRating, isRTL)} / 5)
         </p>
       )}
 
       {/* Criteria Breakdown Grid - Full width 4 columns on desktop, 2 columns on tablet/half-screen, 1 column on mobile */}
       {criteriaList.length > 0 && (
-        <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800/40">
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/40">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 w-full">
             {criteriaList.map(({ key, score }) => (
               <div
@@ -207,8 +191,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       )}
 
       {/* Associated Auction Snippet */}
-      {showAuctionInfo && review.auction && (
-        <div className="mt-4 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
+      {review.auction && (
+        <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2.5 min-w-0">
             {review.auction.images?.[0] ? (
               <img
@@ -223,7 +207,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
             )}
             <div className="min-w-0">
               <span className="text-[10px] text-slate-400 dark:text-slate-500 block">
-                {t('reviews:card.auctionTitle')}
+                {t('reviews:card.auctionTitle', 'المزاد المرتبط:')}
               </span>
               <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
                 {review.auction.title}
@@ -239,13 +223,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </div>
       )}
 
-      {/* Official Reply Bubble */}
+      {/* Seller Reply if present */}
       {review.reply && (
-        <div className="mt-4 ms-3 sm:ms-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/60 relative">
+        <div className="ms-3 sm:ms-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/60">
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
               <CornerIcon className="w-3.5 h-3.5 text-amber-500" />
-              <span>{t('reviews:card.sellerReply')}</span>
+              <span>{t('reviews:card.sellerReply', 'رد البائع')}</span>
             </div>
             {review.repliedAt && (
               <span className="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">
@@ -259,20 +243,6 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           >
             {review.reply}
           </p>
-        </div>
-      )}
-
-      {/* Action Button: Reply to Review (if eligible) */}
-      {canReply && (
-        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex justify-end">
-          <button
-            type="button"
-            onClick={() => onReplyClick?.(review)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-all border border-amber-500/20 cursor-pointer"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>{t('reviews:card.replyButton')}</span>
-          </button>
         </div>
       )}
     </article>

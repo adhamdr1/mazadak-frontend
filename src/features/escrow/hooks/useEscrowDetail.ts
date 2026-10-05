@@ -14,19 +14,22 @@ export function useEscrowDetail(escrowId?: string) {
     queryKey: escrowId ? QUERY_KEYS.ESCROW.DETAIL(escrowId) : ['escrow', 'none'],
     queryFn: async () => {
       if (!escrowId) throw new Error('No escrow identifier provided');
+      // 1. Try direct Escrow ID lookup
       try {
         const directEscrow = await escrowService.getEscrowById(escrowId);
         if (directEscrow) return directEscrow;
-      } catch (err) {
-        // Fallback: Check if the identifier passed is an auctionId
-        try {
-          const byAuctionEscrow = await escrowService.getEscrowByAuction(escrowId);
-          if (byAuctionEscrow) return byAuctionEscrow;
-        } catch {
-          // Both failed, throw original error
-        }
-        throw err;
+      } catch {
+        // Fallback to auctionId lookup
       }
+
+      // 2. Fallback: Lookup by Auction ID
+      try {
+        const byAuctionEscrow = await escrowService.getEscrowByAuction(escrowId);
+        if (byAuctionEscrow) return byAuctionEscrow;
+      } catch {
+        // Both lookups failed
+      }
+
       throw new Error('Escrow not found');
     },
     enabled: Boolean(escrowId),
