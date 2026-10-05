@@ -4,6 +4,7 @@
  */
 
 import { executeGraphQL } from '@/services/api/graphqlClient';
+import { subscribeToSubscription } from '@/services/websocket/socketClient';
 import type {
   Review,
   ReviewsPage,
@@ -13,6 +14,8 @@ import type {
   ReviewsSortInput,
   CanReviewAuctionResponse,
   CreateReviewInput,
+  ReplyReviewInput,
+  ReviewAddedPayload,
 } from '../types/reviews.types';
 
 // ----------------------------------------------------
@@ -130,8 +133,108 @@ const CREATE_REVIEW_MUTATION = `
   }
 `;
 
+const MY_WRITTEN_REVIEWS_QUERY = `
+  query MyWrittenReviews(
+    $input: PaginationInput
+    $filter: ReviewsFilterInput
+    $sort: ReviewsSortInput
+  ) {
+    myWrittenReviews(input: $input, filter: $filter, sort: $sort) {
+      total
+      totalPages
+      hasNextPage
+      items {
+        _id
+        auctionId
+        reviewerId
+        reviewedUserId
+        type
+        status
+        overallRating
+        criteria {
+          itemAccuracy
+          communication
+          packaging
+          smoothExperience
+        }
+        comment
+        reply
+        repliedAt
+        publishedAt
+        createdAt
+        reviewedUser {
+          id
+          firstName
+          lastName
+          city
+        }
+        auction {
+          _id
+          title
+          images
+          currentPrice
+        }
+      }
+    }
+  }
+`;
+
+const REPLY_TO_REVIEW_MUTATION = `
+  mutation ReplyToReview($input: ReplyReviewInput!) {
+    replyToReview(input: $input) {
+      _id
+      reply
+      repliedAt
+    }
+  }
+`;
+
+const REVIEW_ADDED_TO_USER_SUBSCRIPTION = `
+  subscription OnReviewAddedToUser($userId: ID!) {
+    reviewAddedToUser(userId: $userId) {
+      reviewedUserId
+      review {
+        _id
+        auctionId
+        reviewerId
+        reviewedUserId
+        type
+        status
+        overallRating
+        criteria {
+          itemAccuracy
+          communication
+          packaging
+          smoothExperience
+        }
+        comment
+        reply
+        repliedAt
+        publishedAt
+        createdAt
+        reviewer {
+          id
+          firstName
+          lastName
+        }
+      }
+      updatedRatingStats {
+        averageRating
+        totalReviews
+        breakdown {
+          oneStar
+          twoStar
+          threeStar
+          fourStar
+          fiveStar
+        }
+      }
+    }
+  }
+`;
+
 // ----------------------------------------------------
-// Reviews Service Implementation (Core & Mutations)
+// Reviews Service Implementation
 // ----------------------------------------------------
 
 export const reviewsService = {
@@ -198,5 +301,58 @@ export const reviewsService = {
       { input }
     );
     return data.createReview;
+  },
+
+  /**
+   * Fetch all reviews written by the current authenticated user (including PENDING)
+   */
+  async getMyWrittenReviews(
+    input?: PaginationInput,
+    filter?: ReviewsFilterInput,
+    sort?: ReviewsSortInput
+  ): Promise<ReviewsPage> {
+    const data = await executeGraphQL<{ myWrittenReviews: ReviewsPage }>(
+      MY_WRITTEN_REVIEWS_QUERY,
+      {
+        input: input ?? { page: 1, limit: 10 },
+        filter,
+        sort,
+      }
+    );
+    return data.myWrittenReviews;
+  },
+
+  /**
+   * Seller official reply to an existing review
+   */
+  async replyToReview(
+    input: ReplyReviewInput
+  ): Promise<Pick<Review, '_id' | 'reply' | 'repliedAt'>> {
+    const data = await executeGraphQL<{
+      replyToReview: Pick<Review, '_id' | 'reply' | 'repliedAt'>;
+    }>(REPLY_TO_REVIEW_MUTATION, { input });
+    return data.replyToReview;
+  },
+
+  /**
+   * Subscribes to real-time reviews added to a specific user via WebSocket
+   */
+  subscribeToReviewAddedToUser(
+    userId: string,
+    handlers: {
+      next: (data: { reviewAddedToUser: ReviewAddedPayload }) => void;
+      error?: (err: unknown) => void;
+      complete?: () => void;
+    },
+    token?: string | null
+  ): () => void {
+    return subscribeToSubscription<{ reviewAddedToUser: ReviewAddedPayload }>(
+      {
+        query: REVIEW_ADDED_TO_USER_SUBSCRIPTION,
+        variables: { userId },
+      },
+      handlers,
+      token
+    );
   },
 };

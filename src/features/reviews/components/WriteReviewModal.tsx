@@ -215,6 +215,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
 
           <textarea
             id="review-comment-textarea"
+            dir="auto"
             rows={4}
             maxLength={500}
             disabled={isPending}
@@ -224,7 +225,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
               'reviews:modal.commentPlaceholder',
               'اكتب تعليقك الصادق لمساعدة الأعضاء الآخرين (الحد الأقصى 500 حرف)...'
             )}
-            className="w-full px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all resize-none disabled:opacity-50"
+            className="w-full px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all resize-none disabled:opacity-50 text-start"
           />
         </div>
 

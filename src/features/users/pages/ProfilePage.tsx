@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserAvatar } from '../components/UserAvatar';
 import { ProfileInfoForm } from '../components/ProfileInfoForm';
 import { SecuritySettingsCard } from '../components/SecuritySettingsCard';
-import { RatingBreakdownCard, useUserRatingStats } from '@/features/reviews';
+import { UserReviewsSection, useUserRatingStats } from '@/features/reviews';
 import { ROUTES } from '@/constants/routes.constants';
 import { formatDateTime } from '@/utils/formatters';
 import type { ProfileTabType } from '../types/users.types';
@@ -27,7 +27,7 @@ export const ProfilePage: React.FC = () => {
   const currentTab = (searchParams.get('tab') as ProfileTabType) || 'personal';
 
   // Always fetch fresh live rating stats for the profile owner
-  const { data: freshStats, isLoading: isStatsLoading } = useUserRatingStats({
+  const { data: freshStats } = useUserRatingStats({
     userId: user?._id || '',
     enabled: Boolean(user?._id),
   });
@@ -53,8 +53,8 @@ export const ProfilePage: React.FC = () => {
     <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-in fade-in duration-200">
       {/* Profile Header Card */}
       <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8 lg:p-9">
-        <div className="relative flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 text-center sm:text-start">
-          <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+        <div className="relative flex flex-col md:flex-row items-center md:items-start justify-between gap-5 sm:gap-6 text-center md:text-start w-full min-w-0">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 min-w-0 max-w-full">
             {/* User Avatar */}
             <UserAvatar
               firstName={user.firstName}
@@ -65,35 +65,46 @@ export const ProfilePage: React.FC = () => {
             />
 
             {/* User Meta Information */}
-            <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <div className="space-y-1.5 min-w-0 text-center sm:text-start">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 min-w-0">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight truncate max-w-full">
                   {user.firstName} {user.lastName}
                 </h1>
               </div>
 
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-mono">
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-mono truncate max-w-full">
                 {user.email}
               </p>
 
               {memberSinceFormatted && (
-                <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center justify-center sm:justify-start gap-1.5 pt-1">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{t('users:profile.memberSince', { date: memberSinceFormatted })}</span>
+                <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center justify-center sm:justify-start gap-1.5 pt-0.5 truncate max-w-full">
+                  <Calendar className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{t('users:profile.memberSince', { date: memberSinceFormatted })}</span>
                 </p>
               )}
             </div>
           </div>
 
-          {/* Action Link to Public Profile - Styled like browseAuctions in Messages */}
-          <Link
-            to={ROUTES.USER_PUBLIC(user._id)}
-            className="group relative inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black shrink-0 self-center sm:self-start bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden select-none cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-slate-950" />
-            <span>{t('users:profile.viewPublicProfile')}</span>
-            <ExternalLink className="w-4 h-4 text-slate-950 transition-transform group-hover:scale-110" />
-          </Link>
+          {/* Action Links: Public Profile & Reviews (Side-by-side on Full Screen, Stacked vertically on Half Screen) */}
+          <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-2.5 shrink-0 self-center md:self-start xl:self-center w-full md:w-auto min-w-0">
+            <Link
+              to={ROUTES.USER_PUBLIC(user._id)}
+              className="group relative inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden select-none cursor-pointer w-full xl:w-auto text-center whitespace-nowrap"
+            >
+              <Sparkles className="w-4 h-4 text-slate-950 shrink-0" />
+              <span>{t('users:profile.viewPublicProfile', 'الملف العام')}</span>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-950 transition-transform group-hover:scale-110 shrink-0" />
+            </Link>
+
+            <Link
+              to={ROUTES.USER_PUBLIC(user._id) + '?tab=reviews'}
+              className="group relative inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-50 dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shadow-xs hover:border-amber-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden select-none cursor-pointer w-full xl:w-auto text-center whitespace-nowrap"
+            >
+              <Star className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
+              <span>{t('reviews:title', 'التقييمات والآراء')}</span>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-500 transition-colors shrink-0" />
+            </Link>
+          </div>
         </div>
 
         {/* Tab Navigation Segmented Bar - 3 Columns Perfectly Balanced */}
@@ -153,29 +164,12 @@ export const ProfilePage: React.FC = () => {
         {/* Tab 3: Reputation & Reviews */}
         {currentTab === 'reputation' && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>{t('users:reputation.title')}</span>
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {t('users:reputation.description')}
-                </p>
-              </div>
-
-              {/* Action Link to Reviews on Public Profile */}
-              <Link
-                to={ROUTES.USER_PUBLIC(user._id) + '?tab=reviews'}
-                className="group relative inline-flex items-center justify-center gap-2 px-4 py-2 rounded-2xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden select-none shrink-0 self-start sm:self-auto cursor-pointer"
-              >
-                <span>{t('users:reputation.viewAllReviews')}</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-950 transition-transform group-hover:scale-110" />
-              </Link>
-            </div>
-
-            {/* Rating Breakdown Card with fresh live data */}
-            <RatingBreakdownCard stats={effectiveStats} isLoading={isStatsLoading} />
+            <UserReviewsSection
+              userId={user._id}
+              currentUserId={user._id}
+              ratingStats={effectiveStats}
+              paginationMode="local"
+            />
           </div>
         )}
       </div>

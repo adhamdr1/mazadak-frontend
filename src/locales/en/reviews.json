@@ -95,6 +95,8 @@
     "originalReview": "Original Review:",
     "replyLabel": "Official Reply Message",
     "replyPlaceholder": "Write your respectful and professional response (2 to 500 characters)...",
+    "replyWarning": "Notice: Your reply is official, publicly visible, and cannot be edited or removed after publication. Please remain respectful and adhere to platform standards.",
+    "chars": "chars",
     "submitReply": "Publish Reply",
     "cancel": "Cancel"
   },
@@ -112,6 +114,9 @@
   },
   "errors": {
     "auctionIdRequired": "Auction ID is required to submit a review.",
+    "reviewIdRequired": "Review ID is required.",
+    "replyTooShort": "Reply must be at least 2 characters.",
+    "replyTooLong": "Reply must not exceed 500 characters.",
     "REVIEW_ALREADY_EXISTS": "You have already submitted a review for this auction.",
     "REVIEW_WINDOW_EXPIRED": "The 14-day review window for this transaction has expired.",
     "CANNOT_REVIEW_YOURSELF": "You cannot review your own account.",
