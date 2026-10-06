@@ -20,7 +20,8 @@ export function useGoogleAuth() {
     try {
       const response = await authService.googleLogin({ token: idToken });
       setAuth(response);
-      navigate(ROUTES.HOME, { replace: true });
+      const redirectPath = response.user.role === 'ADMIN' ? ROUTES.ADMIN.DASHBOARD : ROUTES.HOME;
+      navigate(redirectPath, { replace: true });
     } catch (err: unknown) {
       const parsed = parseAppError(err);
 

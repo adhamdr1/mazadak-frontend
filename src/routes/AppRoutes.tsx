@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { GuestRoute } from './GuestRoute';
 import { ProtectedRoute } from './ProtectedRoute';
+import { AdminRoute } from './AdminRoute';
+import { AdminLayout } from '@/features/admin/components/layout/AdminLayout';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PageLoader } from '@/components/feedback/PageLoader';
 import { ROUTES } from '@/constants/routes.constants';
@@ -55,7 +57,10 @@ const NotificationsPage = lazy(() => import('@/features/notifications/pages/Noti
 const ProfilePage = lazy(() => import('@/features/users/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const PublicUserPage = lazy(() => import('@/features/users/pages/PublicUserPage').then(m => ({ default: m.PublicUserPage })));
 
-// 9. General Platform Pages
+// 9. Admin Module Pages
+const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
+
+// 10. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
@@ -120,6 +125,13 @@ export const AppRoutes: React.FC = () => {
           <Route path={ROUTES.REACTIVATE} element={<ReactivatePage />} />
           <Route path={ROUTES.CONFIRM_REACTIVATION} element={<ReactivatePage />} />
           <Route path={ROUTES.CONFIRM_REACTIVATION_ALT} element={<ReactivatePage />} />
+
+          {/* 4. Dedicated Admin Control Center (Strict role: ADMIN + Dedicated AdminLayout) */}
+          <Route element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
+            </Route>
+          </Route>
         </Routes>
       </Suspense>
     </>

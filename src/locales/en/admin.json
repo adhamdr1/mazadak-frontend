@@ -1,0 +1,228 @@
+{
+  "layout": {
+    "title": "Admin Dashboard",
+    "subtitle": "Mazadak Platform Management, Supervision & Financial Control",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "User Management",
+      "auctions": "Auctions Moderation",
+      "disputes": "Disputes & Escrow",
+      "financials": "Treasury & Payouts",
+      "transactions": "Audit Logs",
+      "messages": "Messages & Chat",
+      "marketplace": "Auctions Marketplace",
+      "liveBadge": "Live",
+      "pendingBadge": "Pending"
+    },
+    "header": {
+      "marketplace": "Marketplace",
+      "backToMarketplace": "Auctions Marketplace",
+      "adminRoleBadge": "Admin",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "dashboard": "Dashboard",
+        "users": "Users",
+        "auctions": "Auctions",
+        "disputes": "Disputes & Escrow",
+        "financials": "Financials & Treasury",
+        "transactions": "Transactions",
+        "messages": "Messages"
+      },
+      "systemStatus": "System Operational",
+      "toggleSidebar": "Toggle Sidebar"
+    }
+  },
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "subtitle": "Real-time metrics on platform activity, treasury liquidity, and operational KPIs",
+    "kpis": {
+      "totalUsers": "Total Users",
+      "verifiedUsers": "Verified Users",
+      "activeAuctions": "Active Auctions",
+      "completedAuctions": "Completed Auctions",
+      "cancelledAuctions": "Cancelled Auctions",
+      "totalWalletBalance": "Total Wallet Balances",
+      "todaysRevenue": "Today's Revenue",
+      "totalTransactions": "Total Transactions",
+      "pendingWithdrawals": "Pending Withdrawals",
+      "totalPayouts": "Completed Payouts",
+      "collectedFees": "Collected Platform Fees"
+    },
+    "treasuryCard": {
+      "title": "Treasury & Liquidity",
+      "description": "Liquidity distribution and held escrow funds across the system",
+      "totalPlatform": "Total Platform Liquidity",
+      "heldInWallets": "Held in Wallets (Active Bids)",
+      "pendingWithdrawals": "Pending Withdrawal Requests",
+      "heldInEscrow": "Held in Escrow Contracts",
+      "collectedFees": "Total Platform Profit Fees",
+      "completedPayouts": "Total Completed Payouts"
+    },
+    "recentActivity": {
+      "title": "Recent Activities & Transactions",
+      "description": "Latest financial movements and wallet operations",
+      "viewAll": "View All Transactions",
+      "empty": "No recent transactions found.",
+      "transactionId": "Transaction ID",
+      "type": "Type",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date"
+    },
+    "quickActions": {
+      "title": "Quick Management Actions",
+      "reviewWithdrawals": "Process Withdrawals",
+      "resolveDisputes": "Resolve Disputes",
+      "manageUsers": "Manage Users",
+      "monitorAuctions": "Monitor Live Auctions"
+    },
+    "refreshStats": "Refresh Stats",
+    "lastUpdated": "Last updated"
+  },
+  "users": {
+    "title": "User Management",
+    "subtitle": "View member records, adjust wallet balances, and manage account statuses",
+    "searchPlaceholder": "Search by name or email...",
+    "filterAll": "All Users",
+    "filterActive": "Active Only",
+    "filterBanned": "Banned Only",
+    "filterVerified": "Verified Only",
+    "columns": {
+      "user": "User",
+      "role": "Role",
+      "status": "Status",
+      "verification": "Verification",
+      "rating": "Rating",
+      "joinDate": "Joined Date",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "adjustBalance": "Adjust Balance",
+      "ban": "Ban Account",
+      "unban": "Unban Account",
+      "delete": "Delete User"
+    },
+    "drawer": {
+      "title": "Admin User Profile",
+      "personalInfo": "Personal Details",
+      "walletInfo": "Wallet & Balances",
+      "balance": "Total Balance",
+      "availableBalance": "Available Balance",
+      "heldBalance": "Held Balance",
+      "recentAuctions": "Recent Auctions",
+      "recentTransactions": "Recent Transactions",
+      "noAuctions": "No auctions found for this user.",
+      "noTransactions": "No transaction records found."
+    },
+    "adjustModal": {
+      "title": "Manual Balance Adjustment",
+      "subtitle": "Direct credit or debit to user wallet with mandatory auditing reason",
+      "amountLabel": "Amount (EGP)",
+      "typeLabel": "Adjustment Type",
+      "typeCredit": "Credit (Add Funds)",
+      "typeDebit": "Debit (Deduct Funds)",
+      "reasonLabel": "Adjustment Reason",
+      "reasonPlaceholder": "Provide a detailed audit reason (at least 10 characters)...",
+      "confirmButton": "Apply Adjustment",
+      "successMessage": "User wallet balance adjusted successfully."
+    },
+    "banModal": {
+      "banTitle": "Confirm User Ban",
+      "unbanTitle": "Confirm User Unban",
+      "banWarning": "This will immediately restrict the user from logging in, bidding, or creating auctions.",
+      "unbanWarning": "This will restore full user access and participation on the platform.",
+      "confirmBan": "Yes, Ban User",
+      "confirmUnban": "Yes, Unban User",
+      "successBan": "User has been banned successfully.",
+      "successUnban": "User has been unbanned successfully."
+    }
+  },
+  "auctions": {
+    "title": "Auctions Moderation",
+    "subtitle": "Monitor published listings, pricing trends, and administrative interventions",
+    "searchPlaceholder": "Search auction titles...",
+    "filterCategory": "All Categories",
+    "filterStatus": "All Statuses",
+    "cancelModal": {
+      "title": "Cancel Auction Administratively",
+      "warning": "Warning: Cancelling this auction will automatically release all bidder holds back to their wallets.",
+      "reasonLabel": "Cancellation Reason",
+      "reasonPlaceholder": "State the administrative reason for audit logs (at least 10 characters)...",
+      "confirmButton": "Confirm Cancellation",
+      "successMessage": "Auction cancelled and bids refunded successfully."
+    },
+    "reviewsModal": {
+      "title": "Auction Reviews Moderation",
+      "empty": "No reviews found for this auction.",
+      "hide": "Hide Review",
+      "unhide": "Unhide Review",
+      "hiddenBadge": "Hidden",
+      "publishedBadge": "Published"
+    }
+  },
+  "disputes": {
+    "title": "Disputes & Escrow Resolution",
+    "subtitle": "Arbitrate transaction disputes between buyers and sellers and audit escrow contracts",
+    "tabs": {
+      "disputes": "Dispute Cases",
+      "escrows": "Escrow Contracts"
+    },
+    "resolveModal": {
+      "title": "Resolve Dispute & Issue Ruling",
+      "decisionLabel": "Ruling Decision",
+      "refundBuyer": "Refund Buyer in Full (Cancel Sale)",
+      "paySeller": "Release Payment to Seller (Affirm Sale)",
+      "notesLabel": "Administrative Directives & Notes",
+      "notesPlaceholder": "Enter rationale and resolution notes...",
+      "confirmButton": "Issue Final Ruling",
+      "successMessage": "Dispute resolved and escrow funds disbursed successfully."
+    }
+  },
+  "financials": {
+    "title": "Treasury & Payouts",
+    "subtitle": "Process withdrawal requests, inspect system audit logs, and monitor liquidity",
+    "tabs": {
+      "withdrawals": "Withdrawal Requests",
+      "transactions": "Financial Audit Logs",
+      "treasury": "Treasury Report"
+    },
+    "withdrawals": {
+      "startProcessing": "Start Processing",
+      "complete": "Complete & Disburse",
+      "reject": "Reject Request",
+      "completeModal": {
+        "title": "Complete Payout Disbursal",
+        "referenceLabel": "Bank Transfer / Reference Number",
+        "referencePlaceholder": "e.g. TXN-893472918",
+        "receiptUrlLabel": "Receipt URL (Optional)",
+        "receiptUrlPlaceholder": "https://...",
+        "confirmButton": "Confirm Disbursal",
+        "successMessage": "Withdrawal marked as completed and audit logs updated."
+      },
+      "rejectModal": {
+        "title": "Reject Withdrawal Request",
+        "warning": "The requested amount and fees will be immediately returned to the user's wallet with a notification.",
+        "reasonLabel": "Rejection Reason",
+        "reasonPlaceholder": "Explain the reason clearly for the user (at least 10 characters)...",
+        "confirmButton": "Confirm Rejection & Refund",
+        "successMessage": "Withdrawal request rejected and funds returned to wallet."
+      }
+    }
+  },
+  "common": {
+    "loading": "Loading admin data...",
+    "error": "An error occurred while loading administrative records.",
+    "retry": "Retry",
+    "noData": "No administrative records available.",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "currency": "EGP",
+    "all": "All",
+    "page": "Page",
+    "of": "of",
+    "next": "Next",
+    "previous": "Previous"
+  }
+}

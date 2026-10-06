@@ -1,0 +1,250 @@
+{
+  "layout": {
+    "title": "لوحة التحكم الإدارية",
+    "subtitle": "إدارة منصة مزادك، المراقبة والتحكم المالي",
+    "sidebar": {
+      "dashboard": "لوحة التحكم",
+      "users": "إدارة المستخدمين",
+      "auctions": "مراقبة المزادات",
+      "disputes": "فض النزاعات والضمان",
+      "financials": "الخزينة والسحوبات",
+      "transactions": "سجل المعاملات",
+      "messages": "الرسائل والمحادثات",
+      "marketplace": "سوق المزادات",
+      "liveBadge": "مباشر",
+      "pendingBadge": "معلق"
+    },
+    "header": {
+      "marketplace": "سوق المزادات",
+      "backToMarketplace": "سوق المزادات",
+      "adminRoleBadge": "مسؤول",
+      "breadcrumbs": {
+        "admin": "لوحة التحكم",
+        "dashboard": "لوحة التحكم",
+        "users": "المستخدمين",
+        "auctions": "المزادات",
+        "disputes": "النزاعات والضمان",
+        "financials": "المالية والخزينة",
+        "transactions": "المعاملات",
+        "messages": "الرسائل"
+      },
+      "systemStatus": "النظام يعمل بكفاءة",
+      "toggleSidebar": "القائمة"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "نظرة شاملة ولحظية على نشاط المنصة، الأداء المالي، والعمليات",
+    "kpis": {
+      "totalUsers": "إجمالي المستخدمين",
+      "verifiedUsers": "المستخدمين الموثقين",
+      "activeAuctions": "المزادات النشطة",
+      "completedAuctions": "المزادات المكتملة",
+      "cancelledAuctions": "المزادات الملغاة",
+      "totalWalletBalance": "إجمالي أرصدة المحافظ",
+      "todaysRevenue": "إيرادات اليوم",
+      "totalTransactions": "إجمالي العمليات",
+      "pendingWithdrawals": "طلبات السحب المعلقة",
+      "totalPayouts": "إجمالي التحويلات المكتملة",
+      "collectedFees": "إجمالي الرسوم المحصلة"
+    },
+    "treasuryCard": {
+      "title": "الخزينة والسيولة",
+      "description": "توزيع السيولة النقدية والمبالغ المحتجزة في المنصة",
+      "totalPlatform": "إجمالي السيولة بالمنصة",
+      "heldInWallets": "محتجز في المحافظ (مزايدات)",
+      "pendingWithdrawals": "معلق في طلبات السحب",
+      "heldInEscrow": "محتجز في الضمان المالي",
+      "collectedFees": "أرباح ورسوم المنصة المحصلة",
+      "completedPayouts": "إجمالي المسحوبات المصروفة"
+    },
+    "recentActivity": {
+      "title": "آخر العمليات والأنشطة",
+      "description": "أحدث الحركات المالية في المحافظ",
+      "viewAll": "عرض كافة المعاملات",
+      "empty": "لا توجد معاملات حديثة مسجلة حالياً.",
+      "transactionId": "معرف المعاملة",
+      "type": "النوع",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "date": "التاريخ"
+    },
+    "refreshStats": "تحديث",
+    "lastUpdated": "آخر تحديث"
+  },
+  "transactionTypes": {
+    "DEPOSIT": "إيداع رصيد",
+    "WITHDRAW": "طلب سحب",
+    "WITHDRAWAL": "طلب سحب",
+    "HOLD": "حجز مؤقت (مزايدة)",
+    "BID_HOLD": "حجز مؤقت (مزايدة)",
+    "RELEASE": "تحرير حجز (مزايدة)",
+    "BID_RELEASE": "تحرير حجز (مزايدة)",
+    "CAPTURE": "تحصيل صفقة مزاد",
+    "REFUND": "استرداد مالي",
+    "ESCROW_PAYMENT": "دفع ضمان مالي",
+    "ESCROW_RELEASE": "تحرير ضمان مالي",
+    "ESCROW_REFUND": "استرداد ضمان",
+    "AUCTION_FEE": "رسوم المنصة",
+    "ADMIN_CREDIT": "تسوية إدارية (إيداع)",
+    "ADMIN_DEBIT": "تسوية إدارية (خصم)",
+    "ADMIN_ADJUST_CREDIT": "تسوية إدارية (إيداع)",
+    "ADMIN_ADJUST_DEBIT": "تسوية إدارية (خصم)"
+  },
+  "transactionStatuses": {
+    "SUCCESS": "ناجحة",
+    "COMPLETED": "مكتملة",
+    "PENDING": "معلقة",
+    "PROCESSING": "قيد التنفيذ",
+    "FAILED": "فشلت",
+    "REJECTED": "مرفوضة",
+    "CANCELLED": "ملغاة",
+    "EXPIRED": "منتهية الصلاحية"
+  },
+  "users": {
+    "title": "إدارة المستخدمين",
+    "subtitle": "استعراض بيانات الأعضاء، تسوية الأرصدة، والتحكم في صلاحيات الحسابات",
+    "searchPlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
+    "filterAll": "كافة المستخدمين",
+    "filterActive": "نشط فقط",
+    "filterBanned": "محظور فقط",
+    "filterVerified": "موثق فقط",
+    "columns": {
+      "user": "المستخدم",
+      "role": "الرتبة",
+      "status": "حالة الحساب",
+      "verification": "التوثيق",
+      "rating": "التقييم",
+      "joinDate": "تاريخ الانضمام",
+      "actions": "الإجراءات"
+    },
+    "actions": {
+      "viewDetails": "عرض التفاصيل",
+      "adjustBalance": "تسوية الرصيد",
+      "ban": "حظر الحساب",
+      "unban": "فك الحظر",
+      "delete": "حذف الحساب"
+    },
+    "drawer": {
+      "title": "ملف المستخدم الإداري",
+      "personalInfo": "البيانات الشخصية",
+      "walletInfo": "المحفظة والرصيد",
+      "balance": "الرصيد الكلي",
+      "availableBalance": "الرصيد المتاح",
+      "heldBalance": "الرصيد المعلق",
+      "recentAuctions": "آخر المزادات",
+      "recentTransactions": "آخر المعاملات",
+      "noAuctions": "لا توجد مزادات سابقة لهذا المستخدم.",
+      "noTransactions": "لا توجد معاملات مسجلة."
+    },
+    "adjustModal": {
+      "title": "تسوية الرصيد المالي",
+      "subtitle": "إيداع أو خصم مباشر من محفظة المستخدم مع التوثيق المالي",
+      "amountLabel": "المبلغ (ج.م)",
+      "typeLabel": "نوع التسوية",
+      "typeCredit": "إيداع (إضافة رصيد)",
+      "typeDebit": "خصم (سحب رصيد)",
+      "reasonLabel": "سبب التسوية الإدارية",
+      "reasonPlaceholder": "يرجى كتابة سبب مفصل للتسوية (10 أحرف على الأقل)...",
+      "confirmButton": "تنفيذ التسوية",
+      "successMessage": "تم تعديل رصيد المحفظة بنجاح."
+    },
+    "banModal": {
+      "banTitle": "تأكيد حظر المستخدم",
+      "unbanTitle": "تأكيد فك حظر المستخدم",
+      "banWarning": "سيؤدي هذا الإجراء إلى منع المستخدم من تسجيل الدخول والمزايدة وإنشاء المزادات فوراً.",
+      "unbanWarning": "سيتم استعادة صلاحيات المستخدم الكاملة للدخول واستخدام المنصة.",
+      "confirmBan": "نعم، قم بالحظر",
+      "confirmUnban": "نعم، فك الحظر",
+      "successBan": "تم حظر المستخدم بنجاح.",
+      "successUnban": "تم فك حظر المستخدم بنجاح."
+    }
+  },
+  "auctions": {
+    "title": "مراقبة المزادات",
+    "subtitle": "متابعة المزادات المنشورة، مراجعة الأسعار، والتدخل الرقابي",
+    "searchPlaceholder": "البحث في عنوان المزاد...",
+    "filterCategory": "كافة التصنيفات",
+    "filterStatus": "كافة الحالات",
+    "cancelModal": {
+      "title": "إلغاء المزاد إدارياً",
+      "warning": "تحذير: سيتم إلغاء المزاد فوراً وإرجاع كافة مبالغ المزايدين إلى محافظهم تلقائياً.",
+      "reasonLabel": "سبب الإلغاء الإداري",
+      "reasonPlaceholder": "يرجى توضيح سبب إلغاء المزاد للمتابعة والتوثيق (10 أحرف على الأقل)...",
+      "confirmButton": "تأكيد الإلغاء",
+      "successMessage": "تم إلغاء المزاد وإرجاع المزايدات بنجاح."
+    },
+    "reviewsModal": {
+      "title": "إشراف مراجعات المزاد",
+      "empty": "لا توجد مراجعات مسجلة لهذا المزاد.",
+      "hide": "إخفاء المراجعة",
+      "unhide": "إظهار المراجعة",
+      "hiddenBadge": "مخفية",
+      "publishedBadge": "منشورة"
+    }
+  },
+  "disputes": {
+    "title": "فض النزاعات والضمان المالي",
+    "subtitle": "الفصل في الخلافات بين البائعين والمشترين ومتابعة عقود الضمان",
+    "tabs": {
+      "disputes": "ملفات النزاعات",
+      "escrows": "عقود الضمان المالي"
+    },
+    "resolveModal": {
+      "title": "البت في النزاع وإصدار القرار",
+      "decisionLabel": "القرار الإداري",
+      "refundBuyer": "رد المبلغ للمشتري بالكامل (إلغاء البيعة)",
+      "paySeller": "صرف المبلغ للبائع (اعتماد البيعة)",
+      "notesLabel": "ملاحظات وتوجيهات الإدارة",
+      "notesPlaceholder": "أدخل أسباب القرار وتفاصيل المراجعة...",
+      "confirmButton": "إصدار القرار النهائي",
+      "successMessage": "تم فض النزاع وتحديث وضع الضمان المالي بنجاح."
+    }
+  },
+  "financials": {
+    "title": "الخزينة والسحوبات المالية",
+    "subtitle": "معالجة طلبات السحب المباشرة، فحص سجلات التدقيق، والتحكم بالسيولة",
+    "tabs": {
+      "withdrawals": "طلبات السحب",
+      "transactions": "سجل التدقيق المالي",
+      "treasury": "تقرير الخزينة"
+    },
+    "withdrawals": {
+      "startProcessing": "بدء المعالجة",
+      "complete": "إتمام وصرف",
+      "reject": "رفض الطلب",
+      "completeModal": {
+        "title": "إتمام صرف طلب السحب",
+        "referenceLabel": "رقم الحوالة / المرجع المصرفي",
+        "referencePlaceholder": "مثال: TXN-893472918",
+        "receiptUrlLabel": "رابط إيصال التحويل (اختياري)",
+        "receiptUrlPlaceholder": "https://...",
+        "confirmButton": "تأكيد إتمام السحب",
+        "successMessage": "تم إتمام عملية السحب وتحديث السجل بنجاح."
+      },
+      "rejectModal": {
+        "title": "رفض طلب السحب",
+        "warning": "سيتم إعادة المبلغ والرسوم المقتطعة إلى محفظة المستخدم فوراً مع إرسال إشعار بسبب الرفض.",
+        "reasonLabel": "سبب الرفض الإداري",
+        "reasonPlaceholder": "يرجى كتابة سبب واضح ومفصل لرفض الطلب (10 أحرف على الأقل)...",
+        "confirmButton": "تأكيد الرفض وإرجاع الرصيد",
+        "successMessage": "تم رفض طلب السحب وإعادة المبلغ للمحفظة."
+      }
+    }
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ أثناء تحميل البيانات.",
+    "retry": "إعادة المحاولة",
+    "noData": "لا توجد بيانات حالياً.",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "currency": "ج.م",
+    "all": "الكل",
+    "page": "صفحة",
+    "of": "من",
+    "next": "التالي",
+    "previous": "السابق"
+  }
+}

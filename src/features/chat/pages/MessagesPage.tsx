@@ -17,6 +17,7 @@ import {
   ArrowRight,
   ArrowLeft,
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useMyRooms } from '../hooks/useMyRooms';
 import { ChatRoomCard } from '../components/ChatRoomCard';
 import { ChatRoomsSkeleton } from '../components/ChatRoomsSkeleton';
@@ -31,6 +32,7 @@ export const MessagesPage: React.FC = () => {
   const { t, i18n } = useTranslation(['chat', 'common']);
   const isRTL = i18n.language?.startsWith('ar');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const {
     rooms,
@@ -120,14 +122,25 @@ export const MessagesPage: React.FC = () => {
         <EmptyState
           icon={<MessageCircle className="w-10 h-10 text-amber-500" />}
           title={t('chat:messages.empty', 'لا توجد محادثات بعد')}
-          description={t(
-            'chat:messages.emptyDescription',
-            'عند فوزك بمزاد أو بيع سلعتك، ستفتح قنوات الدردشة المباشرة هنا للتنسيق مع الطرف الآخر.'
-          )}
+          description={
+            user?.role === 'ADMIN'
+              ? isRTL
+                ? 'لا توجد قنوات محادثة نشطة حالياً بين البائعين والمشترين على المنصة.'
+                : 'No active chat channels between buyers and sellers currently on the platform.'
+              : t(
+                  'chat:messages.emptyDescription',
+                  'عند فوزك بمزاد أو بيع سلعتك، ستفتح قنوات الدردشة المباشرة هنا للتنسيق مع الطرف الآخر.'
+                )
+          }
           action={{
-            label: t('chat:messages.browseAuctions', 'استكشف المزادات الحية'),
+            label:
+              user?.role === 'ADMIN'
+                ? isRTL
+                  ? 'مراقبة المزادات'
+                  : 'Monitor Auctions'
+                : t('chat:messages.browseAuctions', 'استكشف المزادات الحية'),
             onClick: () => {
-              navigate(ROUTES.AUCTIONS);
+              navigate(user?.role === 'ADMIN' ? ROUTES.ADMIN.AUCTIONS : ROUTES.AUCTIONS);
             },
           }}
         />

@@ -12,6 +12,7 @@ import arChat from '@/locales/ar/chat.json';
 import arNotifications from '@/locales/ar/notifications.json';
 import arReviews from '@/locales/ar/reviews.json';
 import arUsers from '@/locales/ar/users.json';
+import arAdmin from '@/locales/ar/admin.json';
 import enCommon from '@/locales/en/common.json';
 import enAuth from '@/locales/en/auth.json';
 import enAuctions from '@/locales/en/auctions.json';
@@ -22,6 +23,7 @@ import enChat from '@/locales/en/chat.json';
 import enNotifications from '@/locales/en/notifications.json';
 import enReviews from '@/locales/en/reviews.json';
 import enUsers from '@/locales/en/users.json';
+import enAdmin from '@/locales/en/admin.json';
 
 export const defaultNS = 'common';
 export const resources = {
@@ -36,6 +38,7 @@ export const resources = {
     notifications: arNotifications,
     reviews: arReviews,
     users: arUsers,
+    admin: arAdmin,
   },
   en: {
     common: enCommon,
@@ -48,6 +51,7 @@ export const resources = {
     notifications: enNotifications,
     reviews: enReviews,
     users: enUsers,
+    admin: enAdmin,
   },
 } as const;
 

@@ -25,7 +25,8 @@ export function useLogin() {
       }),
     onSuccess: (data, variables) => {
       setAuth(data, variables.rememberMe);
-      const redirectPath = (location.state as { from?: { pathname: string } })?.from?.pathname || ROUTES.HOME;
+      const defaultPath = data.user.role === 'ADMIN' ? ROUTES.ADMIN.DASHBOARD : ROUTES.HOME;
+      const redirectPath = (location.state as { from?: { pathname: string } })?.from?.pathname || defaultPath;
       navigate(redirectPath, { replace: true });
     },
   });

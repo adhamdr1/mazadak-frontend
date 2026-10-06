@@ -118,6 +118,16 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
 
   // Complete unified list for the slide-over sidebar drawer (100% consistent styling)
   const drawerLinks = [
+    ...(user?.role === 'ADMIN'
+      ? [
+          {
+            to: ROUTES.ADMIN.DASHBOARD,
+            label: isRTL ? 'لوحة التحكم الإدارية' : 'Admin Dashboard',
+            icon: ShieldCheck,
+            isActive: location.pathname.startsWith('/admin'),
+          },
+        ]
+      : []),
     {
       to: ROUTES.HOME,
       label: t('nav.home', 'الرئيسية'),
@@ -266,6 +276,17 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
+
+            {/* Admin Panel Quick Switcher Button */}
+            {user?.role === 'ADMIN' && (
+              <Link
+                to={ROUTES.ADMIN.DASHBOARD}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 hover:from-amber-400 hover:to-amber-500 transition-all cursor-pointer shrink-0"
+              >
+                <ShieldCheck className="w-4 h-4 text-slate-950" />
+                <span className="hidden sm:inline-block">{isRTL ? 'لوحة التحكم' : 'Admin Panel'}</span>
+              </Link>
+            )}
 
             {/* Notifications Dropdown (Bell icon with live pulsing badge) */}
             {isAuthenticated && <NotificationDropdown />}
