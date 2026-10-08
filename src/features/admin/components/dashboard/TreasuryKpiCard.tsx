@@ -13,6 +13,53 @@ export interface TreasuryKpiCardProps {
   isLoading?: boolean;
 }
 
+const renderFormattedTreasuryValue = (
+  amount: number | string | undefined | null,
+  isRTL: boolean,
+  isLoading: boolean,
+  isHeadline = false
+) => {
+  if (isLoading) {
+    return (
+      <div
+        className={cn(
+          'bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg',
+          isHeadline ? 'h-8 w-44' : 'h-6 w-24'
+        )}
+      />
+    );
+  }
+
+  const formattedStr = formatAdminCurrency(amount, undefined, isRTL);
+  const parts = formattedStr.split(/\s+/);
+  const currency = parts.length >= 2 ? parts.pop() : isRTL ? 'ج.م' : 'EGP';
+  const val = parts.join(' ');
+
+  if (isHeadline) {
+    return (
+      <div className="flex items-baseline gap-2 flex-wrap">
+        <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+          {val}
+        </span>
+        <span className="text-sm font-bold text-slate-400 dark:text-slate-500">
+          {currency}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-baseline gap-1.5 flex-wrap">
+      <span className="text-base font-black text-slate-900 dark:text-white tracking-tight">
+        {val}
+      </span>
+      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">
+        {currency}
+      </span>
+    </div>
+  );
+};
+
 export const TreasuryKpiCard: React.FC<TreasuryKpiCardProps> = ({ treasury, isLoading = false }) => {
   const { t, i18n } = useTranslation(['admin', 'common']);
   const isRTL = i18n.language?.startsWith('ar');
@@ -29,49 +76,41 @@ export const TreasuryKpiCard: React.FC<TreasuryKpiCardProps> = ({ treasury, isLo
 
   const items = [
     {
-      label: t('dashboard.treasuryCard.heldInWallets', {
-        ns: 'admin',
-        defaultValue: 'محتجز في المحافظ (مزايدات)',
-      }),
+      label: isRTL ? 'محتجز في المحافظ (مزايدات)' : 'Held in Wallets (Bids)',
       value: heldWallets,
       icon: Lock,
-      dotBg: 'bg-amber-500',
+      iconClass: 'bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30',
+      barBg: 'bg-amber-500',
     },
     {
-      label: t('dashboard.treasuryCard.pendingWithdrawals', {
-        ns: 'admin',
-        defaultValue: 'معلق في طلبات السحب',
-      }),
+      label: isRTL ? 'معلق في طلبات السحب' : 'Pending Withdrawals',
       value: pendingWithdrawals,
       icon: Clock,
-      dotBg: 'bg-rose-500',
+      iconClass: 'bg-rose-500/15 text-rose-500 dark:text-rose-400 border border-rose-500/30',
+      barBg: 'bg-rose-500',
     },
     {
-      label: t('dashboard.treasuryCard.heldInEscrow', {
-        ns: 'admin',
-        defaultValue: 'محتجز في الضمان المالي',
-      }),
+      label: isRTL ? 'محتجز في الضمان المالي' : 'Held in Escrow',
       value: heldEscrow,
       icon: ShieldCheck,
-      dotBg: 'bg-purple-500',
+      iconClass: 'bg-purple-500/15 text-purple-500 dark:text-purple-400 border border-purple-500/30',
+      barBg: 'bg-purple-500',
     },
     {
-      label: t('dashboard.treasuryCard.collectedFees', {
-        ns: 'admin',
-        defaultValue: 'أرباح ورسوم المنصة المحصلة',
-      }),
+      label: isRTL ? 'رسوم المنصة المحصلة' : 'Collected Platform Fees',
       value: collectedFees,
       icon: DollarSign,
-      dotBg: 'bg-emerald-500',
+      iconClass: 'bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30',
+      barBg: 'bg-emerald-500',
     },
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 shadow-2xs p-6 sm:p-7">
+    <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 shadow-2xs p-5 sm:p-7 space-y-6">
       {/* Card Header */}
-      <div className="flex items-start justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800/80">
+      <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/80">
         <div className="flex items-center gap-3.5">
-          <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30">
+          <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30 shrink-0">
             <Landmark className="w-5 h-5" />
           </div>
           <div>
@@ -92,16 +131,16 @@ export const TreasuryKpiCard: React.FC<TreasuryKpiCardProps> = ({ treasury, isLo
 
         <Link
           to={ROUTES.ADMIN.FINANCIALS}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-colors"
+          className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 shadow-2xs hover:shadow-xs transition-all duration-200 shrink-0 active:scale-95"
         >
           <span>{isRTL ? 'إدارة الخزينة' : 'Manage Treasury'}</span>
-          <ArrowUpRight className="w-3.5 h-3.5" />
+          <ArrowUpRight className="w-3.5 h-3.5 text-amber-500 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
       </div>
 
       {/* Primary Headline Liquidity Total */}
-      <div className="py-5 space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+      <div className="space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
           <div className="space-y-1">
             <span className="text-xs uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
               {t('dashboard.treasuryCard.totalPlatform', {
@@ -109,24 +148,23 @@ export const TreasuryKpiCard: React.FC<TreasuryKpiCardProps> = ({ treasury, isLo
                 defaultValue: 'إجمالي السيولة النقدية بالمنصة',
               })}
             </span>
-            {isLoading ? (
-              <div className="h-10 w-48 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg" />
-            ) : (
-              <div className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-                {formatAdminCurrency(totalBalance, undefined, isRTL)}
-              </div>
-            )}
+            <div>
+              {renderFormattedTreasuryValue(totalBalance, isRTL, isLoading, true)}
+            </div>
           </div>
 
-          <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
-            <span className="font-bold text-amber-500">
-              {toLocalizedDigits(lockedPercentage, isRTL)}%
-            </span>{' '}
-            {isRTL ? 'مقيد بالعمليات النشطة' : 'committed in active ops'}
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/70 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              {isRTL ? 'إجمالي المحتجز والمعلق:' : 'Held & Processing:'}
+            </span>
+            <span className="font-bold text-amber-600 dark:text-amber-400">
+              {formatAdminCurrency(lockedTotal, undefined, isRTL)} ({toLocalizedDigits(lockedPercentage, isRTL)}%)
+            </span>
           </div>
         </div>
 
-        {/* Commitment Progress Bar */}
+        {/* Commitment Multi-color Progress Bar */}
         <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden flex">
           <div
             className="bg-amber-500 transition-all duration-500"
@@ -147,23 +185,30 @@ export const TreasuryKpiCard: React.FC<TreasuryKpiCardProps> = ({ treasury, isLo
       </div>
 
       {/* Breakdown Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800/80">
         {items.map((item, idx) => {
           const Icon = item.icon;
           return (
             <div
               key={idx}
-              className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800"
+              className="flex flex-col justify-between p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/80 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all space-y-3"
             >
-              <div className={cn('w-2 h-2 rounded-full flex-shrink-0', item.dotBg)} />
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Icon className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">{item.label}</p>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight truncate">
-                    {isLoading ? '...' : formatAdminCurrency(item.value, undefined, isRTL)}
-                  </p>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div
+                  className={cn(
+                    'flex items-center justify-center w-8 h-8 rounded-xl shrink-0 shadow-2xs',
+                    item.iconClass
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
                 </div>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">
+                  {item.label}
+                </p>
+              </div>
+
+              <div className="pt-0.5">
+                {renderFormattedTreasuryValue(item.value, isRTL, isLoading)}
               </div>
             </div>
           );

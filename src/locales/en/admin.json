@@ -9,8 +9,8 @@
       "disputes": "Disputes & Escrow",
       "financials": "Treasury & Payouts",
       "transactions": "Audit Logs",
-      "messages": "Messages & Chat",
       "marketplace": "Auctions Marketplace",
+      "themeAndLang": "Theme & Language",
       "liveBadge": "Live",
       "pendingBadge": "Pending"
     },

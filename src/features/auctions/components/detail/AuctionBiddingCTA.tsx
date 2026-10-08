@@ -17,6 +17,7 @@ import type { Auction, AuctionStatus } from '../../types/auctions.types';
 import { PriceDisplay } from '../shared/PriceDisplay';
 import { CountdownTimer } from '../shared/CountdownTimer';
 import { LiveBiddingBox } from '@/features/bids/components/LiveBiddingBox';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface AuctionBiddingCTAProps {
   auction: Auction;
@@ -43,6 +44,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
 }) => {
   const { t, i18n } = useTranslation('auctions');
   const isRTL = i18n.language?.startsWith('ar');
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const queryClient = useQueryClient();
 
   const currentPriceNum = auction.currentPrice ? parseFloat(auction.currentPrice) : 0;
@@ -61,6 +64,12 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
     // purely event-driven by WebSocket subscriptions (auctionStatusChanged & walletUpdated).
     queryClient.invalidateQueries({
       queryKey: QUERY_KEYS.AUCTIONS.DETAIL(auction._id),
+    });
+    queryClient.invalidateQueries({
+      queryKey: QUERY_KEYS.ESCROW.BY_AUCTION(auction._id),
+    });
+    queryClient.invalidateQueries({
+      queryKey: QUERY_KEYS.REVIEWS.CAN_REVIEW(auction._id),
     });
   };
 
@@ -247,8 +256,22 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 7. Active Bidding Form (STRICTLY for ACTIVE auctions only) */}
-      {activeTimerStatus === 'ACTIVE' && !isSeller && (
+      {/* 7. Active State for Admin (Read-only Supervision Mode) vs Buyers (Live Bidding Box) */}
+      {activeTimerStatus === 'ACTIVE' && isAdmin && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 text-xs font-black text-amber-600 dark:text-amber-400">
+            <ShieldCheck className="w-4 h-4" />
+            <span>{isRTL ? 'وضع الرقابة والمتابعة الإدارية' : 'Admin Supervision Mode'}</span>
+          </div>
+          <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+            {isRTL
+              ? 'المزاد نشط ويتلقى مزايدات حية. لا يمكن لحسابات الإدارة وضع مزايدات على المزادات.'
+              : 'This auction is live. Administrative accounts cannot place bids on active auctions.'}
+          </p>
+        </div>
+      )}
+
+      {activeTimerStatus === 'ACTIVE' && !isSeller && !isAdmin && (
         <LiveBiddingBox
           auction={auction}
           isSeller={isSeller}

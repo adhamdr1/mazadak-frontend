@@ -8,17 +8,15 @@ import {
   Scale,
   Landmark,
   Receipt,
-  MessageSquare,
   Home,
+  User,
   X,
   LogOut,
 } from 'lucide-react';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
-import { UserAvatar } from '@/features/users';
 import { useAuth } from '@/hooks/useAuth';
-import { useUnreadChatRoomsCount } from '@/features/chat';
 import { ROUTES } from '@/constants/routes.constants';
 import { useAdminDashboardStats } from '../../hooks/useAdminDashboardStats';
 import { toLocalizedDigits } from '@/utils/formatters';
@@ -35,7 +33,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
   const location = useLocation();
   const { user, logout } = useAuth();
   const { data: stats } = useAdminDashboardStats();
-  const { unreadRoomsCount } = useUnreadChatRoomsCount();
 
   const pendingWithdrawalsCount = stats?.pendingWithdrawalsCount || 0;
   const roleLabel = isRTL ? 'مسؤول' : 'Admin';
@@ -74,10 +71,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       icon: Receipt,
     },
     {
-      to: ROUTES.MESSAGES,
-      label: t('layout.sidebar.messages', { ns: 'admin', defaultValue: 'الرسائل والمحادثات' }),
-      icon: MessageSquare,
-      badge: unreadRoomsCount > 0 ? unreadRoomsCount : undefined,
+      to: ROUTES.AUCTIONS,
+      label: t('layout.sidebar.marketplace', { ns: 'admin', defaultValue: 'سوق المزادات' }),
+      icon: Home,
+    },
+    {
+      to: ROUTES.PROFILE,
+      label: isRTL ? 'الملف الشخصي' : 'Profile',
+      icon: User,
     },
   ];
 
@@ -95,57 +96,54 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       {/* Pinned Desktop & Slide-in Mobile Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 z-50 flex flex-col w-64 bg-white dark:bg-slate-950 border-slate-200/80 dark:border-slate-800/80 transition-transform duration-200 shadow-xl lg:shadow-none select-none',
-          isRTL ? 'right-0 border-l' : 'left-0 border-r',
-          isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full lg:translate-x-0' : '-translate-x-full lg:translate-x-0'
+          'fixed inset-y-0 z-50 flex flex-col w-72 bg-white dark:bg-slate-950 border-slate-200/80 dark:border-slate-800/80 transition-transform duration-200 ease-out shadow-xl lg:shadow-none select-none',
+          isRTL
+            ? cn(
+                'left-0 border-r lg:left-auto lg:right-0 lg:border-r-0 lg:border-l',
+                isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+              )
+            : cn(
+                'right-0 border-l lg:right-auto lg:left-0 lg:border-l-0 lg:border-r',
+                isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+              )
         )}
       >
-        {/* Top Header: Brand & Close */}
-        <div className="flex items-center justify-between h-14 px-5">
-          <BrandLogo size="md" />
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white lg:hidden cursor-pointer"
-            aria-label="Close Sidebar"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Integrated Clean Profile Card (Lifted Up with NO harsh dividing lines) */}
-        <div className="px-4 pb-3">
-          <Link
-            to={ROUTES.PROFILE}
-            onClick={() => onClose()}
-            className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-100/70 hover:bg-slate-200/70 dark:bg-slate-900/80 dark:hover:bg-slate-800/80 border border-slate-200/60 dark:border-slate-800/80 transition-all group"
-          >
-            <UserAvatar
-              firstName={user?.firstName}
-              lastName={user?.lastName}
-              userId={user?._id}
-              size="sm"
-              variant="gold"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-black text-slate-900 dark:text-white truncate group-hover:text-amber-500 transition-colors">
+        {/* Top Header: Brand & Compact User Info */}
+        <div className="flex items-center justify-between py-3 px-3.5 border-b border-slate-100 dark:border-slate-800/80 gap-2">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <BrandLogo size="xs" to={ROUTES.AUCTIONS} />
+            <div className="h-6 w-px bg-amber-500/30 shrink-0" />
+            <Link
+              to={ROUTES.PROFILE}
+              onClick={() => onClose()}
+              className="flex flex-col min-w-0 flex-1 hover:opacity-85 transition-opacity group"
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-black text-xs leading-tight text-amber-600 dark:text-amber-400 truncate group-hover:underline">
                   {user?.firstName} {user?.lastName}
                 </span>
                 <span className="px-1.5 py-0.2 rounded text-[9px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold shrink-0">
                   {roleLabel}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate mt-0.5">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate block mt-0.5" title={user?.email}>
                 {user?.email}
-              </p>
-            </div>
-          </Link>
+              </span>
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 lg:hidden cursor-pointer shrink-0 transition-colors"
+            aria-label="Close Sidebar"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto px-4 py-1 space-y-1 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar">
           <nav className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -184,18 +182,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               );
             })}
           </nav>
-
-          {/* Direct link to Platform Home */}
-          <div className="pt-2 space-y-1">
-            <Link
-              to={ROUTES.HOME}
-              onClick={() => onClose()}
-              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors group"
-            >
-              <Home className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 shrink-0" />
-              <span className="truncate">{t('layout.sidebar.marketplace', { ns: 'admin', defaultValue: 'سوق المزادات' })}</span>
-            </Link>
-          </div>
         </div>
 
         {/* Sidebar Footer: Language, Theme & Logout */}
@@ -203,7 +189,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           {/* Controls pill */}
           <div className="flex items-center justify-between gap-3 p-2 rounded-2xl bg-slate-100/70 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800/80">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ps-1">
-              {isRTL ? 'المظهر واللغة' : 'Appearance'}
+              {t('layout.sidebar.themeAndLang', { ns: 'admin', defaultValue: isRTL ? 'اللغة والمظهر' : 'Theme & Language' })}
             </span>
             <div className="flex items-center gap-1.5">
               <LanguageSwitcher />

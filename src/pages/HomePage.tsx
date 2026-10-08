@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Gavel,
@@ -46,13 +46,18 @@ const CATEGORIES: Array<{
 
 export const HomePage: React.FC = () => {
   const { t, i18n } = useTranslation('auctions');
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const isRTL = i18n.language?.startsWith('ar');
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   // Fetch featured active & upcoming auctions for the homepage showcase
   const { auctions, isLoading } = useAuctions(6);
   const { newAuctionsCount, refreshFeed, dismiss } = useAuctionCreatedSubscription();
+
+  // Auto-redirect authenticated admins directly to Admin Dashboard
+  if (!isAuthLoading && isAuthenticated && user?.role === 'ADMIN') {
+    return <Navigate to={ROUTES.ADMIN.DASHBOARD} replace />;
+  }
 
   return (
     <div className="space-y-12 sm:space-y-16 py-6 sm:py-10">

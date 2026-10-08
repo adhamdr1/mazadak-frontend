@@ -19,6 +19,10 @@ import {
   UserPlus,
   MessageSquare,
   Bell,
+  LayoutDashboard,
+  Users,
+  Scale,
+  Landmark,
 } from 'lucide-react';
 import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
@@ -74,145 +78,216 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
         ? 'مستخدم'
         : 'User';
 
+  const isAdmin = user?.role === 'ADMIN';
+
   // Desktop top navbar links
-  const desktopTopLinks = [
-    {
-      to: ROUTES.HOME,
-      label: t('nav.home', 'الرئيسية'),
-      icon: Home,
-      isActive: location.pathname === ROUTES.HOME,
-    },
-    {
-      to: ROUTES.AUCTIONS,
-      label: t('nav.auctions', 'المزادات'),
-      icon: Gavel,
-      isActive:
-        location.pathname === ROUTES.AUCTIONS ||
-        (location.pathname.startsWith('/auctions/') &&
-          location.pathname !== ROUTES.CREATE_AUCTION),
-    },
-    {
-      to: ROUTES.CREATE_AUCTION,
-      label: t('nav.createAuction', 'إنشاء مزاد'),
-      icon: PlusCircle,
-      isActive: location.pathname === ROUTES.CREATE_AUCTION,
-    },
-    ...(isAuthenticated
-      ? [
+  const desktopTopLinks = isAdmin
+    ? [
         {
-          to: ROUTES.MY_AUCTIONS,
-          label: t('nav.myAuctions', 'مزاداتي'),
-          icon: Layers,
-          isActive: location.pathname === ROUTES.MY_AUCTIONS,
+          to: ROUTES.HOME,
+          label: t('nav.home', 'الرئيسية'),
+          icon: Home,
+          isActive: location.pathname === ROUTES.HOME,
         },
         {
-          to: ROUTES.MESSAGES,
-          label: t('nav.messages', 'الرسائل'),
-          icon: MessageSquare,
-          isActive: location.pathname.startsWith('/messages'),
-          badge: unreadRoomsCount,
+          to: ROUTES.AUCTIONS,
+          label: t('nav.auctions', 'سوق المزادات'),
+          icon: Gavel,
+          isActive:
+            location.pathname === ROUTES.AUCTIONS ||
+            (location.pathname.startsWith('/auctions/') &&
+              location.pathname !== ROUTES.CREATE_AUCTION),
         },
       ]
-      : []),
-  ];
+    : [
+        {
+          to: ROUTES.HOME,
+          label: t('nav.home', 'الرئيسية'),
+          icon: Home,
+          isActive: location.pathname === ROUTES.HOME,
+        },
+        {
+          to: ROUTES.AUCTIONS,
+          label: t('nav.auctions', 'المزادات'),
+          icon: Gavel,
+          isActive:
+            location.pathname === ROUTES.AUCTIONS ||
+            (location.pathname.startsWith('/auctions/') &&
+              location.pathname !== ROUTES.CREATE_AUCTION),
+        },
+        {
+          to: ROUTES.CREATE_AUCTION,
+          label: t('nav.createAuction', 'إنشاء مزاد'),
+          icon: PlusCircle,
+          isActive: location.pathname === ROUTES.CREATE_AUCTION,
+        },
+        ...(isAuthenticated
+          ? [
+              {
+                to: ROUTES.MY_AUCTIONS,
+                label: t('nav.myAuctions', 'مزاداتي'),
+                icon: Layers,
+                isActive: location.pathname === ROUTES.MY_AUCTIONS,
+              },
+              {
+                to: ROUTES.MESSAGES,
+                label: t('nav.messages', 'الرسائل'),
+                icon: MessageSquare,
+                isActive: location.pathname.startsWith('/messages'),
+                badge: unreadRoomsCount,
+              },
+            ]
+          : []),
+      ];
+
+  interface DrawerLinkItem {
+    to: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    isActive: boolean;
+    badge?: number;
+  }
 
   // Complete unified list for the slide-over sidebar drawer (100% consistent styling)
-  const drawerLinks = [
-    ...(user?.role === 'ADMIN'
-      ? [
-          {
-            to: ROUTES.ADMIN.DASHBOARD,
-            label: isRTL ? 'لوحة التحكم الإدارية' : 'Admin Dashboard',
-            icon: ShieldCheck,
-            isActive: location.pathname.startsWith('/admin'),
-          },
-        ]
-      : []),
-    {
-      to: ROUTES.HOME,
-      label: t('nav.home', 'الرئيسية'),
-      icon: Home,
-      isActive: location.pathname === ROUTES.HOME,
-    },
-    {
-      to: ROUTES.AUCTIONS,
-      label: t('nav.auctions', 'سوق المزادات'),
-      icon: Gavel,
-      isActive:
-        location.pathname === ROUTES.AUCTIONS ||
-        (location.pathname.startsWith('/auctions/') &&
-          location.pathname !== ROUTES.CREATE_AUCTION),
-    },
-    {
-      to: ROUTES.CREATE_AUCTION,
-      label: t('nav.createAuction', 'إنشاء مزاد'),
-      icon: PlusCircle,
-      isActive: location.pathname === ROUTES.CREATE_AUCTION,
-    },
-    ...(isAuthenticated
-      ? [
+  const drawerLinks: DrawerLinkItem[] = isAdmin
+    ? [
         {
-          to: ROUTES.MY_AUCTIONS,
-          label: t('nav.myAuctions', 'مزاداتي'),
-          icon: Layers,
-          isActive: location.pathname === ROUTES.MY_AUCTIONS,
+          to: ROUTES.ADMIN.DASHBOARD,
+          label: isRTL ? 'لوحة التحكم' : 'Dashboard',
+          icon: LayoutDashboard,
+          isActive: location.pathname === ROUTES.ADMIN.DASHBOARD,
         },
         {
-          to: ROUTES.MY_BIDS,
-          label: t('nav.myBids', 'مزايداتي'),
-          icon: TrendingUp,
-          isActive: location.pathname === ROUTES.MY_BIDS,
+          to: ROUTES.ADMIN.USERS,
+          label: isRTL ? 'إدارة المستخدمين' : 'User Management',
+          icon: Users,
+          isActive: location.pathname.startsWith('/admin/users'),
         },
         {
-          to: ROUTES.MY_ESCROWS,
-          label: t('nav.myEscrows', 'معاملات الضمان'),
-          icon: ShieldCheck,
+          to: ROUTES.ADMIN.AUCTIONS,
+          label: isRTL ? 'مراقبة المزادات' : 'Auctions Moderation',
+          icon: Gavel,
+          isActive: location.pathname.startsWith('/admin/auctions'),
+        },
+        {
+          to: ROUTES.ADMIN.DISPUTES,
+          label: isRTL ? 'فض النزاعات والضمان' : 'Disputes & Escrow',
+          icon: Scale,
+          isActive: location.pathname.startsWith('/admin/disputes'),
+        },
+        {
+          to: ROUTES.ADMIN.FINANCIALS,
+          label: isRTL ? 'الخزينة والسحوبات' : 'Treasury & Payouts',
+          icon: Landmark,
           isActive:
-            location.pathname.startsWith('/my-escrows') ||
-            location.pathname.startsWith('/escrow/') ||
-            location.pathname.startsWith('/disputes/'),
+            location.pathname.startsWith('/admin/financials') ||
+            location.pathname.startsWith('/admin/treasury'),
         },
         {
-          to: ROUTES.MESSAGES,
-          label: t('nav.messages', 'الرسائل'),
-          icon: MessageSquare,
-          isActive: location.pathname.startsWith('/messages'),
-          badge: unreadRoomsCount,
-        },
-        {
-          to: ROUTES.NOTIFICATIONS,
-          label: t('nav.notifications', 'الإشعارات'),
-          icon: Bell,
-          isActive: location.pathname.startsWith('/notifications'),
-          badge: unreadNotificationsCount,
-        },
-        {
-          to: ROUTES.WALLET,
-          label: t('nav.wallet', 'المحفظة والرصيد'),
-          icon: Wallet,
-          isActive: location.pathname === ROUTES.WALLET,
-        },
-        {
-          to: ROUTES.WALLET_WITHDRAWALS,
-          label: t('nav.withdrawals', 'سجل السحوبات'),
-          icon: History,
-          isActive: location.pathname === ROUTES.WALLET_WITHDRAWALS,
-        },
-        {
-          to: ROUTES.WALLET_TRANSACTIONS,
-          label: t('nav.transactions', 'سجل المعاملات'),
+          to: ROUTES.ADMIN.TRANSACTIONS,
+          label: isRTL ? 'سجل المعاملات' : 'Audit Logs',
           icon: Receipt,
-          isActive: location.pathname === ROUTES.WALLET_TRANSACTIONS,
+          isActive: location.pathname.startsWith('/admin/transactions'),
+        },
+        {
+          to: ROUTES.AUCTIONS,
+          label: isRTL ? 'سوق المزادات' : 'Auctions Marketplace',
+          icon: Home,
+          isActive: location.pathname === ROUTES.AUCTIONS,
         },
         {
           to: ROUTES.PROFILE,
-          label: t('nav.profile', 'الملف الشخصي والإعدادات'),
+          label: isRTL ? 'الملف الشخصي' : 'Profile',
           icon: User,
           isActive: location.pathname === ROUTES.PROFILE,
         },
       ]
-      : []),
-  ];
+    : [
+        {
+          to: ROUTES.HOME,
+          label: t('nav.home', 'الرئيسية'),
+          icon: Home,
+          isActive: location.pathname === ROUTES.HOME,
+        },
+        {
+          to: ROUTES.AUCTIONS,
+          label: t('nav.auctions', 'سوق المزادات'),
+          icon: Gavel,
+          isActive:
+            location.pathname === ROUTES.AUCTIONS ||
+            (location.pathname.startsWith('/auctions/') &&
+              location.pathname !== ROUTES.CREATE_AUCTION),
+        },
+        {
+          to: ROUTES.CREATE_AUCTION,
+          label: t('nav.createAuction', 'إنشاء مزاد'),
+          icon: PlusCircle,
+          isActive: location.pathname === ROUTES.CREATE_AUCTION,
+        },
+        ...(isAuthenticated
+          ? [
+              {
+                to: ROUTES.MY_AUCTIONS,
+                label: t('nav.myAuctions', 'مزاداتي'),
+                icon: Layers,
+                isActive: location.pathname === ROUTES.MY_AUCTIONS,
+              },
+              {
+                to: ROUTES.MY_BIDS,
+                label: t('nav.myBids', 'مزايداتي'),
+                icon: TrendingUp,
+                isActive: location.pathname === ROUTES.MY_BIDS,
+              },
+              {
+                to: ROUTES.MY_ESCROWS,
+                label: t('nav.myEscrows', 'معاملات الضمان'),
+                icon: ShieldCheck,
+                isActive:
+                  location.pathname.startsWith('/my-escrows') ||
+                  location.pathname.startsWith('/escrow/') ||
+                  location.pathname.startsWith('/disputes/'),
+              },
+              {
+                to: ROUTES.MESSAGES,
+                label: t('nav.messages', 'الرسائل'),
+                icon: MessageSquare,
+                isActive: location.pathname.startsWith('/messages'),
+                badge: unreadRoomsCount,
+              },
+              {
+                to: ROUTES.NOTIFICATIONS,
+                label: t('nav.notifications', 'الإشعارات'),
+                icon: Bell,
+                isActive: location.pathname.startsWith('/notifications'),
+                badge: unreadNotificationsCount,
+              },
+              {
+                to: ROUTES.WALLET,
+                label: t('nav.wallet', 'المحفظة والرصيد'),
+                icon: Wallet,
+                isActive: location.pathname === ROUTES.WALLET,
+              },
+              {
+                to: ROUTES.WALLET_WITHDRAWALS,
+                label: t('nav.withdrawals', 'سجل السحوبات'),
+                icon: History,
+                isActive: location.pathname === ROUTES.WALLET_WITHDRAWALS,
+              },
+              {
+                to: ROUTES.WALLET_TRANSACTIONS,
+                label: t('nav.transactions', 'سجل المعاملات'),
+                icon: Receipt,
+                isActive: location.pathname === ROUTES.WALLET_TRANSACTIONS,
+              },
+              {
+                to: ROUTES.PROFILE,
+                label: t('nav.profile', 'الملف الشخصي والإعدادات'),
+                icon: User,
+                isActive: location.pathname === ROUTES.PROFILE,
+              },
+            ]
+          : []),
+      ];
 
   return (
     <>
@@ -276,17 +351,6 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
-
-            {/* Admin Panel Quick Switcher Button */}
-            {user?.role === 'ADMIN' && (
-              <Link
-                to={ROUTES.ADMIN.DASHBOARD}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 hover:from-amber-400 hover:to-amber-500 transition-all cursor-pointer shrink-0"
-              >
-                <ShieldCheck className="w-4 h-4 text-slate-950" />
-                <span className="hidden sm:inline-block">{isRTL ? 'لوحة التحكم' : 'Admin Panel'}</span>
-              </Link>
-            )}
 
             {/* Notifications Dropdown (Bell icon with live pulsing badge) */}
             {isAuthenticated && <NotificationDropdown />}

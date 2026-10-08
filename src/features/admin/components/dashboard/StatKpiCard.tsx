@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 export type KpiVariant = 'gold' | 'emerald' | 'rose' | 'cyan' | 'purple' | 'blue' | 'slate';
@@ -67,6 +67,29 @@ const variantStyles: Record<
   },
 };
 
+const renderFormattedKpiValue = (val: string | number) => {
+  if (typeof val === 'number') {
+    return <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">{val}</span>;
+  }
+  const str = String(val).trim();
+  const parts = str.split(/\s+/);
+  if (parts.length >= 2 && (parts[parts.length - 1] === 'ج.م' || parts[parts.length - 1] === 'EGP')) {
+    const currency = parts.pop();
+    const amount = parts.join(' ');
+    return (
+      <div className="flex items-baseline gap-1.5 flex-wrap">
+        <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          {amount}
+        </span>
+        <span className="text-xs font-bold text-slate-400 dark:text-slate-500">
+          {currency}
+        </span>
+      </div>
+    );
+  }
+  return <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">{str}</span>;
+};
+
 export const StatKpiCard: React.FC<StatKpiCardProps> = ({
   title,
   value,
@@ -83,28 +106,28 @@ export const StatKpiCard: React.FC<StatKpiCardProps> = ({
   const content = (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 p-5 sm:p-6 transition-all duration-200 shadow-2xs hover:shadow-md hover:-translate-y-0.5',
+        'group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 p-5 transition-all duration-200 shadow-2xs hover:shadow-md hover:-translate-y-0.5',
         styles.borderGlow,
         className
       )}
     >
-      <div className="relative z-10 flex items-start justify-between gap-4">
+      <div className="relative z-10 flex items-start justify-between gap-3">
         {/* Metric Information */}
-        <div className="space-y-1.5 flex-1 min-w-0">
+        <div className="space-y-1 flex-1 min-w-0">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">
             {title}
           </p>
 
           {isLoading ? (
-            <div className="h-8 w-24 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg" />
+            <div className="h-7 w-20 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg mt-1" />
           ) : (
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight truncate">
-              {value}
-            </h3>
+            <div className="py-0.5">
+              {renderFormattedKpiValue(value)}
+            </div>
           )}
 
           {subtitle && (
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">{subtitle}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate pt-0.5">{subtitle}</p>
           )}
 
           {trend && (
@@ -125,21 +148,17 @@ export const StatKpiCard: React.FC<StatKpiCardProps> = ({
           )}
         </div>
 
-        {/* Icon & Hover Link Indicator */}
-        <div className="flex flex-col items-end gap-2 flex-shrink-0">
+        {/* Icon */}
+        <div className="flex-shrink-0">
           <div
             className={cn(
-              'flex items-center justify-center w-12 h-12 rounded-2xl transition-transform duration-200 group-hover:scale-105',
+              'flex items-center justify-center w-11 h-11 rounded-2xl transition-transform duration-200 group-hover:scale-105',
               styles.iconBg,
               styles.iconColor
             )}
           >
-            <Icon className="w-6 h-6" />
+            <Icon className="w-5 h-5" />
           </div>
-
-          {href && (
-            <ArrowUpRight className="w-4 h-4 text-slate-400 transition-colors group-hover:text-amber-500" />
-          )}
         </div>
       </div>
     </div>

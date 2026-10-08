@@ -37,6 +37,8 @@ export function getSocketClient(accessToken?: string | null): Client {
         return {
           authorization: `Bearer ${activeToken}`,
           Authorization: `Bearer ${activeToken}`,
+          token: activeToken,
+          accessToken: activeToken,
         };
       },
       shouldRetry: () => true, // Always reconnect automatically if connection drops

@@ -71,13 +71,8 @@ const SIZE_CONFIG: Record<
   },
 };
 
-const GRADIENT_PALETTES = [
-  'bg-amber-50 dark:bg-slate-900 text-amber-600 dark:text-amber-400 border border-amber-400/60 dark:border-amber-500/40 ring-1 ring-amber-400/20 dark:ring-amber-500/20',
-  'bg-linear-to-br from-amber-500 via-amber-600 to-amber-700 text-slate-950 border border-amber-400/50 shadow-amber-500/20',
-  'bg-slate-100 dark:bg-slate-900 text-amber-600 dark:text-amber-300 border border-amber-400/50 dark:border-amber-500/40 ring-1 ring-amber-400/20 dark:ring-amber-500/20',
-  'bg-linear-to-br from-amber-600 via-yellow-600 to-amber-800 text-white border border-amber-500/30 shadow-amber-600/20',
-  'bg-amber-50 dark:bg-slate-900 text-amber-600 dark:text-amber-400 border border-amber-400/60 dark:border-amber-500/40 ring-1 ring-amber-400/20 dark:ring-amber-500/20',
-];
+const UNIFIED_GOLD_PALETTE =
+  'bg-amber-500/10 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-400/60 dark:border-amber-500/40 ring-1 ring-amber-400/20 dark:ring-amber-500/20 hover:border-amber-500 hover:ring-amber-500/40 group-hover:border-amber-500 group-hover:ring-amber-500/30';
 
 /**
  * Extracts clean, bilingual initials (Arabic and English safe)
@@ -109,28 +104,14 @@ function extractInitials(
   return '';
 }
 
-/**
- * Deterministically picks a gradient based on user string
- */
-function getDeterministicPalette(seed: string): string {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % GRADIENT_PALETTES.length;
-  return GRADIENT_PALETTES[index];
-}
-
 export const UserAvatar: React.FC<UserAvatarProps> = ({
   firstName,
   lastName,
   name,
-  userId,
   size = 'md',
   isVerified = false,
   isAdmin = false,
   showRing = false,
-  variant,
   className,
 }) => {
   const initials = useMemo(
@@ -138,13 +119,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
     [firstName, lastName, name]
   );
 
-  const seed = userId || firstName || name || 'mazadak';
-  const palette = useMemo(() => {
-    if (variant === 'gold') {
-      return 'bg-amber-50 dark:bg-slate-900 text-amber-600 dark:text-amber-400 border border-amber-400 dark:border-amber-500/50 ring-1 ring-amber-400/30 dark:ring-amber-500/30 shadow-xs';
-    }
-    return getDeterministicPalette(seed);
-  }, [seed, variant]);
+  const palette = UNIFIED_GOLD_PALETTE;
 
   const config = SIZE_CONFIG[size];
   const displayName = firstName ? `${firstName} ${lastName || ''}`.trim() : name || 'User';

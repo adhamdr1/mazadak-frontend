@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { User, Star, MapPin, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Star, MapPin, ExternalLink, ShieldCheck } from 'lucide-react';
+import { UserAvatar } from '@/features/users/components/UserAvatar';
 import type { PublicProfile } from '@/features/users/types/users.types';
 import { ROUTES } from '@/constants/routes.constants';
 import { toLocalizedDigits } from '@/utils/formatters';
@@ -10,6 +11,7 @@ import { cn } from '@/utils/cn';
 export interface EscrowCounterpartyCardProps {
   profile?: PublicProfile | null;
   role: 'buyer' | 'seller';
+  title?: string;
   isLoading?: boolean;
   className?: string;
 }
@@ -17,6 +19,7 @@ export interface EscrowCounterpartyCardProps {
 export const EscrowCounterpartyCard: React.FC<EscrowCounterpartyCardProps> = ({
   profile,
   role,
+  title,
   isLoading = false,
   className,
 }) => {
@@ -53,11 +56,6 @@ export const EscrowCounterpartyCard: React.FC<EscrowCounterpartyCardProps> = ({
     `${firstName} ${lastName}`.trim() ||
     t('counterparty.anonymousUser', isRTL ? 'مستخدم' : 'User');
 
-  const initials =
-    `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() ||
-    firstName.charAt(0).toUpperCase() ||
-    '';
-
   const rating = Number(profile?.ratingStats?.averageRating || 0);
   const reviewsCount = Number(profile?.ratingStats?.totalReviews || 0);
 
@@ -71,7 +69,7 @@ export const EscrowCounterpartyCard: React.FC<EscrowCounterpartyCardProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-            {t('counterparty.sectionTitle', isRTL ? 'الطرف الآخر في المعاملة' : 'Transaction Counterparty')}
+            {title || t('counterparty.sectionTitle', isRTL ? 'الطرف الآخر في المعاملة' : 'Transaction Counterparty')}
           </span>
           <span
             className={cn(
@@ -88,13 +86,13 @@ export const EscrowCounterpartyCard: React.FC<EscrowCounterpartyCardProps> = ({
 
         <div className="flex items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 border border-slate-200/80 dark:border-slate-700/80 font-black text-base shadow-2xs">
-              {initials ? (
-                <span>{initials}</span>
-              ) : (
-                <User className="w-5 h-5 text-slate-400" />
-              )}
-            </div>
+            <UserAvatar
+              firstName={profile?.firstName}
+              lastName={profile?.lastName}
+              name={fullName}
+              userId={profile?.id}
+              size="lg"
+            />
 
             <div className="space-y-1 min-w-0">
               <h5 className="text-sm sm:text-base font-black text-slate-900 dark:text-white truncate">
@@ -149,3 +147,4 @@ export const EscrowCounterpartyCard: React.FC<EscrowCounterpartyCardProps> = ({
   );
 };
 
+export default EscrowCounterpartyCard;

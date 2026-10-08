@@ -44,6 +44,14 @@ export function formatPrice(value: number | string, isRTL = false): string {
 }
 
 /**
+ * Formats price with localized currency label (ج.م / EGP)
+ */
+export function formatCurrency(value: number | string, isRTL = false): string {
+  const price = formatPrice(value, isRTL);
+  return isRTL ? `${price} ج.م` : `${price} EGP`;
+}
+
+/**
  * Formats ISO date string to localized relative time (e.g., "5 minutes ago" or "منذ ٥ دقائق")
  */
 export function formatRelativeTime(

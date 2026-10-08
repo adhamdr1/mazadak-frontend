@@ -1,7 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, ArrowUpRight, Receipt, Clock, RefreshCw } from 'lucide-react';
+import {
+  Activity,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Lock,
+  Unlock,
+  CheckCircle2,
+  RotateCcw,
+  Receipt,
+  Clock,
+  RefreshCw,
+} from 'lucide-react';
 import { ROUTES } from '@/constants/routes.constants';
 import { useAdminTransactions } from '../../hooks/useAdminTransactions';
 import {
@@ -9,9 +20,31 @@ import {
   formatAdminDate,
   getTransactionTypeLabel,
   getTransactionStatusBadge,
+  getTransactionTypeIconConfig,
+  type TransactionIconName,
 } from '../../utils/admin.utils';
 import { getTransactionAmountConfig } from '@/features/wallet/types/wallet.types';
 import { cn } from '@/utils/cn';
+
+const renderTransactionIcon = (iconName: TransactionIconName) => {
+  switch (iconName) {
+    case 'ArrowDownLeft':
+      return <ArrowDownLeft className="w-4 h-4" />;
+    case 'ArrowUpRight':
+      return <ArrowUpRight className="w-4 h-4" />;
+    case 'Lock':
+      return <Lock className="w-4 h-4" />;
+    case 'Unlock':
+      return <Unlock className="w-4 h-4" />;
+    case 'CheckCircle2':
+      return <CheckCircle2 className="w-4 h-4" />;
+    case 'RotateCcw':
+      return <RotateCcw className="w-4 h-4" />;
+    case 'Receipt':
+    default:
+      return <Receipt className="w-4 h-4" />;
+  }
+};
 
 export const RecentActivityFeed: React.FC = () => {
   const { t, i18n } = useTranslation(['admin', 'common']);
@@ -48,17 +81,17 @@ export const RecentActivityFeed: React.FC = () => {
           <button
             type="button"
             onClick={() => refetch()}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="group p-2 rounded-xl text-amber-500 bg-white dark:bg-slate-800 hover:bg-amber-500/10 dark:hover:bg-amber-500/10 border border-slate-200 dark:border-slate-700 hover:border-amber-500/40 shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer active:scale-95"
             title={t('common.retry', { ns: 'common', defaultValue: 'تحديث' })}
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4 text-amber-500 transition-transform duration-500 group-hover:rotate-180" />
           </button>
           <Link
             to={ROUTES.ADMIN.TRANSACTIONS}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700"
+            className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 shadow-2xs hover:shadow-xs transition-all duration-200 shrink-0 active:scale-95"
           >
-            <span>{t('dashboard.recentActivity.viewAll', { ns: 'admin', defaultValue: 'عرض الكل' })}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>{t('dashboard.recentActivity.viewAll', { ns: 'admin', defaultValue: 'عرض كافة المعاملات' })}</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-amber-500 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>
       </div>
@@ -68,7 +101,7 @@ export const RecentActivityFeed: React.FC = () => {
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-14 bg-slate-100 dark:bg-slate-800/60 rounded-2xl animate-pulse" />
+              <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800/60 rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : isError ? (
@@ -88,44 +121,54 @@ export const RecentActivityFeed: React.FC = () => {
             <p>{t('dashboard.recentActivity.empty', { ns: 'admin', defaultValue: 'لا توجد معاملات حديثة مسجلة حالياً.' })}</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
+          <div className="space-y-2.5">
             {transactions.map((txn) => {
               const amountConfig = getTransactionAmountConfig(txn.type);
               const typeLabel = getTransactionTypeLabel(txn.type, isRTL);
               const statusBadge = getTransactionStatusBadge(txn.status, isRTL);
+              const iconConfig = getTransactionTypeIconConfig(txn.type);
 
               return (
                 <div
                   key={txn._id}
-                  className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl transition-colors gap-3"
+                  className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/80 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition-all gap-4"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
-                      <Receipt className="w-4 h-4" />
+                  {/* Left: Type Icon + Title & Formatted Timestamp */}
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div
+                      className={cn(
+                        'flex items-center justify-center w-10 h-10 rounded-2xl shrink-0 shadow-2xs',
+                        iconConfig.bgClass
+                      )}
+                    >
+                      {renderTransactionIcon(iconConfig.icon)}
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
                         {typeLabel}
                       </p>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                        <Clock className="w-3 h-3 text-slate-400" />
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                        <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         <span>{formatAdminDate(txn.createdAt, isRTL ? 'ar' : 'en', isRTL)}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right rtl:text-left shrink-0">
+                  {/* Right: Amount & Status Badge */}
+                  <div className="text-right rtl:text-left shrink-0 space-y-1">
                     <p className={cn('text-xs sm:text-sm font-black tracking-tight', amountConfig.textColor)}>
                       {amountConfig.sign} {formatAdminCurrency(txn.amount, undefined, isRTL)}
                     </p>
-                    <span
-                      className={cn(
-                        'inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border mt-0.5',
-                        statusBadge.bgClass
-                      )}
-                    >
-                      {statusBadge.label}
-                    </span>
+                    <div>
+                      <span
+                        className={cn(
+                          'inline-block text-[10px] font-bold px-2 py-0.5 rounded-lg border',
+                          statusBadge.bgClass
+                        )}
+                      >
+                        {statusBadge.label}
+                      </span>
+                    </div>
                   </div>
                 </div>
               );

@@ -25,12 +25,16 @@ import { useEscrowSubscription } from '../hooks/useEscrowSubscription';
 import { getLocalizedErrorMessage } from '@/utils/errorHandler';
 import { ROUTES } from '@/constants/routes.constants';
 import { ReviewEligibilityBanner } from '@/features/reviews';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/utils/cn';
 
 export const EscrowDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['escrow', 'common']);
   const isRTL = i18n.language?.startsWith('ar');
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -46,6 +50,10 @@ export const EscrowDetailPage: React.FC = () => {
     counterpartyRole,
     counterpartyProfile,
     isCounterpartyLoading,
+    buyerProfile,
+    isBuyerProfileLoading,
+    sellerProfile,
+    isSellerProfileLoading,
     canConfirmDelivery,
     canOpenDispute,
     isHeld,
@@ -127,10 +135,10 @@ export const EscrowDetailPage: React.FC = () => {
             {t('common:actions.retry', isRTL ? 'إعادة المحاولة' : 'Try Again')}
           </Button>
           <Button
-            onClick={() => navigate(ROUTES.MY_ESCROWS)}
+            onClick={() => (isAdmin ? navigate(ROUTES.ADMIN.DISPUTES) : navigate(ROUTES.MY_ESCROWS))}
             className="font-bold rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950"
           >
-            {t('detail.backToMyEscrows', isRTL ? 'العودة لمعاملاتي' : 'Back to My Escrows')}
+            {isAdmin ? (isRTL ? 'العودة للوحة النزاعات' : 'Back to Disputes') : (t('detail.backToMyEscrows', isRTL ? 'العودة لمعاملاتي' : 'Back to My Escrows'))}
           </Button>
         </div>
       </div>
@@ -138,7 +146,7 @@ export const EscrowDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
+    <div className={cn('max-w-6xl w-full mx-auto space-y-6 sm:space-y-8', isAdmin ? 'py-1' : 'px-4 sm:px-6 py-6 sm:py-8')}>
       {/* 1. Header Area: Title + Role Badge & Back to Transactions Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200/80 dark:border-slate-800">
         <div className="space-y-1.5 min-w-0">
@@ -148,22 +156,30 @@ export const EscrowDetailPage: React.FC = () => {
             </h1>
 
             {/* Dynamic Role Pill in Header */}
-            {isBuyer && (
+            {isAdmin ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-2xs sm:text-xs font-black bg-amber-500/10 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-2xs shrink-0">
+                <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500" />
+                <span>{isRTL ? 'إشراف إداري على المعاملة' : 'Admin Supervision'}</span>
+              </span>
+            ) : isBuyer ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-2xs sm:text-xs font-black bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 shadow-2xs shrink-0">
                 <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span>{t('card.roleBuyer', isRTL ? 'أنت المشتري' : 'You are Buyer')}</span>
               </span>
-            )}
-            {isSeller && (
+            ) : isSeller ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-2xs sm:text-xs font-black bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-2xs shrink-0">
                 <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span>{t('card.roleSeller', isRTL ? 'أنت البائع' : 'You are Seller')}</span>
               </span>
-            )}
+            ) : null}
           </div>
 
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-            {isBuyer
+            {isAdmin
+              ? (isRTL
+                  ? 'لوحة الإشراف الإداري والرقابة المالية على معاملة الضمان، المبالغ المحتجزة، وبيانات أطراف الصفقة.'
+                  : 'Administrative supervision panel for escrow hold status, inspection verification, and counterparty data.')
+              : isBuyer
               ? t(
                   'detail.buyerSubtitle',
                   isRTL
@@ -187,35 +203,52 @@ export const EscrowDetailPage: React.FC = () => {
         </div>
 
         {/* Back to Transactions Button (Matches Unified Gold Hover Pill) */}
-        <Link
-          to={ROUTES.MY_ESCROWS}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-500/50 dark:hover:border-amber-500/50 hover:bg-amber-50/40 dark:hover:bg-amber-950/20 transition-all shadow-2xs group shrink-0 self-start sm:self-center select-none cursor-pointer whitespace-nowrap"
-        >
-          {isRTL ? (
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-          ) : (
-            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-          )}
-          <span>{t('detail.backToEscrowsList', isRTL ? 'العودة لقائمة المعاملات' : 'Back to Transactions')}</span>
-        </Link>
+        {isAdmin ? (
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-500/50 dark:hover:border-amber-500/50 hover:bg-amber-50/40 dark:hover:bg-amber-950/20 transition-all shadow-2xs group shrink-0 self-start sm:self-center select-none cursor-pointer whitespace-nowrap"
+          >
+            {isRTL ? (
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            ) : (
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            )}
+            <span>{isRTL ? 'العودة' : 'Back'}</span>
+          </button>
+        ) : (
+          <Link
+            to={ROUTES.MY_ESCROWS}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-500/50 dark:hover:border-amber-500/50 hover:bg-amber-50/40 dark:hover:bg-amber-950/20 transition-all shadow-2xs group shrink-0 self-start sm:self-center select-none cursor-pointer whitespace-nowrap"
+          >
+            {isRTL ? (
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            ) : (
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            )}
+            <span>{t('detail.backToEscrowsList', isRTL ? 'العودة لقائمة المعاملات' : 'Back to Transactions')}</span>
+          </Link>
+        )}
       </div>
 
       {/* 2. Top / 1st: Total Held Amount Card (Full Width Horizontal Command Center) */}
       <EscrowInfoCard escrow={escrow} />
 
-      {/* 2.5: Review Eligibility / Status Banner */}
-      <ReviewEligibilityBanner
-        auctionId={escrow.auctionId || escrow.auction?._id || ''}
-        auctionTitle={escrow.auction?.title}
-        escrowStatus={escrow.status}
-        isDisputed={escrow.status === 'DISPUTED'}
-        showPendingNoticeWhenHeld={true}
-        reviewedUserName={
-          counterpartyProfile
-            ? `${counterpartyProfile.firstName} ${counterpartyProfile.lastName}`
-            : undefined
-        }
-      />
+      {/* 2.5: Review Eligibility / Status Banner (Hidden for Admin) */}
+      {!isAdmin && (
+        <ReviewEligibilityBanner
+          auctionId={escrow.auctionId || escrow.auction?._id || ''}
+          auctionTitle={escrow.auction?.title}
+          escrowStatus={escrow.status}
+          isDisputed={escrow.status === 'DISPUTED'}
+          showPendingNoticeWhenHeld={true}
+          reviewedUserName={
+            counterpartyProfile
+              ? `${counterpartyProfile.firstName} ${counterpartyProfile.lastName}`
+              : undefined
+          }
+        />
+      )}
 
       {/* 3. 2nd: Inspection Period Countdown (Full Width when HELD) */}
       {isHeld && escrow.inspectionPeriodEndsAt && (
@@ -225,8 +258,8 @@ export const EscrowDetailPage: React.FC = () => {
         />
       )}
 
-      {/* 4. 3rd: Interactive Action Toolbar (Only shown when HELD and active actions are available) */}
-      {isHeld && (canConfirmDelivery || canOpenDispute) && (
+      {/* 4. 3rd: Interactive Action Toolbar (Only shown when HELD and active actions are available for Buyer) */}
+      {!isAdmin && isHeld && (canConfirmDelivery || canOpenDispute) && (
         <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
           <div className="space-y-1">
             <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
@@ -268,21 +301,56 @@ export const EscrowDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. 4th: 2-Column Responsive Grid (Auction Card + Counterparty Card) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-        {/* Column 1: Associated Auction Details */}
-        <EscrowAuctionCard
-          auction={escrow.auction}
-          auctionId={escrow.auctionId}
-        />
+      {/* 5. 4th: Associated Auction & Counterparty Details */}
+      {isAdmin ? (
+        <div className="space-y-6">
+          {/* Associated Auction Card (Full Width for Admin) */}
+          <EscrowAuctionCard
+            auction={escrow.auction}
+            auctionId={escrow.auctionId}
+          />
 
-        {/* Column 2: Counterparty User Card */}
-        <EscrowCounterpartyCard
-          profile={counterpartyProfile}
-          role={counterpartyRole}
-          isLoading={isCounterpartyLoading}
-        />
-      </div>
+          {/* Both Parties Section for Admin (Buyer & Seller) */}
+          <div className="space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-amber-500" />
+              <span>{isRTL ? 'أطراف المعاملة المعتمدين (المشتري والبائع)' : 'Transaction Parties (Buyer & Seller)'}</span>
+            </h3>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+              {/* Buyer Card */}
+              <EscrowCounterpartyCard
+                profile={buyerProfile}
+                role="buyer"
+                title={isRTL ? 'بيانات المشتري' : 'Buyer Information'}
+                isLoading={isBuyerProfileLoading}
+              />
+
+              {/* Seller Card */}
+              <EscrowCounterpartyCard
+                profile={sellerProfile}
+                role="seller"
+                title={isRTL ? 'بيانات البائع' : 'Seller Information'}
+                isLoading={isSellerProfileLoading}
+              />
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Regular User View: Auction Card + Single Counterparty Card */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <EscrowAuctionCard
+            auction={escrow.auction}
+            auctionId={escrow.auctionId}
+          />
+
+          <EscrowCounterpartyCard
+            profile={counterpartyProfile}
+            role={counterpartyRole}
+            isLoading={isCounterpartyLoading}
+          />
+        </div>
+      )}
 
       {/* 6. 5th: Mazadak Trust Guarantees (Full-Width Horizontal 3-Column Card) */}
       <div className="group relative w-full rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-5 sm:p-7 space-y-5 shadow-sm hover:shadow-xl hover:shadow-slate-200/70 dark:shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_12px_35px_-5px_rgba(0,0,0,0.8),0_0_25px_rgba(245,158,11,0.18)] hover:border-amber-500/50 dark:hover:border-amber-500/50 hover:-translate-y-1 transition-all duration-300">

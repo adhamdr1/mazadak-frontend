@@ -32,9 +32,11 @@ export function useAuctionDetail(id?: string) {
           winnerId: payload.auction.winnerId ?? old.winnerId,
         };
       });
-      // Re-sync wallet when auction ends/finalizes or status updates
+      // Re-sync wallet, escrow, reviews, and auto-bids when auction status changes
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BIDS.MY_AUTO_BID(id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ESCROW.BY_AUCTION(id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REVIEWS.CAN_REVIEW(id) });
     });
 
     return () => {
@@ -118,8 +120,9 @@ export function useAuctionDetail(id?: string) {
   const isSeller = Boolean(user && query.data && user._id === query.data.sellerId);
   const isWinner = Boolean(
     user &&
+    effectiveStatus === 'ENDED' &&
     ((query.data?.winnerId && user._id === query.data.winnerId) ||
-      (effectiveStatus === 'ENDED' && latestLeadingBidderId && user._id === latestLeadingBidderId))
+      (latestLeadingBidderId && user._id === latestLeadingBidderId))
   );
 
   const errorKey = query.error ? `errors.${query.error.message}` : null;

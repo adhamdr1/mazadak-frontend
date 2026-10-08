@@ -9,7 +9,7 @@ export interface GuestRouteProps {
 }
 
 export const GuestRoute: React.FC<GuestRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -20,7 +20,8 @@ export const GuestRoute: React.FC<GuestRouteProps> = ({ children }) => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to={ROUTES.HOME} replace />;
+    const redirectPath = user?.role === 'ADMIN' ? ROUTES.ADMIN.DASHBOARD : ROUTES.HOME;
+    return <Navigate to={redirectPath} replace />;
   }
 
   return children ? <>{children}</> : <Outlet />;

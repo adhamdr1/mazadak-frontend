@@ -20,12 +20,14 @@ import { EscrowBanner } from '@/components/common/EscrowBanner';
 import { ReviewEligibilityBanner, WriteReviewModal } from '@/features/reviews';
 import { ROUTES } from '@/constants/routes.constants';
 import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/utils/cn';
 
 export const AuctionDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation(['auctions', 'chat']);
   const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isAutoBidModalOpen, setIsAutoBidModalOpen] = useState(false);
@@ -56,10 +58,11 @@ export const AuctionDetailPage: React.FC = () => {
     refetch,
   } = useAuctionDetail(id);
 
-  // Chat is strictly available ONLY when the auction has a winner AND the user is Seller, Winner, or Admin
+  // Chat is strictly available ONLY when the auction has ENDED, has a winner, AND the user is Seller, Winner, or Admin
+  const isAuctionEnded = (effectiveStatus || auction?.status) === 'ENDED';
   const hasWinner = Boolean(auction?.winnerId);
   const canAccessChat = Boolean(
-    user && hasWinner && (isSeller || isWinner || user.role === 'ADMIN')
+    isAuctionEnded && user && hasWinner && (isSeller || isWinner || user.role === 'ADMIN')
   );
 
   // Auto-open chat drawer if navigated with ?chat=true
@@ -101,7 +104,7 @@ export const AuctionDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+    <div className={cn('max-w-7xl w-full mx-auto space-y-8', user?.role === 'ADMIN' ? 'py-1' : 'px-4 sm:px-6 py-6 sm:py-8')}>
       {/* Loading Skeleton */}
       {isLoading && <AuctionDetailSkeleton />}
 
@@ -181,7 +184,7 @@ export const AuctionDetailPage: React.FC = () => {
             </div>
 
             {/* Right Column (Desktop 5/4 cols): Sticky Sidebar with Price, Live Bids & Mobile Seller Profile */}
-            <div className="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-24 self-start">
+            <div className={cn('lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky self-start', isAdmin ? 'lg:top-4' : 'lg:top-20')}>
               {/* 1. Action Box: Price, Timer, Bidding Controls or Seller Controls */}
               <AuctionBiddingCTA
                 auction={auction}

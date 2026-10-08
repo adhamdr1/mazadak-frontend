@@ -61,20 +61,90 @@ export const formatAdminDate = (
 export const getTransactionTypeLabel = (type: string, isRTL: boolean = true): string => {
   const map: Record<string, { ar: string; en: string }> = {
     DEPOSIT: { ar: 'إيداع رصيد', en: 'Deposit' },
+    WITHDRAW: { ar: 'سحب رصيد', en: 'Withdrawal' },
     WITHDRAWAL: { ar: 'طلب سحب', en: 'Withdrawal' },
+    HOLD: { ar: 'حجز مؤقت', en: 'Fund Hold' },
     BID_HOLD: { ar: 'حجز مزايدة', en: 'Bid Hold' },
+    RELEASE: { ar: 'فك الحجز المؤقت', en: 'Hold Released' },
     BID_RELEASE: { ar: 'تحرير حجز مزايدة', en: 'Bid Hold Release' },
+    CAPTURE: { ar: 'تحصيل نهائي (إتمام صفقة)', en: 'Payment Capture' },
+    REFUND: { ar: 'استرداد أموال', en: 'Refund' },
     ESCROW_PAYMENT: { ar: 'دفع ضمان مالي', en: 'Escrow Payment' },
     ESCROW_RELEASE: { ar: 'تحرير ضمان مالي', en: 'Escrow Release' },
     ESCROW_REFUND: { ar: 'استرداد ضمان', en: 'Escrow Refund' },
     AUCTION_FEE: { ar: 'رسوم المنصة', en: 'Platform Fee' },
-    ADMIN_ADJUST_CREDIT: { ar: 'تسوية إدارية (إيداع)', en: 'Admin Adjustment (Credit)' },
+    ADMIN_CREDIT: { ar: 'تسوية إدارية (إضافة)', en: 'Admin Credit' },
+    ADMIN_DEBIT: { ar: 'تسوية إدارية (خصم)', en: 'Admin Debit' },
+    ADMIN_ADJUST_CREDIT: { ar: 'تسوية إدارية (إضافة)', en: 'Admin Adjustment (Credit)' },
     ADMIN_ADJUST_DEBIT: { ar: 'تسوية إدارية (خصم)', en: 'Admin Adjustment (Debit)' },
   };
 
   const match = map[type?.toUpperCase()];
   if (match) return isRTL ? match.ar : match.en;
   return type?.replace(/_/g, ' ') || '—';
+};
+
+export type TransactionIconName =
+  | 'ArrowDownLeft'
+  | 'ArrowUpRight'
+  | 'Lock'
+  | 'Unlock'
+  | 'CheckCircle2'
+  | 'RotateCcw'
+  | 'Receipt';
+
+export const getTransactionTypeIconConfig = (
+  type: string
+): { icon: TransactionIconName; bgClass: string } => {
+  const normalized = type?.toUpperCase();
+  switch (normalized) {
+    case 'DEPOSIT':
+    case 'ADMIN_CREDIT':
+    case 'ADMIN_ADJUST_CREDIT':
+      return {
+        icon: 'ArrowDownLeft',
+        bgClass: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30',
+      };
+    case 'WITHDRAW':
+    case 'WITHDRAWAL':
+    case 'ADMIN_DEBIT':
+    case 'ADMIN_ADJUST_DEBIT':
+      return {
+        icon: 'ArrowUpRight',
+        bgClass: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30',
+      };
+    case 'HOLD':
+    case 'BID_HOLD':
+      return {
+        icon: 'Lock',
+        bgClass: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30',
+      };
+    case 'RELEASE':
+    case 'BID_RELEASE':
+    case 'ESCROW_RELEASE':
+      return {
+        icon: 'Unlock',
+        bgClass: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30',
+      };
+    case 'CAPTURE':
+    case 'ESCROW_PAYMENT':
+      return {
+        icon: 'CheckCircle2',
+        bgClass: 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30',
+      };
+    case 'REFUND':
+    case 'ESCROW_REFUND':
+      return {
+        icon: 'RotateCcw',
+        bgClass: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30',
+      };
+    case 'AUCTION_FEE':
+    default:
+      return {
+        icon: 'Receipt',
+        bgClass: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700',
+      };
+  }
 };
 
 export const getTransactionStatusBadge = (

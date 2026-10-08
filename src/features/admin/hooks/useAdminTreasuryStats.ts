@@ -7,7 +7,7 @@ export const useAdminTreasuryStats = () => {
   return useQuery<TreasuryStats, Error>({
     queryKey: QUERY_KEYS.ADMIN.TREASURY,
     queryFn: () => adminService.getTreasuryStats(),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60, // 1 minute
     refetchOnWindowFocus: true,
   });
 };
