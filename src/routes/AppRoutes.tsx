@@ -59,6 +59,7 @@ const PublicUserPage = lazy(() => import('@/features/users/pages/PublicUserPage'
 
 // 9. Admin Module Pages
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
+const AdminUsersPage = lazy(() => import('@/features/admin/pages/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
 
 // 10. General Platform Pages
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -130,6 +131,7 @@ export const AppRoutes: React.FC = () => {
           <Route element={<AdminRoute />}>
             <Route element={<AdminLayout />}>
               <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
+              <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
             </Route>
           </Route>
         </Routes>

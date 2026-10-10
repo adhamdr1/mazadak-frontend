@@ -58,6 +58,64 @@ export const formatAdminDate = (
   }
 };
 
+const EGYPTIAN_CITIES_MAP: Record<string, { ar: string; en: string }> = {
+  cairo: { ar: 'القاهرة', en: 'Cairo' },
+  'القاهرة': { ar: 'القاهرة', en: 'Cairo' },
+  giza: { ar: 'الجيزة', en: 'Giza' },
+  'الجيزة': { ar: 'الجيزة', en: 'Giza' },
+  alexandria: { ar: 'الإسكندرية', en: 'Alexandria' },
+  'الإسكندرية': { ar: 'الإسكندرية', en: 'Alexandria' },
+  mansoura: { ar: 'المنصورة', en: 'Mansoura' },
+  'المنصورة': { ar: 'المنصورة', en: 'Mansoura' },
+  tanta: { ar: 'طنطا', en: 'Tanta' },
+  'طنطا': { ar: 'طنطا', en: 'Tanta' },
+  aswan: { ar: 'أسوان', en: 'Aswan' },
+  'أسوان': { ar: 'أسوان', en: 'Aswan' },
+  luxor: { ar: 'الأقصر', en: 'Luxor' },
+  'الأقصر': { ar: 'الأقصر', en: 'Luxor' },
+  suez: { ar: 'السويس', en: 'Suez' },
+  'السويس': { ar: 'السويس', en: 'Suez' },
+  'port said': { ar: 'بورسعيد', en: 'Port Said' },
+  'بورسعيد': { ar: 'بورسعيد', en: 'Port Said' },
+  ismailia: { ar: 'الإسماعيلية', en: 'Ismailia' },
+  'الإسماعيلية': { ar: 'الإسماعيلية', en: 'Ismailia' },
+  fayoum: { ar: 'الفيوم', en: 'Fayoum' },
+  'الفيوم': { ar: 'الفيوم', en: 'Fayoum' },
+  zagazig: { ar: 'الزقازيق', en: 'Zagazig' },
+  'الزقازيق': { ar: 'الزقازيق', en: 'Zagazig' },
+  damietta: { ar: 'دمياط', en: 'Damietta' },
+  'دمياط': { ar: 'دمياط', en: 'Damietta' },
+  assiut: { ar: 'أسيوط', en: 'Assiut' },
+  'أسيوط': { ar: 'أسيوط', en: 'Assiut' },
+  sohag: { ar: 'سوهاج', en: 'Sohag' },
+  'سوهاج': { ar: 'سوهاج', en: 'Sohag' },
+  qena: { ar: 'قنا', en: 'Qena' },
+  'قنا': { ar: 'قنا', en: 'Qena' },
+  minya: { ar: 'المنيا', en: 'Minya' },
+  'المنيا': { ar: 'المنيا', en: 'Minya' },
+  'beni suef': { ar: 'بني سويف', en: 'Beni Suef' },
+  'بني سويف': { ar: 'بني سويف', en: 'Beni Suef' },
+  hurghada: { ar: 'الغردقة', en: 'Hurghada' },
+  'الغردقة': { ar: 'الغردقة', en: 'Hurghada' },
+  'sharm el sheikh': { ar: 'شرم الشيخ', en: 'Sharm El Sheikh' },
+  'شرم الشيخ': { ar: 'شرم الشيخ', en: 'Sharm El Sheikh' },
+};
+
+export const formatAdminCity = (city: string | undefined | null, isRTL: boolean = true): string => {
+  if (!city || city.trim() === '') return isRTL ? 'غير محدد' : 'Not specified';
+  const clean = city.trim().toLowerCase();
+  const match = EGYPTIAN_CITIES_MAP[clean] || EGYPTIAN_CITIES_MAP[city.trim()];
+  if (match) {
+    return isRTL ? match.ar : match.en;
+  }
+  return city;
+};
+
+export const formatAdminPhone = (phone: string | undefined | null, isRTL: boolean = true): string => {
+  if (!phone || phone.trim() === '') return isRTL ? 'غير متوفر' : 'N/A';
+  return toLocalizedDigits(phone.trim(), isRTL);
+};
+
 export const getTransactionTypeLabel = (type: string, isRTL: boolean = true): string => {
   const map: Record<string, { ar: string; en: string }> = {
     DEPOSIT: { ar: 'إيداع رصيد', en: 'Deposit' },
@@ -148,41 +206,47 @@ export const getTransactionTypeIconConfig = (
 };
 
 export const getTransactionStatusBadge = (
-  status: string,
+  status: string | undefined | null,
   isRTL: boolean = true
 ): { label: string; bgClass: string } => {
-  switch (status?.toUpperCase()) {
+  if (!status) {
+    return {
+      label: '—',
+      bgClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-500/25',
+    };
+  }
+  switch (status.toUpperCase()) {
     case 'SUCCESS':
     case 'COMPLETED':
       return {
         label: isRTL ? 'ناجحة' : 'Success',
-        bgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        bgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
       };
     case 'PENDING':
       return {
         label: isRTL ? 'معلقة' : 'Pending',
-        bgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+        bgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25',
       };
     case 'PROCESSING':
       return {
         label: isRTL ? 'قيد التنفيذ' : 'Processing',
-        bgClass: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+        bgClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25',
       };
     case 'FAILED':
     case 'REJECTED':
       return {
-        label: isRTL ? 'مرفوضة' : 'Failed',
-        bgClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+        label: isRTL ? 'فاشلة' : 'Failed',
+        bgClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25',
       };
     case 'CANCELLED':
       return {
         label: isRTL ? 'ملغاة' : 'Cancelled',
-        bgClass: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+        bgClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-500/25',
       };
     default:
       return {
         label: status,
-        bgClass: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+        bgClass: 'bg-slate-500/10 text-slate-500 dark:text-slate-400 border-slate-500/25',
       };
   }
 };
@@ -228,37 +292,47 @@ export const getUserStatusConfig = (isBanned: boolean, isEmailVerified: boolean)
   };
 };
 
-export const getAuctionStatusBadge = (status: string) => {
-  switch (status?.toUpperCase()) {
+export const getAuctionStatusBadge = (
+  status: string,
+  isRTL: boolean = true
+): { label: string; labelAr: string; labelEn: string; bgClass: string } => {
+  const norm = status?.toUpperCase();
+  switch (norm) {
     case 'ACTIVE':
       return {
+        label: isRTL ? 'نشط ومباشر' : 'Active',
         labelAr: 'نشط ومباشر',
         labelEn: 'Active',
-        bgClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+        bgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
       };
     case 'PENDING':
       return {
+        label: isRTL ? 'قيد الانتظار' : 'Pending',
         labelAr: 'قيد الانتظار',
         labelEn: 'Pending',
-        bgClass: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+        bgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25',
       };
     case 'ENDED':
+    case 'END':
       return {
+        label: isRTL ? 'منتهي' : 'Ended',
         labelAr: 'منتهي',
         labelEn: 'Ended',
-        bgClass: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+        bgClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25',
       };
     case 'CANCELLED':
       return {
-        labelAr: 'ملغي إدارياً',
+        label: isRTL ? 'ملغي' : 'Cancelled',
+        labelAr: 'ملغي',
         labelEn: 'Cancelled',
-        bgClass: 'bg-rose-500/10 text-rose-500 border-rose-500/30',
+        bgClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25',
       };
     default:
       return {
-        labelAr: status,
-        labelEn: status,
-        bgClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
+        label: status || '—',
+        labelAr: status || '—',
+        labelEn: status || '—',
+        bgClass: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/25',
       };
   }
 };

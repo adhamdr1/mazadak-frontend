@@ -141,6 +141,22 @@ export interface UsersFilterInput {
     field: 'CREATED_AT' | 'FIRST_NAME' | 'LAST_NAME';
     order: 'ASC' | 'DESC';
   };
+  isBanned?: boolean;
+  role?: UserRole;
+  isEmailVerified?: boolean;
+}
+
+export interface FindUserInput {
+  id: string;
+}
+
+export interface AdminUpdateUserInput {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  address?: Address;
 }
 
 export interface AdminPaginationInput {

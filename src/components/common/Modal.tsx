@@ -141,7 +141,7 @@ export const Modal: React.FC<ModalProps> = ({
         tabIndex={-1}
         className={cn(
           'relative w-full rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200/80 dark:border-slate-800',
-          'text-slate-900 dark:text-slate-100 outline-none transition-all duration-300',
+          'text-slate-900 dark:text-slate-100 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-all duration-300',
           'animate-in fade-in zoom-in-95 slide-in-from-bottom-2',
           SIZE_CLASSES[size],
           className
