@@ -27,12 +27,15 @@ export function useAuctionDetail(id?: string) {
         if (!old) return payload.auction;
         return {
           ...old,
+          ...payload.auction,
           status: payload.auction.status,
+          adminActionReason: payload.auction.adminActionReason ?? old.adminActionReason,
           currentPrice: payload.auction.currentPrice || old.currentPrice,
           winnerId: payload.auction.winnerId ?? old.winnerId,
         };
       });
-      // Re-sync wallet, escrow, reviews, and auto-bids when auction status changes
+      // Re-sync auction detail immediately from server so cancellation metadata & admin reasons are 100% fresh without manual refresh
+      queryClient.refetchQueries({ queryKey: QUERY_KEYS.AUCTIONS.DETAIL(id) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BIDS.MY_AUTO_BID(id) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ESCROW.BY_AUCTION(id) });

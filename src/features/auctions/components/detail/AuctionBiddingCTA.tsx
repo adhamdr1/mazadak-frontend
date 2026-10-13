@@ -8,6 +8,7 @@ import {
   XCircle,
   Trophy,
   Clock,
+  Ban,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { ROUTES } from '@/constants/routes.constants';
@@ -73,15 +74,29 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
     });
   };
 
+  // Explicit cancellation tracking (Admin vs Seller)
+  // Per business rules: Sellers can ONLY cancel auctions before start (PENDING) and with ZERO bids.
+  // Any cancellation on an ACTIVE auction, an auction with bids, or with an adminActionReason is strictly by Administration.
+  const isCancelled = effectiveStatus === 'CANCELLED' || auction.status === 'CANCELLED';
+  const isCancelledByAdmin =
+    isCancelled &&
+    (Boolean(auction.adminActionReason) ||
+      isAuctionWithBids ||
+      effectiveStatus === 'ACTIVE' ||
+      auction.status === 'ACTIVE');
+
   // Synchronous, glitch-free target date and timer status resolution
   const nowMs = Date.now();
   const startMs = new Date(auction.startTime).getTime();
   const endMs = new Date(auction.endTime).getTime();
 
   let activeTargetDate = auction.startTime;
-  let activeTimerStatus: 'PENDING' | 'ACTIVE' | 'ENDED' = 'ENDED';
+  let activeTimerStatus: 'PENDING' | 'ACTIVE' | 'ENDED' | 'CANCELLED' = 'ENDED';
 
-  if (effectiveStatus === 'PENDING' || (auction.status === 'PENDING' && nowMs < startMs)) {
+  if (isCancelled) {
+    activeTimerStatus = 'CANCELLED';
+    activeTargetDate = auction.endTime;
+  } else if (effectiveStatus === 'PENDING' || (auction.status === 'PENDING' && nowMs < startMs)) {
     activeTargetDate = auction.startTime;
     activeTimerStatus = 'PENDING';
   } else if (
@@ -95,13 +110,10 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
     activeTimerStatus = 'ENDED';
   }
 
-  // Override if backend or prop marked it explicitly CANCELLED
-  if (effectiveStatus === 'CANCELLED' || auction.status === 'CANCELLED') {
-    activeTimerStatus = 'ENDED';
-  }
-
   const priceLabel =
-    activeTimerStatus === 'ENDED'
+    isCancelled
+      ? t('detail.startingPriceLabel')
+      : activeTimerStatus === 'ENDED'
       ? isAuctionWithBids
         ? t('detail.finalPriceLabel')
         : t('detail.startingPriceLabel')
@@ -129,7 +141,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
             variant="accent"
           />
         </div>
-        {activeTimerStatus !== 'ENDED' && auction.minimumBidIncrement && (
+        {!isCancelled && activeTimerStatus !== 'ENDED' && auction.minimumBidIncrement && (
           <div className="text-end">
             <span className="text-[11px] text-slate-400 dark:text-slate-500 block">
               {t('detail.minIncrementLabel')}
@@ -141,8 +153,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         )}
       </div>
 
-      {/* 2. Live Countdown Timer (Active & Pending only) */}
-      {activeTimerStatus !== 'ENDED' && (
+      {/* 2. Live Countdown Timer (Active & Pending only, suppressed when cancelled) */}
+      {!isCancelled && activeTimerStatus !== 'ENDED' && (
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
           <CountdownTimer
             targetDate={activeTargetDate}
@@ -154,8 +166,69 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 3. Seller Status & Management Panel (Strictly if logged-in user is seller) */}
-      {isSeller && (
+      {/* 3. Dedicated Cancellation Banner (Admin vs Seller) */}
+      {isCancelled && (
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+          {isCancelledByAdmin ? (
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 space-y-3">
+              <div className="flex items-center gap-2 font-bold text-xs text-rose-600 dark:text-rose-400">
+                <Ban className="w-4 h-4 shrink-0" />
+                <span>
+                  {t('detail.adminCancelledTitle', {
+                    defaultValue: isRTL
+                      ? 'تم إلغاء المزاد بقرار إداري'
+                      : 'Auction Cancelled by Administration',
+                  })}
+                </span>
+              </div>
+
+              {auction.adminActionReason && (
+                <div className="p-3 rounded-xl bg-rose-500/5 dark:bg-rose-950/20 border-s-2 border-rose-500/60 text-xs space-y-1">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
+                    {t('detail.adminCancelledReason', {
+                      defaultValue: isRTL ? 'سبب الإلغاء التوثيقي:' : 'Cancellation Reason:',
+                    })}
+                  </span>
+                  <p className="text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                    "{auction.adminActionReason}"
+                  </p>
+                </div>
+              )}
+
+              <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                {t('detail.adminCancelledRefundNotice', {
+                  defaultValue: isRTL
+                    ? 'تم إيقاف المزاد ورد كامل مبالغ حجز المزايدات إلى محافظ المزايدين تلقائياً بواسطة النظام.'
+                    : "The auction was terminated and all held bid deposits were automatically refunded to bidders' wallets.",
+                })}
+              </p>
+            </div>
+          ) : (
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 text-center space-y-2">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
+                <XCircle className="w-4 h-4 text-slate-400 shrink-0" />
+                <span>
+                  {t('detail.sellerCancelledTitle', {
+                    defaultValue: isRTL
+                      ? 'تم إلغاء هذا المزاد بواسطة البائع'
+                      : 'This auction was cancelled by the seller',
+                  })}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                {t('detail.auctionCancelledMessage', {
+                  defaultValue: isRTL
+                    ? 'تم إلغاء هذا المزاد بواسطة البائع قبل وقت بدئه، وهو غير متاح للمزايدة.'
+                    : 'This auction was cancelled by the seller before starting and is no longer accepting bids.',
+                })}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 4. Seller Status & Management Panel (Strictly if logged-in user is seller and auction not cancelled) */}
+      {isSeller && !isCancelled && (
         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3">
           <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-extrabold text-xs">
             <ShieldCheck className="w-4 h-4 text-amber-500 shrink-0" />
@@ -219,8 +292,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 4. Winner Trophy Banner (Only if ENDED and current user is winner) */}
-      {activeTimerStatus === 'ENDED' && isWinner && (
+      {/* 5. Winner Trophy Banner (Only if ENDED and current user is winner and not cancelled) */}
+      {activeTimerStatus === 'ENDED' && isWinner && !isCancelled && (
         <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-950 dark:text-emerald-300 space-y-2">
           <div className="flex items-center gap-2 font-extrabold text-sm">
             <Trophy className="w-5 h-5 text-emerald-500 shrink-0" />
@@ -232,8 +305,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 5. Concluded Banner (STRICTLY If ENDED and NOT seller and NOT winner) */}
-      {activeTimerStatus === 'ENDED' && !isSeller && !isWinner && (
+      {/* 6. Concluded Banner (STRICTLY If ENDED and NOT seller and NOT winner and NOT cancelled) */}
+      {activeTimerStatus === 'ENDED' && !isSeller && !isWinner && !isCancelled && (
         <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-center space-y-1.5">
           <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
             {isAuctionWithBids
@@ -243,8 +316,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 6. Pending State Banner (If PENDING and not seller) */}
-      {activeTimerStatus === 'PENDING' && !isSeller && (
+      {/* 7. Pending State Banner (If PENDING and not seller and not cancelled) */}
+      {activeTimerStatus === 'PENDING' && !isSeller && !isCancelled && (
         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/40 text-amber-700 dark:text-amber-300 text-center space-y-2">
           <div className="flex items-center justify-center gap-1.5 text-xs font-bold">
             <Clock className="w-4 h-4 text-amber-500 dark:text-amber-400" />
@@ -256,8 +329,8 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {/* 7. Active State for Admin (Read-only Supervision Mode) vs Buyers (Live Bidding Box) */}
-      {activeTimerStatus === 'ACTIVE' && isAdmin && (
+      {/* 8. Active State for Admin (Read-only Supervision Mode) vs Buyers (Live Bidding Box) */}
+      {activeTimerStatus === 'ACTIVE' && isAdmin && !isCancelled && (
         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2">
           <div className="flex items-center justify-center gap-2 text-xs font-black text-amber-600 dark:text-amber-400">
             <ShieldCheck className="w-4 h-4" />
@@ -271,7 +344,7 @@ export const AuctionBiddingCTA: React.FC<AuctionBiddingCTAProps> = ({
         </div>
       )}
 
-      {activeTimerStatus === 'ACTIVE' && !isSeller && !isAdmin && (
+      {activeTimerStatus === 'ACTIVE' && !isSeller && !isAdmin && !isCancelled && (
         <LiveBiddingBox
           auction={auction}
           isSeller={isSeller}

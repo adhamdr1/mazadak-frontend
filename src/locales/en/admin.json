@@ -218,26 +218,71 @@
     "reasonMinLength": "Adjustment reason must be at least 10 characters for audit logs"
   },
   "auctions": {
-    "title": "Auctions Moderation",
-    "subtitle": "Monitor published listings, pricing trends, and administrative interventions",
-    "searchPlaceholder": "Search auction titles...",
-    "filterCategory": "All Categories",
-    "filterStatus": "All Statuses",
+    "title": "Auctions Moderation & Control",
+    "subtitle": "Monitor live auctions, inspect items and bidding activities, cancel violating auctions, and moderate user reviews",
+    "totalLabel": "Total Auctions:",
+    "filters": {
+      "searchPlaceholder": "Search by auction title or description...",
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "allStatuses": "All Statuses",
+      "statusActive": "Active",
+      "statusPending": "Pending",
+      "statusEnded": "Ended",
+      "statusCancelled": "Cancelled",
+      "categoryLabel": "Category:",
+      "allCategories": "All Categories"
+    },
+    "table": {
+      "title": "Auctions Audit Registry",
+      "auction": "Auction & Item",
+      "category": "Category",
+      "prices": "Pricing",
+      "startPrice": "Start:",
+      "status": "Status",
+      "timeline": "Timeline",
+      "actions": "Actions",
+      "empty": "No auctions found matching criteria",
+      "ended": "Ended",
+      "endsAt": "Ends at",
+      "scheduled": "Scheduled"
+    },
+    "actions": {
+      "view": "View Auction",
+      "reviews": "Audit Reviews",
+      "cancel": "Cancel",
+      "cannotCancel": "Cannot Cancel"
+    },
     "cancelModal": {
       "title": "Cancel Auction Administratively",
-      "warning": "Warning: Cancelling this auction will automatically release all bidder holds back to their wallets.",
-      "reasonLabel": "Cancellation Reason",
-      "reasonPlaceholder": "State the administrative reason for audit logs (at least 10 characters)...",
-      "confirmButton": "Confirm Cancellation",
-      "successMessage": "Auction cancelled and bids refunded successfully."
+      "warningTitle": "Final Administrative Action (Irreversible)",
+      "warningDesc": "This action will immediately terminate the auction and automatically refund all held bidder amounts back to their respective wallets.",
+      "reasonLabel": "Audit Cancellation Reason",
+      "reasonPlaceholder": "Provide a detailed rationale for audit records (terms violation, restricted item, legal inquiry...)",
+      "currentPriceLabel": "Current Price:",
+      "confirmButton": "Confirm Auction Cancellation",
+      "successToast": "Auction was cancelled successfully and all bids were refunded."
     },
     "reviewsModal": {
       "title": "Auction Reviews Moderation",
-      "empty": "No reviews found for this auction.",
-      "hide": "Hide Review",
-      "unhide": "Unhide Review",
-      "hiddenBadge": "Hidden",
-      "publishedBadge": "Published"
+      "auctionSubtitle": "Auction:",
+      "countLabel": "reviews",
+      "cancelledByAdminNotice": "This auction was cancelled by administration",
+      "cancellationReasonLabel": "Cancellation Reason:",
+      "errorLoading": "An error occurred while loading reviews for this auction.",
+      "emptyTitle": "No Reviews Available",
+      "emptyDesc": "No feedback or reviews have been submitted for this auction yet.",
+      "unknownUser": "User",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "reviewedFor": "Review for",
+      "unhideBtn": "Unhide Review",
+      "hideBtn": "Hide Review",
+      "accuracy": "Accuracy",
+      "communication": "Communication",
+      "packaging": "Packaging",
+      "smoothExperience": "Experience",
+      "sellerReply": "Seller Reply:"
     }
   },
   "disputes": {

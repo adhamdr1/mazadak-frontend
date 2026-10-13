@@ -28,7 +28,7 @@
   "status": {
     "all": "كل الحالات",
     "PENDING": "يبدأ قريباً",
-    "ACTIVE": "نشط للمزايدة",
+    "ACTIVE": "نشط",
     "ENDED": "منتهي",
     "CANCELLED": "ملغي"
   },
@@ -138,6 +138,10 @@
     "buyerBannerEndedWithWinner": "انتهت فعاليات المزاد وتمت ترسيته على أعلى مزايد.",
     "buyerBannerEndedNoBids": "انتهت فترة المزاد ولم يتم تقديم أي مزايدات على هذا المنتج.",
     "auctionCancelledMessage": "تم إلغاء هذا المزاد بواسطة البائع قبل وقت بدئه، وهو غير متاح للمزايدة.",
+    "adminCancelledTitle": "تم إلغاء هذا المزاد بقرار إداري",
+    "adminCancelledReason": "سبب الإلغاء التوثيقي:",
+    "adminCancelledRefundNotice": "تم إيقاف المزاد ورد كامل مبالغ حجز المزايدات إلى محافظ المزايدين تلقائياً بواسطة النظام.",
+    "sellerCancelledTitle": "تم إلغاء هذا المزاد بواسطة البائع",
     "editAuction": "تعديل بيانات المزاد",
     "cancelAuction": "إلغاء المزاد",
     "biddingBoxTitle": "تقديم مزايدة حية",

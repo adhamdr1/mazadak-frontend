@@ -18,6 +18,9 @@ import type {
   FindUserInput,
   AdminUpdateUserInput,
   User,
+  AdminAuctionsPageData,
+  AuctionsFilterInput,
+  Review,
 } from '../types/admin.types';
 
 // ----------------------------------------------------
@@ -212,6 +215,100 @@ const ADMIN_DELETE_USER_MUTATION = `
 `;
 
 // ----------------------------------------------------
+// GraphQL Operations (Batch 3: Auctions Moderation & Reviews)
+// ----------------------------------------------------
+
+const ADMIN_GET_AUCTIONS_QUERY = `
+  query AdminGetAuctions($input: PaginationInput!, $filter: AuctionsFilterInput) {
+    adminGetAuctions(input: $input, filter: $filter) {
+      total
+      totalPages
+      hasNextPage
+      items {
+        _id
+        sellerId
+        title
+        description
+        images
+        category
+        startingPrice
+        minimumBidIncrement
+        currentPrice
+        status
+        startTime
+        endTime
+        winnerId
+        isFinalized
+        adminActionReason
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+const ADMIN_CANCEL_AUCTION_MUTATION = `
+  mutation AdminCancelAuction($auctionId: ID!, $reason: String!) {
+    adminCancelAuction(auctionId: $auctionId, reason: $reason)
+  }
+`;
+
+const ADMIN_AUCTION_REVIEWS_QUERY = `
+  query AdminAuctionReviews($auctionId: ID!) {
+    adminAuctionReviews(auctionId: $auctionId) {
+      _id
+      auctionId
+      reviewerId
+      reviewedUserId
+      type
+      status
+      overallRating
+      criteria {
+        itemAccuracy
+        communication
+        packaging
+        smoothExperience
+      }
+      comment
+      reply
+      repliedAt
+      publishedAt
+      createdAt
+      reviewer {
+        id
+        firstName
+        lastName
+        city
+      }
+      reviewedUser {
+        id
+        firstName
+        lastName
+        city
+      }
+    }
+  }
+`;
+
+const ADMIN_HIDE_REVIEW_MUTATION = `
+  mutation AdminHideReview($reviewId: ID!) {
+    hideReview(reviewId: $reviewId) {
+      _id
+      status
+    }
+  }
+`;
+
+const ADMIN_UNHIDE_REVIEW_MUTATION = `
+  mutation AdminUnhideReview($reviewId: ID!) {
+    unhideReview(reviewId: $reviewId) {
+      _id
+      status
+    }
+  }
+`;
+
+// ----------------------------------------------------
 // Service Methods Implementation
 // ----------------------------------------------------
 
@@ -317,6 +414,64 @@ export const adminService = {
       { targetUser }
     );
     return data.adminDeleteUser;
+  },
+
+  /**
+   * Fetches paginated auctions with full server-side filters (Batch 3)
+   */
+  async getAdminAuctions(
+    input: AdminPaginationInput = { page: 1, limit: 10 },
+    filter?: AuctionsFilterInput
+  ): Promise<AdminAuctionsPageData> {
+    const data = await executeGraphQL<{ adminGetAuctions: AdminAuctionsPageData }>(
+      ADMIN_GET_AUCTIONS_QUERY,
+      { input, filter }
+    );
+    return data.adminGetAuctions;
+  },
+
+  /**
+   * Cancels an auction administratively with a mandatory documented reason (>= 10 chars)
+   */
+  async cancelAuction(auctionId: string, reason: string): Promise<boolean> {
+    const data = await executeGraphQL<{ adminCancelAuction: boolean }>(
+      ADMIN_CANCEL_AUCTION_MUTATION,
+      { auctionId, reason }
+    );
+    return data.adminCancelAuction;
+  },
+
+  /**
+   * Fetches reviews associated with an auction for moderation
+   */
+  async getAuctionReviews(auctionId: string): Promise<Review[]> {
+    const data = await executeGraphQL<{ adminAuctionReviews: Review[] }>(
+      ADMIN_AUCTION_REVIEWS_QUERY,
+      { auctionId }
+    );
+    return data.adminAuctionReviews;
+  },
+
+  /**
+   * Hides a violating review
+   */
+  async hideReview(reviewId: string): Promise<Review> {
+    const data = await executeGraphQL<{ hideReview: Review }>(
+      ADMIN_HIDE_REVIEW_MUTATION,
+      { reviewId }
+    );
+    return data.hideReview;
+  },
+
+  /**
+   * Unhides a previously hidden review
+   */
+  async unhideReview(reviewId: string): Promise<Review> {
+    const data = await executeGraphQL<{ unhideReview: Review }>(
+      ADMIN_UNHIDE_REVIEW_MUTATION,
+      { reviewId }
+    );
+    return data.unhideReview;
   },
 };
 

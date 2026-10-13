@@ -44,13 +44,21 @@
   }
 
   /* Prevent blue/black tap highlight or flashing outline on clicks */
-  button, a {
-    -webkit-tap-highlight-color: transparent;
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent !important;
   }
-  button:focus:not(:focus-visible),
-  a:focus:not(:focus-visible) {
-    outline: none;
-    box-shadow: none;
+  button:focus,
+  button:focus-visible,
+  button:active,
+  a:focus,
+  a:focus-visible,
+  a:active,
+  [role="button"]:focus,
+  [role="button"]:focus-visible,
+  [role="button"]:active {
+    outline: none !important;
+    outline-style: none !important;
+    outline-width: 0 !important;
   }
 
   /* Eliminate browser native focus outlines and flicker across all form inputs */

@@ -33,8 +33,48 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   isResending,
   resendSuccess,
 }) => {
-  const { t } = useTranslation('auth');
-  const { handleGoogleSuccess, handleGoogleError, error: googleError } = useGoogleAuth();
+  const { t, i18n } = useTranslation('auth');
+  const isRTL = i18n.language?.startsWith('ar');
+  const {
+    handleGoogleSuccess,
+    handleGoogleError,
+    error: googleError,
+    errorCode: googleErrorCode,
+  } = useGoogleAuth();
+
+  const supportSubject = encodeURIComponent(
+    isRTL ? 'طلب مراجعة حساب محظور' : 'Account Suspension Appeal'
+  );
+  const supportBody = encodeURIComponent(
+    isRTL
+      ? 'مرحباً فريق دعم مزادك،\n\nأود تقديم طلب التماس ومراجعة بخصوص إيقاف حسابي.\n\nالتفاصيل:\n'
+      : 'Hello Mazadak Support Team,\n\nI would like to appeal the suspension of my account.\n\nDetails:\n'
+  );
+  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=support@mazadak.com&su=${supportSubject}&body=${supportBody}`;
+
+  const renderBannedAction = () => (
+    <div className="mt-3 pt-2.5 border-t border-rose-500/20 flex justify-center">
+      <a
+        href={gmailComposeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-500 text-white shadow-xs transition-all active:scale-95"
+      >
+        <Mail className="w-3.5 h-3.5 shrink-0" />
+        <span>
+          {t('banned.contactSupport', {
+            defaultValue: isRTL ? 'مراسلة فريق الدعم' : 'Contact Support Team',
+          })}
+        </span>
+      </a>
+    </div>
+  );
+
+  const displayGoogleError =
+    googleErrorCode === 'ACCOUNT_BANNED' ? t('errors.ACCOUNT_BANNED') : googleError;
+
+  const displayFormError =
+    errorCode === 'ACCOUNT_BANNED' ? t('errors.ACCOUNT_BANNED') : error;
 
   const {
     register,
@@ -67,11 +107,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Google Error Alert */}
-      {googleError && <Alert variant="error">{googleError}</Alert>}
+      {/* Google Error Alert with Context-Aware Action */}
+      {displayGoogleError && (
+        <Alert
+          variant="error"
+          action={googleErrorCode === 'ACCOUNT_BANNED' ? renderBannedAction() : null}
+        >
+          {displayGoogleError}
+        </Alert>
+      )}
 
       {/* Backend Errors with Context-Aware Actions */}
-      {error && (
+      {displayFormError && (
         <Alert
           variant={errorCode === 'EMAIL_NOT_VERIFIED' ? 'warning' : 'error'}
           action={
@@ -102,10 +149,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               >
                 {t('reactivate.title')} →
               </Link>
+            ) : errorCode === 'ACCOUNT_BANNED' ? (
+              renderBannedAction()
             ) : null
           }
         >
-          {error}
+          {displayFormError}
         </Alert>
       )}
 

@@ -300,17 +300,17 @@ export const getAuctionStatusBadge = (
   switch (norm) {
     case 'ACTIVE':
       return {
-        label: isRTL ? 'نشط ومباشر' : 'Active',
-        labelAr: 'نشط ومباشر',
+        label: isRTL ? 'نشط' : 'Active',
+        labelAr: 'نشط',
         labelEn: 'Active',
-        bgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
+        bgClass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 dark:bg-emerald-500/15',
       };
     case 'PENDING':
       return {
         label: isRTL ? 'قيد الانتظار' : 'Pending',
         labelAr: 'قيد الانتظار',
         labelEn: 'Pending',
-        bgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25',
+        bgClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30 dark:bg-amber-500/15',
       };
     case 'ENDED':
     case 'END':
@@ -318,21 +318,21 @@ export const getAuctionStatusBadge = (
         label: isRTL ? 'منتهي' : 'Ended',
         labelAr: 'منتهي',
         labelEn: 'Ended',
-        bgClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25',
+        bgClass: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30 dark:bg-blue-500/15',
       };
     case 'CANCELLED':
       return {
         label: isRTL ? 'ملغي' : 'Cancelled',
         labelAr: 'ملغي',
         labelEn: 'Cancelled',
-        bgClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25',
+        bgClass: 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30 dark:bg-rose-500/15',
       };
     default:
       return {
         label: status || '—',
         labelAr: status || '—',
         labelEn: status || '—',
-        bgClass: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/25',
+        bgClass: 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/30 dark:bg-slate-500/15',
       };
   }
 };
@@ -418,3 +418,58 @@ export const getWithdrawalStatusBadge = (status: string) => {
       };
   }
 };
+
+export const getAuctionCategoryLabel = (category: string, isRTL: boolean = true): string => {
+  const map: Record<string, { ar: string; en: string }> = {
+    ELECTRONICS: { ar: 'إلكترونيات', en: 'Electronics' },
+    FASHION: { ar: 'أزياء وموضة', en: 'Fashion' },
+    JEWELRY: { ar: 'مجوهرات وحلي', en: 'Jewelry' },
+    WATCHES: { ar: 'ساعات فاخرة', en: 'Watches' },
+    ANTIQUES: { ar: 'تحف وأنتيكات', en: 'Antiques' },
+    ART: { ar: 'فنون ولوحات', en: 'Art' },
+    COLLECTIBLES: { ar: 'مقتنيات نادرة', en: 'Collectibles' },
+    BOOKS: { ar: 'كتب ومخطوطات', en: 'Books' },
+    FURNITURE: { ar: 'أثاث وديكور', en: 'Furniture' },
+    HOME_APPLIANCES: { ar: 'أجهزة منزلية', en: 'Home Appliances' },
+    CARS: { ar: 'سيارات ومركبات', en: 'Cars' },
+    MOTORCYCLES: { ar: 'دراجات نارية', en: 'Motorcycles' },
+    REAL_ESTATE: { ar: 'عقارات وأراضي', en: 'Real Estate' },
+    SPORTS: { ar: 'رياضة ولياقة', en: 'Sports' },
+    TOYS: { ar: 'ألعاب ومجسمات', en: 'Toys' },
+    OTHER: { ar: 'أخرى ومتنوعة', en: 'Other' },
+  };
+
+  const match = map[category?.toUpperCase()];
+  if (match) return isRTL ? match.ar : match.en;
+  return category || '—';
+};
+
+export const getReviewStatusBadge = (status: string) => {
+  switch (status?.toUpperCase()) {
+    case 'PUBLISHED':
+      return {
+        labelAr: 'منشور',
+        labelEn: 'Published',
+        bgClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+      };
+    case 'HIDDEN':
+      return {
+        labelAr: 'محجوب إدارياً',
+        labelEn: 'Hidden',
+        bgClass: 'bg-rose-500/10 text-rose-500 border-rose-500/30',
+      };
+    case 'PENDING':
+      return {
+        labelAr: 'قيد المراجعة',
+        labelEn: 'Pending',
+        bgClass: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+      };
+    default:
+      return {
+        labelAr: status || '—',
+        labelEn: status || '—',
+        bgClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
+      };
+  }
+};
+

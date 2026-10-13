@@ -16,6 +16,7 @@ export const ROUTES = {
   CONFIRM_REACTIVATION_ALT: '/confirm-reactivation',
   UPDATE_PASSWORD: '/update-password',
   UNAUTHORIZED: '/unauthorized',
+  BANNED: '/banned',
 
   // Auctions
   AUCTIONS: '/auctions',
