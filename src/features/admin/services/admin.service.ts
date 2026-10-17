@@ -5,6 +5,7 @@
  */
 
 import { executeGraphQL } from '@/services/api/graphqlClient';
+import { subscribeToSubscription } from '@/services/websocket/socketClient';
 import type {
   DashboardStats,
   TreasuryStats,
@@ -21,7 +22,16 @@ import type {
   AdminAuctionsPageData,
   AuctionsFilterInput,
   Review,
+  AdminDisputesPageData,
+  AdminEscrowsPageData,
+  DisputeFilterInput,
+  EscrowFilterInput,
+  ResolveDisputeInput,
+  UpdateDisputeStatusInput,
+  DisputeData,
+  EscrowData,
 } from '../types/admin.types';
+import type { DisputeStatusChangedPayload } from '@/features/escrow/types/escrow.types';
 
 // ----------------------------------------------------
 // GraphQL Operations (Batch 1: Dashboard, Treasury & Recent Activity)
@@ -473,7 +483,244 @@ export const adminService = {
     );
     return data.unhideReview;
   },
+
+  // ----------------------------------------------------
+  // Batch 4: Disputes & Escrow Operations
+  // ----------------------------------------------------
+
+  /**
+   * Fetches all disputes across the platform with server filters and pagination
+   */
+  async getAllDisputes(
+    input: AdminPaginationInput = { page: 1, limit: 10 },
+    filter?: DisputeFilterInput
+  ): Promise<AdminDisputesPageData> {
+    const data = await executeGraphQL<{ allDisputes: AdminDisputesPageData }>(
+      ADMIN_ALL_DISPUTES_QUERY,
+      { input, filter }
+    );
+    return data.allDisputes;
+  },
+
+  /**
+   * Fetches all escrow contracts across the platform with server filters and pagination
+   */
+  async getAllEscrows(
+    input: AdminPaginationInput = { page: 1, limit: 10 },
+    filter?: EscrowFilterInput
+  ): Promise<AdminEscrowsPageData> {
+    const data = await executeGraphQL<{ allEscrows: AdminEscrowsPageData }>(
+      ADMIN_ALL_ESCROWS_QUERY,
+      { input, filter }
+    );
+    return data.allEscrows;
+  },
+
+  /**
+   * Resolves a financial dispute with admin decision (REFUND_BUYER or PAY_SELLER) and optional notes
+   */
+  async resolveDispute(input: ResolveDisputeInput): Promise<DisputeData> {
+    const data = await executeGraphQL<{ resolveDispute: DisputeData }>(
+      ADMIN_RESOLVE_DISPUTE_MUTATION,
+      { input }
+    );
+    return data.resolveDispute;
+  },
+
+  /**
+   * Updates dispute status (e.g. to UNDER_REVIEW)
+   */
+  async updateDisputeStatus(input: UpdateDisputeStatusInput): Promise<DisputeData> {
+    const data = await executeGraphQL<{ updateDisputeStatus: DisputeData }>(
+      ADMIN_UPDATE_DISPUTE_STATUS_MUTATION,
+      { input }
+    );
+    return data.updateDisputeStatus;
+  },
+
+  /**
+   * Manually releases held escrow funds to seller
+   */
+  async releaseEscrow(escrowId: string, reason?: string): Promise<EscrowData> {
+    const data = await executeGraphQL<{ releaseEscrow: EscrowData }>(
+      ADMIN_RELEASE_ESCROW_MUTATION,
+      { escrowId, reason }
+    );
+    return data.releaseEscrow;
+  },
+
+  /**
+   * Manually refunds held escrow funds to buyer
+   */
+  async refundEscrow(escrowId: string, reason?: string): Promise<EscrowData> {
+    const data = await executeGraphQL<{ refundEscrow: EscrowData }>(
+      ADMIN_REFUND_ESCROW_MUTATION,
+      { escrowId, reason }
+    );
+    return data.refundEscrow;
+  },
+
+  /**
+   * Subscribes to real-time dispute status changes.
+   * When disputeId is omitted, acts as a Global Admin Feed for all platform disputes.
+   */
+  subscribeToDisputeStatusChanged(
+    handlers: {
+      next: (payload: DisputeStatusChangedPayload) => void;
+      error?: (err: unknown) => void;
+      complete?: () => void;
+    },
+    token?: string | null,
+    disputeId?: string
+  ): () => void {
+    return subscribeToSubscription<{ disputeStatusChanged: DisputeStatusChangedPayload }>(
+      {
+        query: ADMIN_DISPUTE_STATUS_CHANGED_SUBSCRIPTION,
+        variables: disputeId ? { disputeId } : {},
+      },
+      {
+        next: (data: { disputeStatusChanged: DisputeStatusChangedPayload }) => {
+          if (data?.disputeStatusChanged) {
+            handlers.next(data.disputeStatusChanged);
+          }
+        },
+        error: handlers.error,
+        complete: handlers.complete,
+      },
+      token
+    );
+  },
 };
+
+// ----------------------------------------------------
+// GraphQL Operations (Batch 4: Disputes & Escrow)
+// ----------------------------------------------------
+
+const ADMIN_ALL_DISPUTES_QUERY = `
+  query AdminAllDisputes($input: PaginationInput, $filter: DisputeFilterInput) {
+    allDisputes(input: $input, filter: $filter) {
+      total
+      totalPages
+      hasNextPage
+      items {
+        _id
+        escrowId
+        auctionId
+        openedById
+        againstUserId
+        reason
+        description
+        evidenceUrls
+        status
+        adminDecision
+        adminNotes
+        resolvedAt
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+const ADMIN_ALL_ESCROWS_QUERY = `
+  query AdminAllEscrows($input: PaginationInput, $filter: EscrowFilterInput) {
+    allEscrows(input: $input, filter: $filter) {
+      total
+      totalPages
+      hasNextPage
+      items {
+        _id
+        auctionId
+        buyerId
+        sellerId
+        amount
+        currency
+        status
+        inspectionPeriodEndsAt
+        inspectionDurationHours
+        releasedAt
+        refundedAt
+        releaseReason
+        disputeId
+        createdAt
+        updatedAt
+        auction {
+          _id
+          title
+          images
+          currentPrice
+          startingPrice
+        }
+      }
+    }
+  }
+`;
+
+const ADMIN_RESOLVE_DISPUTE_MUTATION = `
+  mutation AdminResolveDispute($input: ResolveDisputeInput!) {
+    resolveDispute(input: $input) {
+      _id
+      escrowId
+      auctionId
+      openedById
+      againstUserId
+      reason
+      description
+      evidenceUrls
+      status
+      adminDecision
+      adminNotes
+      resolvedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const ADMIN_UPDATE_DISPUTE_STATUS_MUTATION = `
+  mutation AdminUpdateDisputeStatus($input: UpdateDisputeStatusInput!) {
+    updateDisputeStatus(input: $input) {
+      _id
+      status
+    }
+  }
+`;
+
+const ADMIN_RELEASE_ESCROW_MUTATION = `
+  mutation AdminReleaseEscrow($escrowId: ID!, $reason: String) {
+    releaseEscrow(escrowId: $escrowId, reason: $reason) {
+      _id
+      status
+      releasedAt
+      releaseReason
+    }
+  }
+`;
+
+const ADMIN_REFUND_ESCROW_MUTATION = `
+  mutation AdminRefundEscrow($escrowId: ID!, $reason: String) {
+    refundEscrow(escrowId: $escrowId, reason: $reason) {
+      _id
+      status
+      refundedAt
+      releaseReason
+    }
+  }
+`;
+
+const ADMIN_DISPUTE_STATUS_CHANGED_SUBSCRIPTION = `
+  subscription AdminDisputeStatusChanged($disputeId: ID) {
+    disputeStatusChanged(disputeId: $disputeId) {
+      disputeId
+      escrowId
+      auctionId
+      status
+      adminDecision
+      adminNotes
+      resolvedAt
+    }
+  }
+`;
 
 export default adminService;
 

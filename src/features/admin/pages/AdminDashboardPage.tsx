@@ -5,10 +5,10 @@ import {
   Gavel,
   DollarSign,
   Clock,
-  RefreshCw,
   ShieldAlert,
   AlertTriangle,
 } from 'lucide-react';
+import { RefreshButton } from '@/components/common/RefreshButton';
 import { ROUTES } from '@/constants/routes.constants';
 import { useAdminDashboardStats } from '../hooks/useAdminDashboardStats';
 import { useAdminTreasuryStats } from '../hooks/useAdminTreasuryStats';
@@ -67,19 +67,13 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-start sm:items-end gap-1 shrink-0 self-start sm:self-auto">
-          <button
-            type="button"
-            onClick={handleRefreshAll}
-            disabled={isStatsLoading || isStatsRefetching}
-            className="group inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-amber-500/10 dark:hover:bg-amber-500/15 hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-500/50 dark:hover:border-amber-500/40 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:shadow-xs transition-all duration-200 disabled:opacity-50 cursor-pointer active:scale-95"
-          >
-            <RefreshCw
-              className={`w-3.5 h-3.5 text-amber-500 group-hover:text-amber-400 transition-transform duration-500 group-hover:rotate-180 ${
-                isStatsRefetching ? 'animate-spin' : ''
-              }`}
-            />
-            <span>{t('dashboard.refreshStats', { ns: 'admin', defaultValue: 'تحديث البيانات' })}</span>
-          </button>
+          <RefreshButton
+            onRefresh={handleRefreshAll}
+            isLoading={isStatsLoading}
+            isRefetching={isStatsRefetching}
+            label={t('dashboard.refreshStats', { ns: 'admin', defaultValue: 'تحديث البيانات' })}
+            showLabelOnMobile={true}
+          />
 
           {lastUpdatedTime && (
             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono inline-flex items-center justify-start sm:justify-end gap-1 px-1 select-none">

@@ -21,10 +21,18 @@ export const formatAdminCurrency = (
   currency?: string,
   isRTL: boolean = true
 ): string => {
-  const finalCurrency = currency || (isRTL ? 'ج.م' : 'EGP');
-  if (amount === undefined || amount === null) return `${isRTL ? '٠' : '0'} ${finalCurrency}`;
+  let displayCurrency: string;
+  if (!currency || currency.toUpperCase() === 'EGP' || currency === 'ج.م') {
+    displayCurrency = isRTL ? 'ج.م' : 'EGP';
+  } else if (currency.toUpperCase() === 'USD' || currency === '$') {
+    displayCurrency = isRTL ? 'دولار' : 'USD';
+  } else {
+    displayCurrency = currency;
+  }
+
+  if (amount === undefined || amount === null) return `${isRTL ? '٠' : '0'} ${displayCurrency}`;
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  if (isNaN(num)) return `${isRTL ? '٠' : '0'} ${finalCurrency}`;
+  if (isNaN(num)) return `${isRTL ? '٠' : '0'} ${displayCurrency}`;
 
   const hasFractions = num % 1 !== 0;
   const formatted = new Intl.NumberFormat('en-US', {
@@ -33,7 +41,7 @@ export const formatAdminCurrency = (
   }).format(num);
 
   const localizedNum = toLocalizedDigits(formatted, isRTL);
-  return `${localizedNum} ${finalCurrency}`;
+  return `${localizedNum} ${displayCurrency}`;
 };
 
 export const formatAdminDate = (
@@ -341,41 +349,194 @@ export const getDisputeStatusBadge = (status: string) => {
   switch (status?.toUpperCase()) {
     case 'OPEN':
       return {
-        labelAr: 'نزاع مفتوح',
+        labelAr: 'مفتوح',
         labelEn: 'Open',
-        bgClass: 'bg-rose-500/10 text-rose-500 border-rose-500/30',
+        bgClass: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30',
       };
     case 'UNDER_REVIEW':
       return {
-        labelAr: 'قيد المراجعة الإدارية',
+        labelAr: 'قيد الفحص',
         labelEn: 'Under Review',
-        bgClass: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+        bgClass: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30',
       };
     case 'RESOLVED_BUYER_REFUNDED':
       return {
-        labelAr: 'محلول (رد للمشتري)',
-        labelEn: 'Refunded Buyer',
-        bgClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+        labelAr: 'مسترد للمشتري',
+        labelEn: 'Buyer Refunded',
+        bgClass: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
       };
     case 'RESOLVED_SELLER_PAID':
       return {
-        labelAr: 'محلول (صرف للبائع)',
-        labelEn: 'Paid Seller',
-        bgClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+        labelAr: 'مصروف للبائع',
+        labelEn: 'Seller Paid',
+        bgClass: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
       };
     case 'CANCELLED':
       return {
         labelAr: 'ملغي',
         labelEn: 'Cancelled',
-        bgClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
+        bgClass: 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30',
       };
     default:
       return {
         labelAr: status,
         labelEn: status,
+        bgClass: 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30',
+      };
+  }
+};
+
+export const getEscrowStatusBadge = (status: string) => {
+  switch (status?.toUpperCase()) {
+    case 'HELD':
+      return {
+        labelAr: 'محجوز بالأمانات',
+        labelEn: 'Held in Escrow',
+        bgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
+      };
+    case 'RELEASED':
+      return {
+        labelAr: 'محرر للبائع',
+        labelEn: 'Released to Seller',
+        bgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+      };
+    case 'REFUNDED':
+      return {
+        labelAr: 'مسترد للمشتري',
+        labelEn: 'Refunded to Buyer',
+        bgClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
+      };
+    case 'DISPUTED':
+      return {
+        labelAr: 'محل نزاع قائم',
+        labelEn: 'Under Dispute',
+        bgClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30',
+      };
+    default:
+      return {
+        labelAr: status || '—',
+        labelEn: status || '—',
         bgClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
       };
   }
+};
+
+export interface FormattedEscrowReleaseReason {
+  label: string;
+  isDispute: boolean;
+  notes?: string;
+}
+
+export const formatEscrowReleaseReason = (
+  reason: string | undefined | null,
+  isRTL: boolean = true
+): FormattedEscrowReleaseReason => {
+  if (!reason || reason.trim() === '') {
+    return { label: isRTL ? '—' : '—', isDispute: false };
+  }
+
+  const trimmed = reason.trim();
+
+  // If dispute resolution: e.g. "ADMIN_RESOLVED_DISPUTE: refund buyer" or custom notes
+  if (trimmed.toUpperCase().startsWith('ADMIN_RESOLVED_DISPUTE')) {
+    const rawNotes = trimmed.replace(/^ADMIN_RESOLVED_DISPUTE:?\s*/i, '').trim();
+    let cleanNotes = rawNotes;
+    if (rawNotes.toLowerCase() === 'refund buyer') {
+      cleanNotes = isRTL
+        ? 'تم حسم النزاع لصالح المشتري ورد كامل المبلغ.'
+        : 'Dispute ruled in buyer favor; full amount refunded.';
+    } else if (rawNotes.toLowerCase() === 'pay seller') {
+      cleanNotes = isRTL
+        ? 'تم حسم النزاع لصالح البائع وتحرير المبلغ له.'
+        : 'Dispute ruled in seller favor; funds released to seller.';
+    }
+
+    return {
+      label: isRTL ? 'حسم نزاع إداري' : 'Dispute Resolution',
+      isDispute: true,
+      notes: cleanNotes || undefined,
+    };
+  }
+
+  const map: Record<string, { ar: string; en: string; isDispute: boolean }> = {
+    BUYER_CONFIRMED: {
+      ar: 'تأكيد استلام المشتري',
+      en: 'Buyer Confirmed Delivery',
+      isDispute: false,
+    },
+    EXPIRED_INSPECTION_WINDOW: {
+      ar: 'انقضاء مهلة الفحص (٧ أيام)',
+      en: 'Inspection Window Expired (7 Days)',
+      isDispute: false,
+    },
+    MANUAL_RELEASE: {
+      ar: 'تحرير يدوي من الإدارة',
+      en: 'Admin Manual Release',
+      isDispute: false,
+    },
+    MANUAL_REFUND: {
+      ar: 'استرداد يدوي من الإدارة',
+      en: 'Admin Manual Refund',
+      isDispute: false,
+    },
+    DISPUTE_REFUND: {
+      ar: 'استرداد بموجب نزاع',
+      en: 'Dispute Refund',
+      isDispute: true,
+    },
+    DISPUTE_RELEASE: {
+      ar: 'تحرير بموجب نزاع',
+      en: 'Dispute Release',
+      isDispute: true,
+    },
+    DISPUTE_RESOLVED_PAY_SELLER: {
+      ar: 'حسم النزاع لصالح البائع',
+      en: 'Dispute Resolved (Pay Seller)',
+      isDispute: true,
+    },
+    DISPUTE_RESOLVED_REFUND_BUYER: {
+      ar: 'حسم النزاع لصالح المشتري',
+      en: 'Dispute Resolved (Refund Buyer)',
+      isDispute: true,
+    },
+    ADMIN_MANUAL_RELEASE: {
+      ar: 'تسوية يدوية من الإدارة',
+      en: 'Admin Manual Settlement',
+      isDispute: false,
+    },
+  };
+
+  const match = map[trimmed.toUpperCase()];
+  if (match) {
+    return {
+      label: isRTL ? match.ar : match.en,
+      isDispute: match.isDispute,
+    };
+  }
+
+  // Fallback: format any SNAKE_CASE or ALL_CAPS string cleanly into Title Case if English
+  const formattedFallback = isRTL
+    ? trimmed
+    : trimmed
+        .replace(/_/g, ' ')
+        .toLowerCase()
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return { label: formattedFallback, isDispute: false };
+};
+
+export const getDisputeReasonLabel = (reason: string, isRTL: boolean = true): string => {
+  const map: Record<string, { ar: string; en: string }> = {
+    ITEM_NOT_RECEIVED: { ar: 'السلعة لم تصل', en: 'Item Not Received' },
+    ITEM_DAMAGED: { ar: 'السلعة تالفة أو متضررة', en: 'Item Damaged' },
+    ITEM_MISMATCH: { ar: 'السلعة غير مطابقة للوصف', en: 'Item Mismatch' },
+    COUNTERFEIT_ITEM: { ar: 'سلعة مقلدة أو مزيفة', en: 'Counterfeit Item' },
+    OTHER: { ar: 'سبب آخر', en: 'Other Reason' },
+  };
+
+  const match = map[reason?.toUpperCase()];
+  if (match) return isRTL ? match.ar : match.en;
+  return reason?.replace(/_/g, ' ') || '—';
 };
 
 export const getWithdrawalStatusBadge = (status: string) => {
@@ -471,5 +632,15 @@ export const getReviewStatusBadge = (status: string) => {
         bgClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
       };
   }
+};
+
+/**
+ * Detects if the first alphabetical character of a text string is Arabic.
+ */
+export const isArabicText = (text: string | undefined | null): boolean => {
+  if (!text) return false;
+  const match = text.match(/[\p{L}]/u);
+  if (!match) return false;
+  return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(match[0]);
 };
 

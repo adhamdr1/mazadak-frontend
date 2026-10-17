@@ -286,22 +286,140 @@
     }
   },
   "disputes": {
-    "title": "Disputes & Escrow Resolution",
-    "subtitle": "Arbitrate transaction disputes between buyers and sellers and audit escrow contracts",
+    "pageTitle": "Disputes & Escrow Arbitrations",
+    "pageSubtitle": "Arbitrate transaction disputes between buyers and sellers and manage financial escrow contracts.",
+    "openDisputesCount": "Total Disputes:",
     "tabs": {
       "disputes": "Dispute Cases",
       "escrows": "Escrow Contracts"
     },
+    "table": {
+      "searchPlaceholder": "Search by user name, dispute ID, auction, or complaint...",
+      "disputeAndAuction": "Auction & Dispute",
+      "auction": "Auction",
+      "parties": "Parties",
+      "reasonAndDescription": "Reason & Statement",
+      "reason": "Reason",
+      "status": "Status",
+      "createdAt": "Date Opened",
+      "actions": "Actions",
+      "auctionId": "Auction:",
+      "disputeId": "Dispute:",
+      "viewAuction": "View auction page",
+      "claimant": "Claimant",
+      "respondent": "Respondent",
+      "viewEvidence": "Evidence ({{count}})",
+      "resolvedOn": "Resolved On:"
+    },
+    "actions": {
+      "markReview": "Start Review",
+      "startReview": "Start Review",
+      "underReview": "Under Review",
+      "resolve": "Resolve Dispute",
+      "settled": "Settled",
+      "settledTooltip": "Dispute resolved and financial settlement executed",
+      "cancelled": "Cancelled",
+      "cancelledTooltip": "Dispute cancelled by claimant"
+    },
+    "empty": {
+      "title": "No Disputes Found",
+      "description": "There are no dispute cases matching the selected filter criteria."
+    },
+    "evidenceModal": {
+      "title": "Dispute Evidence Documents",
+      "statement": "Claim Statement:"
+    },
     "resolveModal": {
       "title": "Resolve Dispute & Issue Ruling",
-      "decisionLabel": "Ruling Decision",
-      "refundBuyer": "Refund Buyer in Full (Cancel Sale)",
-      "paySeller": "Release Payment to Seller (Affirm Sale)",
-      "notesLabel": "Administrative Directives & Notes",
-      "notesPlaceholder": "Enter rationale and resolution notes...",
-      "confirmButton": "Issue Final Ruling",
-      "successMessage": "Dispute resolved and escrow funds disbursed successfully."
-    }
+      "disputeId": "Dispute ID:",
+      "reason": "Dispute Reason:",
+      "caseSummary": "Case & Escrow Summary",
+      "auction": "Associated Auction:",
+      "escrowAmount": "Disputed Escrow Amount:",
+      "claimant": "Claimant (Plaintiff):",
+      "respondent": "Respondent (Defendant):",
+      "claimantStatement": "Claim Statement Submitted:",
+      "decisionPrompt": "Select the final administrative ruling for this dispute:",
+      "refundBuyer": "Refund Buyer",
+      "refundBuyerTag": "Credit Buyer Wallet",
+      "refundBuyerHelp": "Held escrow funds will be immediately refunded to the buyer's wallet and the dispute resolved.",
+      "paySeller": "Pay Seller",
+      "paySellerTag": "Credit Seller Wallet",
+      "paySellerHelp": "Held escrow funds will be immediately released to the seller's wallet and the dispute resolved.",
+      "executionPlan": "Actions executed upon approving this ruling:",
+      "creditBuyerPlan": "Instant transfer of full escrow funds to the buyer's wallet",
+      "creditSellerPlan": "Instant transfer of full escrow funds to the seller's wallet",
+      "updateDisputeAndEscrow": "Update escrow and dispute records in financial ledgers",
+      "notifyParties": "Officially notify both parties of administrative ruling and notes",
+      "notesLabel": "Administrative Directives & Audit Notes (Optional):",
+      "notesSublabel": "These notes are archived in audit logs and sent to dispute parties.",
+      "notesPlaceholder": "Summarize the decision rationale and evidence findings for administrative documentation...",
+      "irreversibleWarning": "Important: Dispute resolution rulings are final and cannot be undone. They trigger immediate wallet transfers and update escrow and auction records.",
+      "confirmSubmit": "Execute Dispute Ruling",
+      "confirmRefundBtn": "Confirm Refund to Buyer",
+      "confirmPayoutBtn": "Confirm Payout to Seller",
+      "validation": {
+        "decisionRequired": "Please select an administrative ruling",
+        "notesTooLong": "Administrative notes cannot exceed 500 characters"
+      }
+    },
+    "resolveSuccess": "Dispute resolved and financial settlement executed successfully.",
+    "markedUnderReviewSuccess": "Dispute status updated to Under Review.",
+    "realtimeUpdate": "A dispute status was updated in real-time."
+  },
+  "escrow": {
+    "contractsCount": "Escrow Contracts:",
+    "table": {
+      "searchPlaceholder": "Search by user name, escrow ID, auction, or release reason...",
+      "escrowAndAuction": "Auction & Escrow",
+      "auction": "Auction",
+      "escrowId": "Escrow:",
+      "viewAuction": "View auction page",
+      "parties": "Parties",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "amount": "Escrow Amount",
+      "status": "Escrow Status",
+      "hasDispute": "Active Dispute",
+      "inspectionPeriod": "Timeline & Inspection",
+      "inspectionEnds": "Inspection ends:",
+      "releasedOn": "Released on:",
+      "refundedOn": "Refunded on:",
+      "actions": "Status & Follow-up"
+    },
+    "actions": {
+      "viewDispute": "View Dispute",
+      "viewDisputeTooltip": "Navigate to dispute record in Disputes tab",
+      "holding": "Held in Escrow",
+      "holdingTooltip": "Funds held pending buyer confirmation or inspection expiry",
+      "released": "Released to Seller",
+      "releasedTooltip": "Funds released and disbursed to seller wallet",
+      "refunded": "Refunded to Buyer",
+      "refundedTooltip": "Funds refunded to buyer wallet",
+      "release": "Pay Seller",
+      "releaseTooltip": "Manually release held funds to seller",
+      "refund": "Refund Buyer",
+      "refundTooltip": "Manually refund held funds to buyer",
+      "finalized": "Finalized"
+    },
+    "empty": {
+      "title": "No Escrow Contracts Found",
+      "description": "There are no escrow contracts matching the selected filter criteria."
+    },
+    "confirmModal": {
+      "releaseTitle": "Confirm Manual Escrow Release to Seller",
+      "refundTitle": "Confirm Manual Escrow Refund to Buyer",
+      "escrowId": "Escrow ID:",
+      "amount": "Settlement Amount:",
+      "releaseNotice": "Held funds will be released and transferred to the seller's available balance permanently.",
+      "refundNotice": "Held funds will be refunded and returned to the buyer's available balance permanently.",
+      "reasonLabel": "Action Reason (Optional for Audit):",
+      "reasonPlaceholder": "Enter rationale for this administrative action for audit logging...",
+      "confirmRelease": "Confirm Release to Seller",
+      "confirmRefund": "Confirm Refund to Buyer"
+    },
+    "releaseSuccess": "Escrow funds released and disbursed to seller successfully.",
+    "refundSuccess": "Escrow funds refunded to buyer successfully."
   },
   "financials": {
     "title": "Treasury & Payouts",

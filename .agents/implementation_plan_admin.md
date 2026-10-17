@@ -50,7 +50,7 @@
    - مراجعة مزايدات المزاد `adminBids`.
    - إخفاء/إظهار المراجعات المخالفة `hideReview` / `unhideReview`.
 4. **النزاعات والضمان المالي (`allDisputes`, `allEscrows`, `resolveDispute`, `updateDisputeStatus`, `releaseEscrow`, `refundEscrow`):**
-   - استعراض كافة النزاعات مع فلاتر الحالة والأطراف.
+   - استعراض كافة النزاعات مع فلاتر الحالة والأطراف ودعم البحث السيرفري المتقدم `search: String` (بالاسم الكامل، الاسم المركب، الإيميل، المعرفات المختصرة، والبيان).
    - حل النزاع بقرار إداري `REFUND_BUYER` أو `PAY_SELLER` مع ملاحظات إدارية `adminNotes`.
 5. **السحوبات والخزينة والسيولة (`adminGetTreasuryStats`, `adminGetWithdrawals`, `adminStartWithdrawalProcessing`, `adminCompleteWithdrawal`, `adminRejectWithdrawal`):**
    - استعراض تقرير الخزينة والسيولة المباشر.

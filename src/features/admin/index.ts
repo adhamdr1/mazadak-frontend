@@ -24,10 +24,17 @@ export { useAdminAuctions } from './hooks/useAdminAuctions';
 export { useAdminCancelAuction } from './hooks/useAdminCancelAuction';
 export { useAdminAuctionReviews } from './hooks/useAdminAuctionReviews';
 export { useAdminReviewModeration } from './hooks/useAdminReviewModeration';
+export { useAdminDisputes } from './hooks/useAdminDisputes';
+export { useAdminEscrows } from './hooks/useAdminEscrows';
+export { useResolveDispute } from './hooks/useResolveDispute';
+export { useUpdateDisputeStatus } from './hooks/useUpdateDisputeStatus';
+export { useEscrowAdminActions } from './hooks/useEscrowAdminActions';
+export { useAdminDisputesSubscription } from './hooks/useAdminDisputesSubscription';
 
 // Schemas
 export { adminAdjustBalanceSchema, type AdminAdjustBalanceFormData } from './schemas/adminAdjustBalance.schema';
 export { adminCancelAuctionSchema, type AdminCancelAuctionFormData } from './schemas/adminCancelAuction.schema';
+export { adminResolveDisputeSchema, type AdminResolveDisputeFormData } from './schemas/adminResolveDispute.schema';
 
 // Components
 export { AdminLayout } from './components/layout/AdminLayout';
@@ -43,8 +50,13 @@ export { BanUserConfirmModal } from './components/users/BanUserConfirmModal';
 export { AdminAuctionsTable } from './components/auctions/AdminAuctionsTable';
 export { AdminCancelAuctionModal } from './components/auctions/AdminCancelAuctionModal';
 export { AuctionReviewsModerationModal } from './components/auctions/AuctionReviewsModerationModal';
+export { AdminDisputesTable } from './components/disputes/AdminDisputesTable';
+export { AdminEscrowsTable } from './components/disputes/AdminEscrowsTable';
+export { DisputeResolveModal } from './components/disputes/DisputeResolveModal';
 
 // Pages
 export { AdminDashboardPage } from './pages/AdminDashboardPage';
 export { AdminUsersPage } from './pages/AdminUsersPage';
 export { AdminAuctionsPage } from './pages/AdminAuctionsPage';
+export { AdminDisputesPage } from './pages/AdminDisputesPage';
+

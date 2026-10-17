@@ -61,6 +61,7 @@ const PublicUserPage = lazy(() => import('@/features/users/pages/PublicUserPage'
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
 const AdminUsersPage = lazy(() => import('@/features/admin/pages/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
 const AdminAuctionsPage = lazy(() => import('@/features/admin/pages/AdminAuctionsPage').then(m => ({ default: m.AdminAuctionsPage })));
+const AdminDisputesPage = lazy(() => import('@/features/admin/pages/AdminDisputesPage').then(m => ({ default: m.AdminDisputesPage })));
 
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
@@ -135,6 +136,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboardPage />} />
               <Route path={ROUTES.ADMIN.USERS} element={<AdminUsersPage />} />
               <Route path={ROUTES.ADMIN.AUCTIONS} element={<AdminAuctionsPage />} />
+              <Route path={ROUTES.ADMIN.DISPUTES} element={<AdminDisputesPage />} />
             </Route>
           </Route>
         </Routes>
