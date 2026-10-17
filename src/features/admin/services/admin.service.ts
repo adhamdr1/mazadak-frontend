@@ -30,6 +30,11 @@ import type {
   UpdateDisputeStatusInput,
   DisputeData,
   EscrowData,
+  AdminWithdrawalsPageData,
+  WithdrawalsFilterInput,
+  AdminCompleteWithdrawalInput,
+  AdminRejectWithdrawalInput,
+  WithdrawalResponse,
 } from '../types/admin.types';
 import type { DisputeStatusChangedPayload } from '@/features/escrow/types/escrow.types';
 
@@ -590,6 +595,92 @@ export const adminService = {
       token
     );
   },
+
+  /**
+   * Fetches paginated platform withdrawals with server-side filters and search
+   */
+  async getAdminWithdrawals(
+    pagination: AdminPaginationInput = { page: 1, limit: 10 },
+    filter?: WithdrawalsFilterInput
+  ): Promise<AdminWithdrawalsPageData> {
+    const data = await executeGraphQL<{ adminGetWithdrawals: AdminWithdrawalsPageData }>(
+      ADMIN_GET_WITHDRAWALS_QUERY,
+      { pagination, filter }
+    );
+    return data.adminGetWithdrawals;
+  },
+
+  /**
+   * Fetches a specific withdrawal request details by ID
+   */
+  async getAdminWithdrawal(id: string): Promise<WithdrawalResponse> {
+    const data = await executeGraphQL<{ adminGetWithdrawal: WithdrawalResponse }>(
+      ADMIN_GET_WITHDRAWAL_QUERY,
+      { id }
+    );
+    return data.adminGetWithdrawal;
+  },
+
+  /**
+   * Locks and starts banking processing for a withdrawal request
+   */
+  async startWithdrawalProcessing(requestId: string): Promise<WithdrawalResponse> {
+    const data = await executeGraphQL<{ adminStartWithdrawalProcessing: WithdrawalResponse }>(
+      ADMIN_START_WITHDRAWAL_PROCESSING_MUTATION,
+      { requestId }
+    );
+    return data.adminStartWithdrawalProcessing;
+  },
+
+  /**
+   * Marks a withdrawal request as completed with bank reference and receipt image
+   */
+  async completeWithdrawal(input: AdminCompleteWithdrawalInput): Promise<WithdrawalResponse> {
+    const data = await executeGraphQL<{ adminCompleteWithdrawal: WithdrawalResponse }>(
+      ADMIN_COMPLETE_WITHDRAWAL_MUTATION,
+      { input }
+    );
+    return data.adminCompleteWithdrawal;
+  },
+
+  /**
+   * Rejects a withdrawal request with documented reason and refunds user's wallet
+   */
+  async rejectWithdrawal(input: AdminRejectWithdrawalInput): Promise<WithdrawalResponse> {
+    const data = await executeGraphQL<{ adminRejectWithdrawal: WithdrawalResponse }>(
+      ADMIN_REJECT_WITHDRAWAL_MUTATION,
+      { input }
+    );
+    return data.adminRejectWithdrawal;
+  },
+
+  /**
+   * Subscribes to real-time live admin withdrawal feed
+   */
+  subscribeToWithdrawalFeed(
+    handlers: {
+      next: (payload: WithdrawalResponse) => void;
+      error?: (err: unknown) => void;
+      complete?: () => void;
+    },
+    token?: string | null
+  ): () => void {
+    return subscribeToSubscription<{ adminWithdrawalFeed: WithdrawalResponse }>(
+      {
+        query: ADMIN_WITHDRAWAL_FEED_SUBSCRIPTION,
+      },
+      {
+        next: (data: { adminWithdrawalFeed: WithdrawalResponse }) => {
+          if (data?.adminWithdrawalFeed) {
+            handlers.next(data.adminWithdrawalFeed);
+          }
+        },
+        error: handlers.error,
+        complete: handlers.complete,
+      },
+      token
+    );
+  },
 };
 
 // ----------------------------------------------------
@@ -722,5 +813,121 @@ const ADMIN_DISPUTE_STATUS_CHANGED_SUBSCRIPTION = `
   }
 `;
 
+// ----------------------------------------------------
+// GraphQL Operations (Batch 5: Withdrawals & Financials)
+// ----------------------------------------------------
+
+const ADMIN_GET_WITHDRAWALS_QUERY = `
+  query AdminGetWithdrawals($pagination: PaginationInput!, $filter: WithdrawalsFilterInput) {
+    adminGetWithdrawals(pagination: $pagination, filter: $filter) {
+      total
+      totalPages
+      hasNextPage
+      items {
+        _id
+        userId
+        amount
+        fee
+        feePercentage
+        netAmount
+        currency
+        payoutMethod
+        payoutDetails {
+          accountHolderName
+          bankName
+          accountNumber
+          iban
+          phoneNumber
+          ipaAddress
+        }
+        status
+        adminReference
+        receiptUrl
+        rejectionReason
+        processedAt
+        completedAt
+        createdAt
+      }
+    }
+  }
+`;
+
+const ADMIN_GET_WITHDRAWAL_QUERY = `
+  query AdminGetWithdrawal($id: ID!) {
+    adminGetWithdrawal(id: $id) {
+      _id
+      userId
+      amount
+      fee
+      feePercentage
+      netAmount
+      currency
+      payoutMethod
+      payoutDetails {
+        accountHolderName
+        bankName
+        accountNumber
+        iban
+        phoneNumber
+        ipaAddress
+      }
+      status
+      adminReference
+      receiptUrl
+      rejectionReason
+      processedAt
+      completedAt
+      createdAt
+    }
+  }
+`;
+
+const ADMIN_START_WITHDRAWAL_PROCESSING_MUTATION = `
+  mutation AdminStartWithdrawalProcessing($requestId: ID!) {
+    adminStartWithdrawalProcessing(requestId: $requestId) {
+      _id
+      status
+      processedAt
+    }
+  }
+`;
+
+const ADMIN_COMPLETE_WITHDRAWAL_MUTATION = `
+  mutation AdminCompleteWithdrawal($input: AdminCompleteWithdrawalInput!) {
+    adminCompleteWithdrawal(input: $input) {
+      _id
+      status
+      adminReference
+      receiptUrl
+      completedAt
+    }
+  }
+`;
+
+const ADMIN_REJECT_WITHDRAWAL_MUTATION = `
+  mutation AdminRejectWithdrawal($input: AdminRejectWithdrawalInput!) {
+    adminRejectWithdrawal(input: $input) {
+      _id
+      status
+      rejectionReason
+    }
+  }
+`;
+
+const ADMIN_WITHDRAWAL_FEED_SUBSCRIPTION = `
+  subscription AdminWithdrawalFeed {
+    adminWithdrawalFeed {
+      _id
+      userId
+      amount
+      netAmount
+      payoutMethod
+      status
+      createdAt
+    }
+  }
+`;
+
 export default adminService;
+
 

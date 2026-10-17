@@ -451,21 +451,23 @@
     },
     "withdrawals": {
       "startProcessing": "بدء المعالجة",
+      "startProcessingSuccess": "تم بدء معالجة طلب السحب بنجاح وقفله للتدقيق المصرفي",
+      "realtimeFeedNotice": "تم تحديث طلبات السحب في النظام لحظياً عبر البث المباشر",
       "complete": "إتمام وصرف",
       "reject": "رفض الطلب",
       "completeModal": {
         "title": "إتمام صرف طلب السحب",
-        "referenceLabel": "رقم الحوالة / المرجع المصرفي",
+        "referenceLabel": "رقم الحوالة / المرجع المصرفي *",
         "referencePlaceholder": "مثال: TXN-893472918",
-        "receiptUrlLabel": "رابط إيصال التحويل (اختياري)",
+        "receiptUrlLabel": "صورة إيصال التحويل البنكي (JPG, PNG, WEBP) *",
         "receiptUrlPlaceholder": "https://...",
-        "confirmButton": "تأكيد إتمام السحب",
+        "confirmButton": "تأكيد إتمام السحب والصرف",
         "successMessage": "تم إتمام عملية السحب وتحديث السجل بنجاح."
       },
       "rejectModal": {
         "title": "رفض طلب السحب",
         "warning": "سيتم إعادة المبلغ والرسوم المقتطعة إلى محفظة المستخدم فوراً مع إرسال إشعار بسبب الرفض.",
-        "reasonLabel": "سبب الرفض الإداري",
+        "reasonLabel": "سبب الرفض الإداري (10 أحرف على الأقل) *",
         "reasonPlaceholder": "يرجى كتابة سبب واضح ومفصل لرفض الطلب (10 أحرف على الأقل)...",
         "confirmButton": "تأكيد الرفض وإرجاع الرصيد",
         "successMessage": "تم رفض طلب السحب وإعادة المبلغ للمحفظة."

@@ -580,6 +580,53 @@ export const getWithdrawalStatusBadge = (status: string) => {
   }
 };
 
+export const getPayoutMethodConfig = (method: string, isRTL: boolean = true) => {
+  switch (method?.toUpperCase()) {
+    case 'INSTAPAY':
+      return {
+        label: isRTL ? 'انستاباي' : 'InstaPay',
+        badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        type: 'INSTAPAY' as const,
+      };
+    case 'BANK_ACCOUNT':
+      return {
+        label: isRTL ? 'تحويل بنكي' : 'Bank Account',
+        badgeClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+        type: 'BANK' as const,
+      };
+    case 'VODAFONE_CASH':
+      return {
+        label: isRTL ? 'فودافون كاش' : 'Vodafone Cash',
+        badgeClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+        type: 'WALLET' as const,
+      };
+    case 'ORANGE_CASH':
+      return {
+        label: isRTL ? 'أورنج كاش' : 'Orange Cash',
+        badgeClass: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+        type: 'WALLET' as const,
+      };
+    case 'ETISALAT_CASH':
+      return {
+        label: isRTL ? 'اتصالات كاش' : 'Etisalat Cash',
+        badgeClass: 'bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 border-emerald-600/20',
+        type: 'WALLET' as const,
+      };
+    case 'WE_PAY':
+      return {
+        label: isRTL ? 'وي باي' : 'WE Pay',
+        badgeClass: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+        type: 'WALLET' as const,
+      };
+    default:
+      return {
+        label: method || '—',
+        badgeClass: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
+        type: 'OTHER' as const,
+      };
+  }
+};
+
 export const getAuctionCategoryLabel = (category: string, isRTL: boolean = true): string => {
   const map: Record<string, { ar: string; en: string }> = {
     ELECTRONICS: { ar: 'إلكترونيات', en: 'Electronics' },
@@ -642,5 +689,74 @@ export const isArabicText = (text: string | undefined | null): boolean => {
   const match = text.match(/[\p{L}]/u);
   if (!match) return false;
   return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(match[0]);
+};
+
+/**
+ * Normalizes and formats bank names into bilingual representation
+ * e.g., "CIB" -> ar: "البنك التجاري الدولي (CIB)", en: "Commercial International Bank (CIB)"
+ */
+export const formatAdminBankName = (
+  bankName: string | undefined | null,
+  isRTL: boolean = true
+): string => {
+  if (!bankName) return '—';
+  const raw = bankName.trim();
+  const upper = raw.toUpperCase();
+
+  // 1. CIB
+  if (
+    upper.includes('CIB') ||
+    upper.includes('COMMERCIAL INTERNATIONAL') ||
+    raw.includes('التجاري الدولي')
+  ) {
+    return isRTL ? 'البنك التجاري الدولي (CIB)' : 'Commercial International Bank (CIB)';
+  }
+
+  // 2. NBE / الأهلي
+  if (
+    upper.includes('NBE') ||
+    upper.includes('NATIONAL BANK OF EGYPT') ||
+    (raw.includes('الأهلي') && !upper.includes('QNB'))
+  ) {
+    return isRTL ? 'البنك الأهلي المصري' : 'National Bank of Egypt (NBE)';
+  }
+
+  // 3. Banque Misr / بنك مصر
+  if (upper.includes('MISR') || raw.includes('مصر')) {
+    return isRTL ? 'بنك مصر' : 'Banque Misr';
+  }
+
+  // 4. QNB
+  if (upper.includes('QNB') || raw.includes('قطر الوطني')) {
+    return isRTL ? 'بنك QNB الأهلي' : 'QNB Alahli';
+  }
+
+  // 5. Bank of Alexandria / بنك الإسكندرية
+  if (upper.includes('ALEX') || raw.includes('الإسكندرية') || raw.includes('الاسكندرية')) {
+    return isRTL ? 'بنك الإسكندرية' : 'Bank of Alexandria';
+  }
+
+  // 6. Banque du Caire / بنك القاهرة
+  if (upper.includes('CAIRE') || raw.includes('القاهرة')) {
+    return isRTL ? 'بنك القاهرة' : 'Banque du Caire';
+  }
+
+  // 7. ADIB / مصرف أبوظبي الإسلامي
+  if (upper.includes('ADIB') || raw.includes('أبوظبي') || raw.includes('ابوظبي')) {
+    return isRTL ? 'مصرف أبوظبي الإسلامي' : 'Abu Dhabi Islamic Bank (ADIB)';
+  }
+
+  // 8. Faisal / فيصل الإسلامي
+  if (upper.includes('FAISAL') || raw.includes('فيصل')) {
+    return isRTL ? 'بنك فيصل الإسلامي' : 'Faisal Islamic Bank';
+  }
+
+  // 9. HSBC
+  if (upper.includes('HSBC')) {
+    return isRTL ? 'بنك إتش إس بي سي (HSBC)' : 'HSBC Bank Egypt';
+  }
+
+  // Fallback to original bankName
+  return raw;
 };
 

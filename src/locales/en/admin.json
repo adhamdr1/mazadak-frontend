@@ -431,13 +431,15 @@
     },
     "withdrawals": {
       "startProcessing": "Start Processing",
+      "startProcessingSuccess": "Withdrawal processing started and locked for banking audit.",
+      "realtimeFeedNotice": "Platform withdrawals updated in real-time via WebSocket live feed.",
       "complete": "Complete & Disburse",
       "reject": "Reject Request",
       "completeModal": {
         "title": "Complete Payout Disbursal",
-        "referenceLabel": "Bank Transfer / Reference Number",
+        "referenceLabel": "Bank Transfer / Reference Number *",
         "referencePlaceholder": "e.g. TXN-893472918",
-        "receiptUrlLabel": "Receipt URL (Optional)",
+        "receiptUrlLabel": "Bank Transfer Receipt Image (JPG, PNG, WEBP) *",
         "receiptUrlPlaceholder": "https://...",
         "confirmButton": "Confirm Disbursal",
         "successMessage": "Withdrawal marked as completed and audit logs updated."
@@ -445,7 +447,7 @@
       "rejectModal": {
         "title": "Reject Withdrawal Request",
         "warning": "The requested amount and fees will be immediately returned to the user's wallet with a notification.",
-        "reasonLabel": "Rejection Reason",
+        "reasonLabel": "Rejection Reason (at least 10 characters) *",
         "reasonPlaceholder": "Explain the reason clearly for the user (at least 10 characters)...",
         "confirmButton": "Confirm Rejection & Refund",
         "successMessage": "Withdrawal request rejected and funds returned to wallet."
