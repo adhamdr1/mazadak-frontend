@@ -27,6 +27,8 @@ export const AdminUsersPage: React.FC = () => {
   const selectedBanStatus = (searchParams.get('banned') as 'ALL' | 'ACTIVE' | 'BANNED') || 'ALL';
   const selectedVerification = (searchParams.get('verified') as 'ALL' | 'VERIFIED' | 'UNVERIFIED') || 'ALL';
   const sortOrder = (searchParams.get('sortOrder') as 'DESC' | 'ASC') || 'DESC';
+  const startDateFilter = searchParams.get('startDate') || undefined;
+  const endDateFilter = searchParams.get('endDate') || undefined;
 
   const updateParam = useCallback(
     (key: string, value: string | null, resetPage = true) => {
@@ -74,9 +76,15 @@ export const AdminUsersPage: React.FC = () => {
     } else if (selectedVerification === 'UNVERIFIED') {
       f.isEmailVerified = false;
     }
+    if (startDateFilter) {
+      f.startDate = startDateFilter;
+    }
+    if (endDateFilter) {
+      f.endDate = endDateFilter;
+    }
 
     return f;
-  }, [searchQuery, selectedRole, selectedBanStatus, selectedVerification, sortOrder]);
+  }, [searchQuery, selectedRole, selectedBanStatus, selectedVerification, sortOrder, startDateFilter, endDateFilter]);
 
   // 3. Data fetching hook
   const {
@@ -151,6 +159,22 @@ export const AdminUsersPage: React.FC = () => {
         onBanStatusChange={(s) => updateParam('banned', s)}
         selectedVerification={selectedVerification}
         onVerificationChange={(v) => updateParam('verified', v)}
+        startDate={startDateFilter}
+        endDate={endDateFilter}
+        onDateRangeChange={({ startDate, endDate }) => {
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev);
+              if (startDate) next.set('startDate', startDate);
+              else next.delete('startDate');
+              if (endDate) next.set('endDate', endDate);
+              else next.delete('endDate');
+              next.delete('usersPage');
+              return next;
+            },
+            { replace: true }
+          );
+        }}
         sortOrder={sortOrder}
         onSortOrderToggle={() => updateParam('sortOrder', sortOrder === 'DESC' ? 'ASC' : 'DESC', false)}
         onPageChange={(p) => updateParam('usersPage', String(p), false)}

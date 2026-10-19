@@ -63,7 +63,7 @@ export function FilterDropdown<T extends string = string>({
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className="relative shrink-0">
+    <div ref={containerRef} className={cn('relative', className)}>
       {/* Trigger Button - Sized identically to RefreshButton */}
       <button
         type="button"
@@ -72,24 +72,20 @@ export function FilterDropdown<T extends string = string>({
         aria-expanded={isOpen}
         aria-label={ariaLabel || selectedOption?.label}
         className={cn(
-          'group inline-flex items-center justify-between gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2.5 rounded-xl text-xs font-bold select-none cursor-pointer border transition-all duration-150 shadow-2xs shrink-0',
+          'group inline-flex items-center justify-between gap-1.5 sm:gap-2 px-3 sm:px-3.5 h-[38px] rounded-xl text-xs font-bold select-none cursor-pointer border transition-all duration-150 shadow-2xs w-full',
           isFiltered
             ? 'bg-amber-500/10 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-500/35 hover:bg-amber-500/15'
             : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:bg-slate-100/60 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white',
-          isOpen && 'ring-2 ring-amber-500/20 border-amber-500/50',
-          className
+          isOpen && 'ring-2 ring-amber-500/20 border-amber-500/50'
         )}
       >
         <div className="flex items-center gap-1.5 truncate">
           {Icon && (
             <Icon
-              className={cn(
-                'w-3.5 h-3.5 shrink-0 transition-colors',
-                isFiltered ? 'text-amber-500' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'
-              )}
+              className="w-3.5 h-3.5 shrink-0 text-amber-500 transition-colors"
             />
           )}
-          <span className="truncate max-w-[105px] sm:max-w-[140px]">
+          <span className="truncate">
             {selectedOption?.label}
           </span>
         </div>
@@ -107,7 +103,7 @@ export function FilterDropdown<T extends string = string>({
         <div
           role="listbox"
           className={cn(
-            'absolute z-50 end-0 mt-2 w-52 sm:w-56 rounded-2xl p-1.5 select-none',
+            'absolute z-50 start-0 sm:start-auto sm:end-0 mt-2 w-52 sm:w-56 rounded-2xl p-1.5 select-none',
             'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800',
             'shadow-xl shadow-slate-900/10 dark:shadow-black/50',
             'animate-in fade-in-0 zoom-in-95 duration-100 max-h-60 overflow-y-auto space-y-0.5',

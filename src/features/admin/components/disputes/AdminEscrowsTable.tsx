@@ -5,7 +5,6 @@ import {
   Search,
   X,
   ExternalLink,
-  Layers,
   ShieldCheck,
   RotateCcw,
   Clock,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { FilterDropdown } from '@/components/common/FilterDropdown';
 import { RefreshButton } from '@/components/common/RefreshButton';
+import { DateRangeFilter } from '@/components/common/DateRangeFilter';
 import { Pagination } from '@/components/common/Pagination';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { Modal } from '@/components/common/Modal';
@@ -51,6 +51,9 @@ export interface AdminEscrowsTableProps {
   onSearchChange: (value: string) => void;
   selectedStatus: EscrowStatus | 'ALL';
   onStatusChange: (status: EscrowStatus | 'ALL') => void;
+  startDate?: string;
+  endDate?: string;
+  onDateRangeChange: (range: { startDate?: string; endDate?: string }) => void;
   onPageChange: (page: number) => void;
   onRefresh: () => void;
   onReleaseEscrow?: (escrowId: string, reason?: string) => Promise<void>;
@@ -69,6 +72,9 @@ export const AdminEscrowsTable: React.FC<AdminEscrowsTableProps> = ({
   onSearchChange,
   selectedStatus,
   onStatusChange,
+  startDate,
+  endDate,
+  onDateRangeChange,
   onPageChange,
   onRefresh,
 }) => {
@@ -90,11 +96,11 @@ export const AdminEscrowsTable: React.FC<AdminEscrowsTableProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* 1. Header Filter Controls (Strict Single Row On All Screen Sizes) */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-3 sm:p-4 shadow-xs">
-        <div className="flex items-center gap-2 sm:gap-3 w-full">
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-0">
+      {/* 1. Header Filter Controls */}
+      <div className="relative z-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-3 sm:p-4 shadow-xs">
+        <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-2 sm:gap-2.5 w-full">
+          {/* Search Input: Row 1 on < xl (Full Width for spacious placeholder), Flex-1 on xl */}
+          <div className="relative w-full xl:flex-1 min-w-0">
             <Search className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
@@ -119,23 +125,37 @@ export const AdminEscrowsTable: React.FC<AdminEscrowsTableProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Controls: Row 2 on < xl (fills row width evenly), inline on xl */}
+          <div className="flex items-center gap-2 sm:gap-2.5 w-full xl:w-auto flex-nowrap shrink-0">
             {/* Standardized Reusable Filter Dropdown */}
-            <FilterDropdown
-              value={selectedStatus}
-              onChange={onStatusChange}
-              options={filterOptions}
-              icon={Layers}
-              allValue="ALL"
-            />
+            <div className="flex-1 min-w-0 xl:flex-initial xl:w-auto">
+              <FilterDropdown
+                value={selectedStatus}
+                onChange={onStatusChange}
+                options={filterOptions}
+                icon={ShieldCheck}
+                allValue="ALL"
+              />
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="flex-1 min-w-0 xl:flex-initial xl:w-auto">
+              <DateRangeFilter
+                startDate={startDate}
+                endDate={endDate}
+                onChange={onDateRangeChange}
+              />
+            </div>
 
             {/* Refresh Button */}
-            <RefreshButton
-              onRefresh={onRefresh}
-              isLoading={isLoading}
-              isRefetching={isRefetching}
-              showLabelOnMobile={false}
-            />
+            <div className="shrink-0">
+              <RefreshButton
+                onRefresh={onRefresh}
+                isLoading={isLoading}
+                isRefetching={isRefetching}
+                showLabelOnMobile={false}
+              />
+            </div>
           </div>
         </div>
       </div>

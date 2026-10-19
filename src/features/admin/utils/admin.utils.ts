@@ -259,6 +259,98 @@ export const getTransactionStatusBadge = (
   }
 };
 
+export type TransactionReferenceIconName =
+  | 'Gavel'
+  | 'ShieldCheck'
+  | 'Building2'
+  | 'Scale'
+  | 'ArrowRightLeft';
+
+export const getTransactionReferenceConfig = (
+  referenceType: string | undefined | null,
+  isRTL: boolean = true
+): { label: string; bgClass: string; icon: TransactionReferenceIconName } => {
+  switch (referenceType?.toUpperCase()) {
+    case 'AUCTION':
+      return {
+        label: isRTL ? 'مزاد' : 'Auction',
+        bgClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25',
+        icon: 'Gavel',
+      };
+    case 'ESCROW':
+      return {
+        label: isRTL ? 'ضمان' : 'Escrow',
+        bgClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
+        icon: 'ShieldCheck',
+      };
+    case 'WITHDRAWAL':
+    case 'WITHDRAW':
+      return {
+        label: isRTL ? 'سحب' : 'Payout',
+        bgClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25',
+        icon: 'Building2',
+      };
+    case 'DISPUTE':
+      return {
+        label: isRTL ? 'نزاع' : 'Dispute',
+        bgClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25',
+        icon: 'Scale',
+      };
+    case 'TRANSACTION':
+    default:
+      return {
+        label: isRTL ? 'مرجع' : 'Ref',
+        bgClass: 'bg-slate-500/10 text-slate-600 dark:text-slate-300 border-slate-500/25',
+        icon: 'ArrowRightLeft',
+      };
+  }
+};
+
+export const getTransactionImpactDescription = (
+  type: string | undefined | null,
+  isRTL: boolean = true
+): string => {
+  switch (type?.toUpperCase()) {
+    case 'HOLD':
+      return isRTL
+        ? 'حجز مؤقت للرصيد كتأمين إلزامي للمزايدة النشطة. يظل المبلغ في المحفظة ولكنه غير متاح للسحب حتى انتهاء المزاد.'
+        : 'Temporary balance hold as bidding deposit. Funds remain in wallet but are locked until auction finalization.';
+    case 'RELEASE':
+      return isRTL
+        ? 'فك حجز الرصيد وإعادته كاملاً للرصيد المتاح للمزايد بعد انتهاء المزاد أو تفوق مزايد آخر.'
+        : 'Hold released and funds restored to available wallet balance after outbid or auction conclusion.';
+    case 'CAPTURE':
+      return isRTL
+        ? 'خصم نهائي للمبلغ من محفظة المشتري الفائز وتحويله لحساب الضمان المالي كقيمة شراء للمزاد.'
+        : 'Final funds capture from winner wallet transferred to escrow for auction purchase settlement.';
+    case 'DEPOSIT':
+      return isRTL
+        ? 'إيداع نقدي مباشر في رصيد المحفظة عبر بوابة الدفع الإلكتروني المعتمدة.'
+        : 'Direct balance deposit into wallet via payment gateway checkout.';
+    case 'WITHDRAW':
+      return isRTL
+        ? 'خصم رصيد من المحفظة لتنفيذ حوالة سحب مصرفي أو محفظة إلكترونية لحساب المستخدم.'
+        : 'Balance deduction to process payout transfer to bank or digital wallet.';
+    case 'REFUND':
+      return isRTL
+        ? 'استرداد مالي لحساب المشتري بعد فض نزاع أو إلغاء المعاملة بقرار إداري.'
+        : 'Escrow or auction refund returned to user available balance.';
+    case 'ADMIN_CREDIT':
+      return isRTL
+        ? 'تسوية رصيد إدارية (+): تمت إضافة رصيد للمحفظة يدوياً بقرار وتوثيق إداري.'
+        : 'Administrative credit (+): manual balance addition documented by system administrator.';
+    case 'ADMIN_DEBIT':
+      return isRTL
+        ? 'تسوية رصيد إدارية (-): تم خصم رصيد من المحفظة يدوياً بقرار وتوثيق إداري.'
+        : 'Administrative debit (-): manual balance deduction documented by system administrator.';
+    default:
+      return isRTL
+        ? 'حركة مالية نظامية مسجلة في سجل تدقيق المحفظة.'
+        : 'Standard system transaction recorded in wallet audit log.';
+  }
+};
+
+
 export const getRoleBadgeConfig = (role: string) => {
   switch (role?.toUpperCase()) {
     case 'ADMIN':

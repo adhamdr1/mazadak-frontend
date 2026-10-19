@@ -768,6 +768,8 @@ input UsersFilterInput {
   isBanned: Boolean
   role: UserRole
   isEmailVerified: Boolean
+  startDate: DateTime
+  endDate: DateTime
 }
 
 input UsersSortInput {
@@ -791,6 +793,7 @@ enum SortOrder {
 input TransactionsFilterInput {
   search: String
   walletId: String
+  walletIds: [String!]
   userId: String
   type: TransactionType
   status: TransactionStatus
@@ -831,6 +834,8 @@ input AuctionsFilterInput {
   status: AuctionStatus
   search: String
   sort: AuctionsSortInput
+  startDate: DateTime
+  endDate: DateTime
 }
 
 input AuctionsSortInput {
@@ -871,6 +876,8 @@ input EscrowFilterInput {
   buyerId: String
   sellerId: String
   auctionId: String
+  startDate: DateTime
+  endDate: DateTime
 }
 
 input DisputeFilterInput {
@@ -880,6 +887,8 @@ input DisputeFilterInput {
   openedById: String
   againstUserId: String
   auctionId: String
+  startDate: DateTime
+  endDate: DateTime
 }
 
 input WithdrawalsFilterInput {

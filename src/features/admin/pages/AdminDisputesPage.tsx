@@ -44,10 +44,14 @@ export const AdminDisputesPage: React.FC = () => {
   const disputeSearch = searchParams.get('disputeSearch') || '';
   const disputeStatus =
     (searchParams.get('disputeStatus') as DisputeStatus | 'ALL') || 'ALL';
+  const disputeStartDate = searchParams.get('disputeStartDate') || undefined;
+  const disputeEndDate = searchParams.get('disputeEndDate') || undefined;
 
   const escrowSearch = searchParams.get('escrowSearch') || '';
   const escrowStatus =
     (searchParams.get('escrowStatus') as EscrowStatus | 'ALL') || 'ALL';
+  const escrowStartDate = searchParams.get('escrowStartDate') || undefined;
+  const escrowEndDate = searchParams.get('escrowEndDate') || undefined;
 
   const updateParam = useCallback(
     (key: string, value: string | null, resetPageKey?: string) => {
@@ -85,8 +89,14 @@ export const AdminDisputesPage: React.FC = () => {
     if (cleanSearch) {
       f.search = cleanSearch;
     }
+    if (disputeStartDate) {
+      f.startDate = disputeStartDate;
+    }
+    if (disputeEndDate) {
+      f.endDate = disputeEndDate;
+    }
     return f;
-  }, [disputeStatus, disputeSearch]);
+  }, [disputeStatus, disputeSearch, disputeStartDate, disputeEndDate]);
 
   const escrowFilter: EscrowFilterInput = useMemo(() => {
     const f: EscrowFilterInput = {};
@@ -99,8 +109,14 @@ export const AdminDisputesPage: React.FC = () => {
     if (cleanSearch) {
       f.search = cleanSearch;
     }
+    if (escrowStartDate) {
+      f.startDate = escrowStartDate;
+    }
+    if (escrowEndDate) {
+      f.endDate = escrowEndDate;
+    }
     return f;
-  }, [escrowStatus, escrowSearch]);
+  }, [escrowStatus, escrowSearch, escrowStartDate, escrowEndDate]);
 
   // 4. Data Hooks
   const {
@@ -285,6 +301,22 @@ export const AdminDisputesPage: React.FC = () => {
           onSearchChange={(q) => updateParam('disputeSearch', q, 'disputesPage')}
           selectedStatus={disputeStatus}
           onStatusChange={(s) => updateParam('disputeStatus', s, 'disputesPage')}
+          startDate={disputeStartDate}
+          endDate={disputeEndDate}
+          onDateRangeChange={({ startDate, endDate }) => {
+            setSearchParams(
+              (prev) => {
+                const next = new URLSearchParams(prev);
+                if (startDate) next.set('disputeStartDate', startDate);
+                else next.delete('disputeStartDate');
+                if (endDate) next.set('disputeEndDate', endDate);
+                else next.delete('disputeEndDate');
+                next.delete('disputesPage');
+                return next;
+              },
+              { replace: true }
+            );
+          }}
           onPageChange={(p) => updateParam('disputesPage', p.toString())}
           onRefresh={refetchDisputes}
           onResolveDispute={(dispute) => setResolveTargetDispute(dispute)}
@@ -303,6 +335,22 @@ export const AdminDisputesPage: React.FC = () => {
           onSearchChange={(q) => updateParam('escrowSearch', q, 'escrowsPage')}
           selectedStatus={escrowStatus}
           onStatusChange={(s) => updateParam('escrowStatus', s, 'escrowsPage')}
+          startDate={escrowStartDate}
+          endDate={escrowEndDate}
+          onDateRangeChange={({ startDate, endDate }) => {
+            setSearchParams(
+              (prev) => {
+                const next = new URLSearchParams(prev);
+                if (startDate) next.set('escrowStartDate', startDate);
+                else next.delete('escrowStartDate');
+                if (endDate) next.set('escrowEndDate', endDate);
+                else next.delete('escrowEndDate');
+                next.delete('escrowsPage');
+                return next;
+              },
+              { replace: true }
+            );
+          }}
           onPageChange={(p) => updateParam('escrowsPage', p.toString())}
           onRefresh={refetchEscrows}
           onReleaseEscrow={handleReleaseEscrow}

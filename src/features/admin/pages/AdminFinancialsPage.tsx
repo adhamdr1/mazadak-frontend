@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Landmark, ArrowRightLeft } from 'lucide-react';
+import { Landmark, ArrowRightLeft, Receipt } from 'lucide-react';
+import { ROUTES } from '@/constants/routes.constants';
 import { toLocalizedDigits } from '@/utils/formatters';
 import { useAdminTreasuryStats } from '../hooks/useAdminTreasuryStats';
 import { useAdminWithdrawals } from '../hooks/useAdminWithdrawals';
@@ -32,6 +33,8 @@ export const AdminFinancialsPage: React.FC = () => {
   const searchQuery = searchParams.get('search') || '';
   const selectedStatus = (searchParams.get('status') as WithdrawalStatus | 'ALL') || 'ALL';
   const selectedMethod = (searchParams.get('method') as PayoutMethod | 'ALL') || 'ALL';
+  const startDateFilter = searchParams.get('startDate') || undefined;
+  const endDateFilter = searchParams.get('endDate') || undefined;
 
   const updateParam = useCallback(
     (key: string, value: string | null, resetPageKey?: string) => {
@@ -72,8 +75,14 @@ export const AdminFinancialsPage: React.FC = () => {
     if (cleanSearch) {
       f.search = cleanSearch;
     }
+    if (startDateFilter) {
+      f.startDate = startDateFilter;
+    }
+    if (endDateFilter) {
+      f.endDate = endDateFilter;
+    }
     return f;
-  }, [selectedStatus, selectedMethod, searchQuery]);
+  }, [selectedStatus, selectedMethod, searchQuery, startDateFilter, endDateFilter]);
 
   // 4. Data Hooks
   const {
@@ -152,15 +161,25 @@ export const AdminFinancialsPage: React.FC = () => {
 
       {/* Section 2: Withdrawals Management Table */}
       <section className="space-y-3 pt-2">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500">
-            <ArrowRightLeft className="w-4 h-4" />
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500">
+              <ArrowRightLeft className="w-4 h-4" />
+            </div>
+            <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+              {t('financials.tabs.withdrawals', {
+                defaultValue: 'إدارة طلبات سحب الأرباح المصرفية',
+              })}
+            </h2>
           </div>
-          <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-            {t('financials.tabs.withdrawals', {
-              defaultValue: 'إدارة طلبات سحب الأرباح المصرفية',
-            })}
-          </h2>
+
+          <Link
+            to={ROUTES.ADMIN.TRANSACTIONS}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 border border-amber-500/20 transition-colors shadow-2xs"
+          >
+            <Receipt className="w-3.5 h-3.5" />
+            <span>{isRTL ? 'عرض سجل التدقيق المالي' : 'View Transactions Audit'}</span>
+          </Link>
         </div>
 
         <WithdrawalsTable
@@ -176,6 +195,22 @@ export const AdminFinancialsPage: React.FC = () => {
           onStatusChange={(st) => updateParam('status', st, 'withdrawalsPage')}
           selectedMethod={selectedMethod}
           onMethodChange={(m) => updateParam('method', m, 'withdrawalsPage')}
+          startDate={startDateFilter}
+          endDate={endDateFilter}
+          onDateRangeChange={({ startDate, endDate }) => {
+            setSearchParams(
+              (prev) => {
+                const next = new URLSearchParams(prev);
+                if (startDate) next.set('startDate', startDate);
+                else next.delete('startDate');
+                if (endDate) next.set('endDate', endDate);
+                else next.delete('endDate');
+                next.delete('withdrawalsPage');
+                return next;
+              },
+              { replace: true }
+            );
+          }}
           onPageChange={(page) => updateParam('withdrawalsPage', String(page))}
           onRefresh={handleRefreshAll}
           onStartProcessing={startProcessing}

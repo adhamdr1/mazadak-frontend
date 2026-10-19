@@ -54,6 +54,7 @@ export interface PaginationInput {
 export interface TransactionsFilterInput {
   search?: string;
   walletId?: string;
+  walletIds?: string[];
   userId?: string;
   type?: TransactionType;
   status?: TransactionStatus;

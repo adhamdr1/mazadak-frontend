@@ -144,6 +144,8 @@ export interface UsersFilterInput {
   isBanned?: boolean;
   role?: UserRole;
   isEmailVerified?: boolean;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface FindUserInput {

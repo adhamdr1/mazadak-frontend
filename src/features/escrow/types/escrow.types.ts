@@ -101,6 +101,8 @@ export interface EscrowFilterInput {
   buyerId?: string;
   sellerId?: string;
   auctionId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface DisputeFilterInput {
@@ -110,6 +112,8 @@ export interface DisputeFilterInput {
   openedById?: string;
   againstUserId?: string;
   auctionId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface OpenDisputeInput {

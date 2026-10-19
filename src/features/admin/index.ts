@@ -62,6 +62,7 @@ export { TreasuryOverviewSection } from './components/financials/TreasuryOvervie
 export { WithdrawalsTable } from './components/financials/WithdrawalsTable';
 export { CompleteWithdrawalModal } from './components/financials/CompleteWithdrawalModal';
 export { RejectWithdrawalModal } from './components/financials/RejectWithdrawalModal';
+export { TransactionsAuditTable } from './components/financials/TransactionsAuditTable';
 
 // Pages
 export { AdminDashboardPage } from './pages/AdminDashboardPage';
@@ -69,5 +70,6 @@ export { AdminUsersPage } from './pages/AdminUsersPage';
 export { AdminAuctionsPage } from './pages/AdminAuctionsPage';
 export { AdminDisputesPage } from './pages/AdminDisputesPage';
 export { AdminFinancialsPage } from './pages/AdminFinancialsPage';
+export { AdminTransactionsPage } from './pages/AdminTransactionsPage';
 
 

@@ -21,6 +21,7 @@ import {
 import { ROUTES } from '@/constants/routes.constants';
 import { FilterDropdown } from '@/components/common/FilterDropdown';
 import { RefreshButton } from '@/components/common/RefreshButton';
+import { DateRangeFilter } from '@/components/common/DateRangeFilter';
 import { Pagination } from '@/components/common/Pagination';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { Modal } from '@/components/common/Modal';
@@ -72,6 +73,9 @@ export interface WithdrawalsTableProps {
   onStatusChange: (status: WithdrawalStatus | 'ALL') => void;
   selectedMethod: PayoutMethod | 'ALL';
   onMethodChange: (method: PayoutMethod | 'ALL') => void;
+  startDate?: string;
+  endDate?: string;
+  onDateRangeChange: (range: { startDate?: string; endDate?: string }) => void;
   onPageChange: (page: number) => void;
   onRefresh: () => void;
   onStartProcessing: (requestId: string) => Promise<unknown>;
@@ -93,6 +97,9 @@ export const WithdrawalsTable: React.FC<WithdrawalsTableProps> = ({
   onStatusChange,
   selectedMethod,
   onMethodChange,
+  startDate,
+  endDate,
+  onDateRangeChange,
   onPageChange,
   onRefresh,
   onStartProcessing,
@@ -111,6 +118,15 @@ export const WithdrawalsTable: React.FC<WithdrawalsTableProps> = ({
   useEffect(() => {
     setLocalSearch(searchQuery);
   }, [searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== searchQuery) {
+        onSearchChange(localSearch);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [localSearch, onSearchChange, searchQuery]);
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -134,26 +150,27 @@ export const WithdrawalsTable: React.FC<WithdrawalsTableProps> = ({
     onSearchChange('');
     onStatusChange('ALL');
     onMethodChange('ALL');
+    onDateRangeChange({ startDate: undefined, endDate: undefined });
   };
 
   const hasActiveFilters =
-    searchQuery.trim() !== '' || selectedStatus !== 'ALL' || selectedMethod !== 'ALL';
+    searchQuery.trim() !== '' ||
+    selectedStatus !== 'ALL' ||
+    selectedMethod !== 'ALL' ||
+    Boolean(startDate || endDate);
 
   return (
     <div className="space-y-4">
       {/* 1. Filter & Search Controls Bar */}
-      <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-2.5">
-        <div className="flex items-center gap-2 sm:gap-2.5 w-full flex-nowrap">
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-0">
+      <div className="relative z-20 p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-2.5">
+        <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-2 sm:gap-2.5 w-full">
+          {/* Search Input: Row 1 on < xl (Full Width for spacious placeholder), Flex-1 on xl */}
+          <div className="relative w-full xl:flex-1 min-w-0">
             <Search className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={localSearch}
-              onChange={(e) => {
-                setLocalSearch(e.target.value);
-                onSearchChange(e.target.value);
-              }}
+              onChange={(e) => setLocalSearch(e.target.value)}
               placeholder={
                 isRTL
                   ? 'بحث بالسيرفر بالاسم، الهاتف، الآيبان، الحساب، أو المعرف...'
@@ -175,42 +192,58 @@ export const WithdrawalsTable: React.FC<WithdrawalsTableProps> = ({
             )}
           </div>
 
-          {/* Status Dropdown */}
-          <div className="shrink-0">
-            <FilterDropdown
-              value={selectedStatus}
-              onChange={(val) => onStatusChange(val as WithdrawalStatus | 'ALL')}
-              options={STATUS_OPTIONS.map((opt) => ({
-                value: opt.value,
-                label: isRTL ? opt.labelAr : opt.labelEn,
-              }))}
-              icon={Clock}
-              allValue="ALL"
-            />
-          </div>
+          {/* Controls: Row 2 on < xl (fills row width evenly), inline on xl */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full xl:w-auto shrink-0">
+            <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto flex-1 xl:flex-initial">
+              {/* Status Dropdown */}
+              <div className="flex-1 min-w-0 xl:flex-initial xl:w-auto">
+                <FilterDropdown
+                  value={selectedStatus}
+                  onChange={(val) => onStatusChange(val as WithdrawalStatus | 'ALL')}
+                  options={STATUS_OPTIONS.map((opt) => ({
+                    value: opt.value,
+                    label: isRTL ? opt.labelAr : opt.labelEn,
+                  }))}
+                  icon={Clock}
+                  allValue="ALL"
+                />
+              </div>
 
-          {/* Method Dropdown */}
-          <div className="shrink-0">
-            <FilterDropdown
-              value={selectedMethod}
-              onChange={(val) => onMethodChange(val as PayoutMethod | 'ALL')}
-              options={METHOD_OPTIONS.map((opt) => ({
-                value: opt.value,
-                label: isRTL ? opt.labelAr : opt.labelEn,
-              }))}
-              icon={Building2}
-              allValue="ALL"
-            />
-          </div>
+              {/* Method Dropdown */}
+              <div className="flex-1 min-w-0 xl:flex-initial xl:w-auto">
+                <FilterDropdown
+                  value={selectedMethod}
+                  onChange={(val) => onMethodChange(val as PayoutMethod | 'ALL')}
+                  options={METHOD_OPTIONS.map((opt) => ({
+                    value: opt.value,
+                    label: isRTL ? opt.labelAr : opt.labelEn,
+                  }))}
+                  icon={Building2}
+                  allValue="ALL"
+                />
+              </div>
+            </div>
 
-          {/* Common RefreshButton */}
-          <div className="shrink-0">
-            <RefreshButton
-              onRefresh={onRefresh}
-              isLoading={isLoading}
-              isRefetching={isRefetching}
-              showLabelOnMobile={false}
-            />
+            <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto flex-1 xl:flex-initial">
+              {/* Date Range Filter */}
+              <div className="flex-1 min-w-0 xl:flex-initial xl:w-auto">
+                <DateRangeFilter
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={onDateRangeChange}
+                />
+              </div>
+
+              {/* Common RefreshButton */}
+              <div className="shrink-0">
+                <RefreshButton
+                  onRefresh={onRefresh}
+                  isLoading={isLoading}
+                  isRefetching={isRefetching}
+                  showLabelOnMobile={false}
+                />
+              </div>
+            </div>
           </div>
         </div>
 

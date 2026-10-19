@@ -454,6 +454,34 @@
       }
     }
   },
+  "transactions": {
+    "title": "Transactions Audit Trail",
+    "subtitle": "Monitor and audit all system financial operations, payouts, and auction holds",
+    "table": {
+      "transaction": "Transaction & Ref",
+      "walletId": "Wallet ID",
+      "type": "Transaction Type",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date & Time",
+      "actions": "Details",
+      "emptyTitle": "No matching transactions found",
+      "emptyDesc": "System financial transactions will appear here in real-time.",
+      "searchPlaceholder": "Smart search by phone number, email, name, or transaction/ref ID..."
+    },
+    "modal": {
+      "title": "Transaction Audit Details",
+      "amount": "Amount",
+      "transactionId": "Transaction ID:",
+      "walletId": "Wallet ID:",
+      "operationType": "Operation Type:",
+      "referenceType": "Reference Type:",
+      "referenceId": "Reference ID:",
+      "gatewayProvider": "Gateway Provider:",
+      "gatewayTrxId": "Gateway Trx ID:",
+      "timestamp": "Timestamp:"
+    }
+  },
   "common": {
     "loading": "Loading admin data...",
     "error": "An error occurred while loading administrative records.",
@@ -467,6 +495,19 @@
     "page": "Page",
     "of": "of",
     "next": "Next",
-    "previous": "Previous"
+    "previous": "Previous",
+    "dateRange": "Date Range",
+    "filterByDateRange": "Filter by Date Range",
+    "quickPresets": "Quick Presets",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "thisMonth": "This Month",
+    "customRange": "Custom Range",
+    "fromDate": "From Date",
+    "toDate": "To Date",
+    "clearAll": "Clear All",
+    "applyFilter": "Apply Filter"
   }
 }

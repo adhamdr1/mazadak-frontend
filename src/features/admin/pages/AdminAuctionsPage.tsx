@@ -27,6 +27,8 @@ export const AdminAuctionsPage: React.FC = () => {
   const selectedCategory = (searchParams.get('category') as AuctionCategory | 'ALL') || 'ALL';
   const selectedStatus = (searchParams.get('status') as AuctionStatus | 'ALL') || 'ALL';
   const sortOrder = (searchParams.get('sortOrder') as 'DESC' | 'ASC') || 'DESC';
+  const startDateFilter = searchParams.get('startDate') || undefined;
+  const endDateFilter = searchParams.get('endDate') || undefined;
 
   const updateParam = useCallback(
     (key: string, value: string | null, resetPage = true) => {
@@ -67,9 +69,15 @@ export const AdminAuctionsPage: React.FC = () => {
     if (selectedStatus && selectedStatus !== 'ALL') {
       f.status = selectedStatus;
     }
+    if (startDateFilter) {
+      f.startDate = startDateFilter;
+    }
+    if (endDateFilter) {
+      f.endDate = endDateFilter;
+    }
 
     return f;
-  }, [searchQuery, selectedCategory, selectedStatus, sortOrder]);
+  }, [searchQuery, selectedCategory, selectedStatus, sortOrder, startDateFilter, endDateFilter]);
 
   // 3. Data fetching hook
   const {
@@ -155,6 +163,22 @@ export const AdminAuctionsPage: React.FC = () => {
         onCategoryChange={(cat) => updateParam('category', cat)}
         selectedStatus={selectedStatus}
         onStatusChange={(st) => updateParam('status', st)}
+        startDate={startDateFilter}
+        endDate={endDateFilter}
+        onDateRangeChange={({ startDate, endDate }) => {
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev);
+              if (startDate) next.set('startDate', startDate);
+              else next.delete('startDate');
+              if (endDate) next.set('endDate', endDate);
+              else next.delete('endDate');
+              next.delete('auctionsPage');
+              return next;
+            },
+            { replace: true }
+          );
+        }}
         sortOrder={sortOrder}
         onSortOrderToggle={() =>
           updateParam('sortOrder', sortOrder === 'DESC' ? 'ASC' : 'DESC')
