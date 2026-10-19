@@ -27,14 +27,19 @@ export function useAuctionDetail(id?: string) {
         if (!old) return payload.auction;
         return {
           ...old,
+          ...payload.auction,
           status: payload.auction.status,
+          adminActionReason: payload.auction.adminActionReason ?? old.adminActionReason,
           currentPrice: payload.auction.currentPrice || old.currentPrice,
           winnerId: payload.auction.winnerId ?? old.winnerId,
         };
       });
-      // Re-sync wallet when auction ends/finalizes or status updates
+      // Re-sync auction detail immediately from server so cancellation metadata & admin reasons are 100% fresh without manual refresh
+      queryClient.refetchQueries({ queryKey: QUERY_KEYS.AUCTIONS.DETAIL(id) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.MY_WALLET });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BIDS.MY_AUTO_BID(id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ESCROW.BY_AUCTION(id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REVIEWS.CAN_REVIEW(id) });
     });
 
     return () => {
@@ -118,8 +123,9 @@ export function useAuctionDetail(id?: string) {
   const isSeller = Boolean(user && query.data && user._id === query.data.sellerId);
   const isWinner = Boolean(
     user &&
+    effectiveStatus === 'ENDED' &&
     ((query.data?.winnerId && user._id === query.data.winnerId) ||
-      (effectiveStatus === 'ENDED' && latestLeadingBidderId && user._id === latestLeadingBidderId))
+      (latestLeadingBidderId && user._id === latestLeadingBidderId))
   );
 
   const errorKey = query.error ? `errors.${query.error.message}` : null;

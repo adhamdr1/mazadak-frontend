@@ -46,47 +46,49 @@ export const Modal: React.FC<ModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
-  // Handle focus trap
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!isOpen) return;
+  // Keep latest handlers in refs so keydown handler never triggers effect re-runs
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
-      if (e.key === 'Escape' && closeOnEscape) {
+  const closeOnEscapeRef = useRef(closeOnEscape);
+  closeOnEscapeRef.current = closeOnEscape;
+
+  // Handle focus trap with stable identity
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && closeOnEscapeRef.current) {
+      e.preventDefault();
+      onCloseRef.current();
+      return;
+    }
+
+    if (e.key === 'Tab' && modalRef.current) {
+      const focusableElements = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
+      );
+
+      if (focusableElements.length === 0) {
         e.preventDefault();
-        onClose();
         return;
       }
 
-      if (e.key === 'Tab' && modalRef.current) {
-        const focusableElements = Array.from(
-          modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
-        );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
 
-        if (focusableElements.length === 0) {
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement || !modalRef.current.contains(document.activeElement)) {
           e.preventDefault();
-          return;
+          lastElement.focus();
         }
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement || !modalRef.current.contains(document.activeElement)) {
-            e.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          if (document.activeElement === lastElement || !modalRef.current.contains(document.activeElement)) {
-            e.preventDefault();
-            firstElement.focus();
-          }
+      } else {
+        if (document.activeElement === lastElement || !modalRef.current.contains(document.activeElement)) {
+          e.preventDefault();
+          firstElement.focus();
         }
       }
-    },
-    [isOpen, closeOnEscape, onClose]
-  );
+    }
+  }, []);
 
-  // Lock body scroll and manage initial focus
+  // Lock body scroll and manage initial focus strictly once per open/close transition
   useEffect(() => {
     if (isOpen) {
       previousActiveElementRef.current = document.activeElement as HTMLElement | null;
@@ -95,15 +97,10 @@ export const Modal: React.FC<ModalProps> = ({
 
       window.addEventListener('keydown', handleKeyDown);
 
-      // Focus first focusable element or modal container
+      // Focus modal container cleanly so keyboard navigation works without highlighting close button
       const timeoutId = setTimeout(() => {
-        if (modalRef.current) {
-          const focusable = modalRef.current.querySelector<HTMLElement>(FOCUSABLE_SELECTORS);
-          if (focusable) {
-            focusable.focus();
-          } else {
-            modalRef.current.focus();
-          }
+        if (modalRef.current && !modalRef.current.contains(document.activeElement)) {
+          modalRef.current.focus({ preventScroll: true });
         }
       }, 50);
 
@@ -141,7 +138,7 @@ export const Modal: React.FC<ModalProps> = ({
         tabIndex={-1}
         className={cn(
           'relative w-full rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200/80 dark:border-slate-800',
-          'text-slate-900 dark:text-slate-100 outline-none transition-all duration-300',
+          'text-slate-900 dark:text-slate-100 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-all duration-300',
           'animate-in fade-in zoom-in-95 slide-in-from-bottom-2',
           SIZE_CLASSES[size],
           className
@@ -175,7 +172,7 @@ export const Modal: React.FC<ModalProps> = ({
                 className={cn(
                   'inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors',
                   'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200',
-                  'hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500'
+                  'hover:bg-slate-100 dark:hover:bg-slate-800 outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500'
                 )}
                 aria-label="Close modal"
               >

@@ -14,7 +14,9 @@
   "close": "Close",
   "error": "An unexpected error occurred",
   "success": "Operation completed successfully",
+  "refresh": "Refresh",
   "actions": {
+    "refresh": "Refresh",
     "retry": "Try Again",
     "cancel": "Cancel",
     "confirm": "Confirm",

@@ -98,6 +98,8 @@ export interface AuctionsFilterInput {
   status?: AuctionStatus;
   search?: string;
   sort?: AuctionsSortInput;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface CreateAuctionInput {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/utils/cn';
+import { useAuth } from '@/hooks/useAuth';
 import type { Auction } from '../../types/auctions.types';
 import { AuctionCard } from '../shared/AuctionCard';
 import { AuctionCardSkeleton } from '../shared/AuctionCardSkeleton';
@@ -24,15 +25,19 @@ export const AuctionGrid: React.FC<AuctionGridProps> = ({
   onStatusExpire,
   className,
 }) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const isListView = viewMode === 'list';
+
+  const gridColsClass = isAdmin
+    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-5 sm:gap-6'
+    : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6';
 
   if (isLoading) {
     return (
       <div
         className={cn(
-          isListView
-            ? 'flex flex-col gap-4'
-            : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6',
+          isListView ? 'flex flex-col gap-4' : gridColsClass,
           className
         )}
       >
@@ -48,9 +53,7 @@ export const AuctionGrid: React.FC<AuctionGridProps> = ({
   return (
     <div
       className={cn(
-        isListView
-          ? 'flex flex-col gap-4'
-          : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6',
+        isListView ? 'flex flex-col gap-4' : gridColsClass,
         className
       )}
     >

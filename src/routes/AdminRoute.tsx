@@ -24,6 +24,10 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
+  if (user?.isBanned) {
+    return <Navigate to={ROUTES.BANNED} replace />;
+  }
+
   if (user?.role !== 'ADMIN') {
     return <Navigate to={ROUTES.UNAUTHORIZED} replace />;
   }

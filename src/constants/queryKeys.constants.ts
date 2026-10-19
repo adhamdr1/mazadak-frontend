@@ -75,10 +75,29 @@ export const QUERY_KEYS = {
     DETAIL: (id: string) => ['reviews', 'detail', id] as const,
   },
   ADMIN: {
+    ALL: ['admin'] as const,
     STATS: ['admin', 'stats'] as const,
-    USERS: ['admin', 'users'] as const,
-    AUCTIONS: ['admin', 'auctions'] as const,
-    DISPUTES: ['admin', 'disputes'] as const,
-    TRANSACTIONS: ['admin', 'transactions'] as const,
+    TREASURY: ['admin', 'treasury'] as const,
+    USERS: (page?: number, limit?: number, filter?: unknown) =>
+      ['admin', 'users', page, limit, filter] as const,
+    USERS_ALL: ['admin', 'users'] as const,
+    USER_DETAILS: (userId: string) => ['admin', 'user-details', userId] as const,
+    AUCTIONS: (page?: number, limit?: number, filter?: unknown) =>
+      ['admin', 'auctions', page, limit, filter] as const,
+    AUCTIONS_ALL: ['admin', 'auctions'] as const,
+    AUCTION_REVIEWS: (auctionId: string) => ['admin', 'auction-reviews', auctionId] as const,
+    DISPUTES: (page?: number, limit?: number, filter?: unknown) =>
+      ['admin', 'disputes', page, limit, filter] as const,
+    DISPUTES_ALL: ['admin', 'disputes'] as const,
+    ESCROWS: (page?: number, limit?: number, filter?: unknown) =>
+      ['admin', 'escrows', page, limit, filter] as const,
+    ESCROWS_ALL: ['admin', 'escrows'] as const,
+    WITHDRAWALS: (page?: number, limit?: number, filter?: unknown) =>
+      ['admin', 'withdrawals', page, limit, filter] as const,
+    WITHDRAWALS_ALL: ['admin', 'withdrawals'] as const,
+    WITHDRAWAL_DETAIL: (id: string) => ['admin', 'withdrawal', id] as const,
+    TRANSACTIONS: (page?: number, limit?: number, filter?: unknown) =>
+      ['admin', 'transactions', page, limit, filter] as const,
+    TRANSACTIONS_ALL: ['admin', 'transactions'] as const,
   },
 } as const;

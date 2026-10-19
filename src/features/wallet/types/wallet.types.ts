@@ -53,6 +53,9 @@ export interface PaginationInput {
 
 export interface TransactionsFilterInput {
   search?: string;
+  walletId?: string;
+  walletIds?: string[];
+  userId?: string;
   type?: TransactionType;
   status?: TransactionStatus;
   startDate?: string; // ISO DateTime
@@ -189,6 +192,8 @@ export interface WithdrawalResponse {
 }
 
 export interface WithdrawalsFilterInput {
+  search?: string;
+  userId?: string;
   status?: WithdrawalStatus;
   payoutMethod?: PayoutMethod;
   sortOrder?: SortOrder;

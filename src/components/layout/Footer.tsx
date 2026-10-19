@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
   const { t, i18n } = useTranslation(['common', 'auctions', 'bids']);
   const { t: tAuctions } = useTranslation('auctions');
   const { t: tBids } = useTranslation('bids');
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const isRTL = i18n.language?.startsWith('ar');
 
@@ -66,28 +66,53 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               {isAuthenticated && (
-                <>
-                  <li>
-                    <Link to={ROUTES.MY_AUCTIONS} className="hover:text-amber-500 transition-colors">
-                      {tAuctions('myAuctions.title')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={ROUTES.MY_BIDS} className="hover:text-amber-500 transition-colors">
-                      {tBids('pageTitle')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={ROUTES.MY_ESCROWS} className="hover:text-amber-500 transition-colors">
-                      {t('nav.myEscrows')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={ROUTES.CREATE_AUCTION} className="hover:text-amber-500 transition-colors">
-                      {tAuctions('create.title')}
-                    </Link>
-                  </li>
-                </>
+                user?.role === 'ADMIN' ? (
+                  <>
+                    <li>
+                      <Link to={ROUTES.ADMIN.DASHBOARD} className="hover:text-amber-500 transition-colors font-bold text-amber-600 dark:text-amber-400">
+                        {isRTL ? 'لوحة التحكم الإدارية' : 'Admin Dashboard'}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.ADMIN.USERS} className="hover:text-amber-500 transition-colors">
+                        {isRTL ? 'إدارة المستخدمين' : 'User Management'}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.ADMIN.AUCTIONS} className="hover:text-amber-500 transition-colors">
+                        {isRTL ? 'مراقبة المزادات' : 'Auctions Moderation'}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.ADMIN.DISPUTES} className="hover:text-amber-500 transition-colors">
+                        {isRTL ? 'فض النزاعات والضمان' : 'Disputes & Escrow'}
+                      </Link>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      <Link to={ROUTES.MY_AUCTIONS} className="hover:text-amber-500 transition-colors">
+                        {tAuctions('myAuctions.title')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.MY_BIDS} className="hover:text-amber-500 transition-colors">
+                        {tBids('pageTitle')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.MY_ESCROWS} className="hover:text-amber-500 transition-colors">
+                        {t('nav.myEscrows')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.CREATE_AUCTION} className="hover:text-amber-500 transition-colors">
+                        {tAuctions('create.title')}
+                      </Link>
+                    </li>
+                  </>
+                )
               )}
             </ul>
           </div>
@@ -120,28 +145,48 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs text-slate-500 dark:text-slate-400">
               {isAuthenticated ? (
-                <>
-                  <li>
-                    <Link to={ROUTES.WALLET} className="hover:text-amber-500 transition-colors">
-                      {t('footer.wallet')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={ROUTES.WALLET_WITHDRAWALS} className="hover:text-amber-500 transition-colors">
-                      {t('footer.withdrawals')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={ROUTES.WALLET_TRANSACTIONS} className="hover:text-amber-500 transition-colors">
-                      {t('footer.transactions')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={ROUTES.PROFILE} className="hover:text-amber-500 transition-colors">
-                      {t('nav.profile')}
-                    </Link>
-                  </li>
-                </>
+                user?.role === 'ADMIN' ? (
+                  <>
+                    <li>
+                      <Link to={ROUTES.ADMIN.FINANCIALS} className="hover:text-amber-500 transition-colors">
+                        {isRTL ? 'الخزينة والسحوبات' : 'Treasury & Payouts'}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.ADMIN.TRANSACTIONS} className="hover:text-amber-500 transition-colors">
+                        {isRTL ? 'سجل المعاملات' : 'Audit Logs'}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.PROFILE} className="hover:text-amber-500 transition-colors">
+                        {t('nav.profile')}
+                      </Link>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      <Link to={ROUTES.WALLET} className="hover:text-amber-500 transition-colors">
+                        {t('footer.wallet')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.WALLET_WITHDRAWALS} className="hover:text-amber-500 transition-colors">
+                        {t('footer.withdrawals')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.WALLET_TRANSACTIONS} className="hover:text-amber-500 transition-colors">
+                        {t('footer.transactions')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to={ROUTES.PROFILE} className="hover:text-amber-500 transition-colors">
+                        {t('nav.profile')}
+                      </Link>
+                    </li>
+                  </>
+                )
               ) : (
                 <>
                   <li>

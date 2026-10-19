@@ -28,7 +28,7 @@
   "status": {
     "all": "All Statuses",
     "PENDING": "Upcoming",
-    "ACTIVE": "Live Bidding",
+    "ACTIVE": "Active",
     "ENDED": "Ended",
     "CANCELLED": "Cancelled"
   },
@@ -136,6 +136,10 @@
     "buyerBannerEndedWithWinner": "This auction has ended and was awarded to the highest bidder.",
     "buyerBannerEndedNoBids": "This auction has concluded with no bids placed on this item.",
     "auctionCancelledMessage": "This auction was cancelled by the seller before starting and is no longer accepting bids.",
+    "adminCancelledTitle": "This auction was cancelled by administration",
+    "adminCancelledReason": "Audit Cancellation Reason:",
+    "adminCancelledRefundNotice": "The auction was terminated and all held bid deposits were automatically refunded to bidders' wallets.",
+    "sellerCancelledTitle": "This auction was cancelled by the seller",
     "editAuction": "Edit Auction Details",
     "cancelAuction": "Cancel Auction",
     "biddingBoxTitle": "Place a Live Bid",

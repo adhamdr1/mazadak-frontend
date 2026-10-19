@@ -1670,202 +1670,50 @@ mutation {
 ### 10.1 فحص إمكانية التقييم (canReviewAuction) — محمي
 
 ```graphql
-query CanReviewAuction($auctionId: ID!) {
-  canReviewAuction(auctionId: $auctionId) {
+query {
+  canReviewAuction(auctionId: ID!) {
     canReview    # Boolean
-    reason       # سبب عدم الإمكانية لو canReview = false (مثل: عدم انتهاء المزاد، عدم المشاركة، انتهاء المهلة، سبق التقييم)
+    reason       # سبب عدم الإمكانية لو canReview = false
   }
 }
 ```
 
-> **استخدم هذا Query أولاً** قبل عرض زر أو بانر التقييم (`staleTime: 0`).
+> **استخدم هذا Query أولاً** قبل ما تعرض زر التقييم.
 
 ---
 
 ### 10.2 إنشاء تقييم (createReview) — محمي
 
 ```graphql
-mutation CreateReview($input: CreateReviewInput!) {
+mutation {
   createReview(input: {
     auctionId: String!
-    overallRating: Int!      # من 1 إلى 5 (إلزامي)
-    criteria: {              # اختياري
+    overallRating: Int!      # من 1 إلى 5
+    criteria: {
       itemAccuracy: Int      # من 1 إلى 5
-      communication: Int     # من 1 إلى 5
-      packaging: Int         # من 1 إلى 5
-      smoothExperience: Int  # من 1 إلى 5
+      communication: Int
+      packaging: Int
+      smoothExperience: Int
     }
-    comment: String          # حد أقصى 500 حرف
-  }) {
-    _id
-    auctionId
-    reviewerId
-    reviewedUserId
-    type
-    status
-    overallRating
-    criteria { itemAccuracy communication packaging smoothExperience }
-    comment
-    createdAt
-  }
+    comment: String
+  }) { _id  overallRating  status  createdAt }
 }
 ```
 
 **الأخطاء:**
-| كود الخطأ | HTTP Status | المعنى |
-|:---|:---|:---|
-| `REVIEW_ALREADY_EXISTS` | 409 Conflict | قيّمت هذا المزاد بالفعل |
-| `REVIEW_WINDOW_EXPIRED` | 400 Bad Request | انتهت فترة الـ 14 يوماً المسموحة للتقييم بعد انتهاء المزاد |
-| `CANNOT_REVIEW_YOURSELF` | 400 Bad Request | لا يمكن تقييم نفسك |
-| `AUCTION_NOT_ELIGIBLE_FOR_REVIEW` | 400 Bad Request | المزاد ليس في حالة مؤهلة للتقييم (لم ينتهِ أو معلق) |
-| `NOT_AUCTION_PARTICIPANT` | 403 Forbidden | المستخدم ليس المشتري الفائز ولا البائع |
-| `REVIEW_NOT_FOUND` | 404 Not Found | التقييم المطلوب غير موجود |
+| كود الخطأ | المعنى |
+|:---|:---|
+| `REVIEW_ALREADY_EXISTS` | قيّمت بالفعل |
+| `REVIEW_WINDOW_EXPIRED` | انتهت فترة التقييم |
+| `CANNOT_REVIEW_YOURSELF` | لا يمكن تقييم نفسك |
 
 ---
 
-### 10.3 الرد على تقييم (replyToReview) — محمي (الطرف المُقيَّم فقط)
+### 10.3 الرد على تقييم (replyToReview) — محمي (البائع فقط)
 
 ```graphql
-mutation ReplyToReview($input: ReplyReviewInput!) {
-  replyToReview(input: {
-    reviewId: String!
-    reply: String!           # نص الرد (من 2 إلى 500 حرف)
-  }) {
-    _id
-    reply
-    repliedAt
-  }
-}
-```
-
-**الأخطاء:**
-| كود الخطأ | HTTP Status | المعنى |
-|:---|:---|:---|
-| `REPLY_ALREADY_EXISTS` | 409 Conflict | تم الرد على هذا التقييم مسبقاً (الرد لمرة واحدة فقط) |
-| `REVIEW_REPLY_FORBIDDEN` | 403 Forbidden | لست الشخص المُقيَّم المخول بالرد |
-| `REVIEW_NOT_FOUND` | 404 Not Found | التقييم غير موجود |
-
----
-
-### 10.4 استعلام تقييمات المستخدم (userReviews) — عام / محمي
-
-```graphql
-query UserReviews(
-  $userId: ID!
-  $input: PaginationInput
-  $filter: ReviewsFilterInput
-  $sort: ReviewsSortInput
-) {
-  userReviews(userId: $userId, input: $input, filter: $filter, sort: $sort) {
-    total
-    totalPages
-    hasNextPage
-    items {
-      _id
-      auctionId
-      reviewerId
-      reviewedUserId
-      type
-      status
-      overallRating
-      criteria { itemAccuracy communication packaging smoothExperience }
-      comment
-      reply
-      repliedAt
-      publishedAt
-      createdAt
-      reviewer { id firstName lastName city ratingStats { averageRating totalReviews } }
-      auction { _id title images currentPrice }
-    }
-  }
-}
-```
-
-> **ملاحظة معمارية:** يعيد التقييمات المنشورة `PUBLISHED` فقط لجميع الزوار لضمان كفاءة كاش Redis SWR السريع.
-
----
-
-### 10.5 إحصائيات تقييم المستخدم وتوزيع النجوم (userRatingStats) — عام / محمي
-
-```graphql
-query UserRatingStats($userId: ID!) {
-  userRatingStats(userId: $userId) {
-    averageRating
-    totalReviews
-    asSellerAverageRating
-    asSellerTotalReviews
-    asBuyerAverageRating
-    asBuyerTotalReviews
-    breakdown {
-      oneStar
-      twoStar
-      threeStar
-      fourStar
-      fiveStar
-    }
-  }
-}
-```
-
----
-
-### 10.6 تقييماتي المكتوبة (myWrittenReviews) — محمي
-
-```graphql
-query MyWrittenReviews(
-  $input: PaginationInput
-  $filter: ReviewsFilterInput
-  $sort: ReviewsSortInput
-) {
-  myWrittenReviews(input: $input, filter: $filter, sort: $sort) {
-    total
-    totalPages
-    hasNextPage
-    items {
-      _id
-      auctionId
-      reviewedUserId
-      type
-      status
-      overallRating
-      criteria { itemAccuracy communication packaging smoothExperience }
-      comment
-      reply
-      repliedAt
-      createdAt
-      reviewedUser { id firstName lastName city }
-      auction { _id title images currentPrice }
-    }
-  }
-}
-```
-
-> **ملاحظة معمارية:** يعيد كافة تقييمات المستخدم بما فيها `PENDING` (نظام التقييم الأعمى Blind Review) لعرض شارة "قيد المراجعة".
-
----
-
-### 10.7 تفاصيل تقييم مفرد (review) — عام / محمي
-
-```graphql
-query GetReview($id: ID!) {
-  review(id: $id) {
-    _id
-    auctionId
-    reviewerId
-    reviewedUserId
-    type
-    status
-    overallRating
-    criteria { itemAccuracy communication packaging smoothExperience }
-    comment
-    reply
-    repliedAt
-    publishedAt
-    createdAt
-    reviewer { id firstName lastName city }
-    reviewedUser { id firstName lastName city }
-    auction { _id title images currentPrice }
-  }
+mutation {
+  replyToReview(input: { reviewId: String!  reply: String! }) { _id  reply  repliedAt }
 }
 ```
 
@@ -1916,13 +1764,15 @@ subscription {
 
 ```graphql
 subscription {
-  auctionStatusChanged(auctionId: ID!) {
+  auctionStatusChanged(auctionId: ID) {
     auction { _id  status  winnerId  currentPrice  isFinalized }
   }
 }
 ```
 
-> يُستخدم في صفحة تفاصيل المزاد لإغلاق المزايدة فور انتهاء الوقت.
+> **الاستخدام:**
+> * عند تمرير `auctionId`: يُستخدم في صفحة تفاصيل المزاد لمتابعة حالة هذا المزاد فقط.
+> * عند عدم تمرير `auctionId` (اختياري): يعمل كـ **Global Feed** عام لبث كافة تغيرات حالات المزادات على مستوى المنصة (مثالي للوحة تحكم الأدمن والصفحة الرئيسية).
 
 ---
 
@@ -2043,7 +1893,7 @@ subscription {
 
 ```graphql
 subscription {
-  disputeStatusChanged(disputeId: ID!) {
+  disputeStatusChanged(disputeId: ID) {
     disputeId
     escrowId
     auctionId
@@ -2055,54 +1905,9 @@ subscription {
 }
 ```
 
-> **ملاحظة أمنية:** البث يصل حصراً لأطراف النزاع (المدعي والمدعى عليه) أو الأدمن.
-
----
-
-### 11.11 إضافة تقييم جديد للمستخدم (reviewAddedToUser) — عام / محمي
-
-```graphql
-subscription OnReviewAddedToUser($userId: ID!) {
-  reviewAddedToUser(userId: $userId) {
-    reviewedUserId
-    review {
-      _id
-      auctionId
-      reviewerId
-      reviewedUserId
-      type
-      status
-      overallRating
-      criteria { itemAccuracy communication packaging smoothExperience }
-      comment
-      reply
-      repliedAt
-      publishedAt
-      createdAt
-      reviewer { id firstName lastName city }
-      auction { _id title currentPrice }
-    }
-    updatedRatingStats {
-      averageRating
-      totalReviews
-      asSellerAverageRating
-      asSellerTotalReviews
-      asBuyerAverageRating
-      asBuyerTotalReviews
-      breakdown {
-        oneStar
-        twoStar
-        threeStar
-        fourStar
-        fiveStar
-      }
-    }
-  }
-}
-```
-
-> 🌟 **ملاحظة معمارية (Blind Review & Live Sync):**
-> نظراً لتطبيق نظام التقييم الأعمى (Blind Review)، يُبث هذا الحدث حصراً عند تحول التقييم إلى `PUBLISHED` (سواء عند اكتمال تقييم الطرفين متبادلاً أو عند انقضاء مهلة الـ 14 يوماً) لضمان سرية التقييم قبل نشره، ويحمل الإحصائيات المحدثة `updatedRatingStats` لتحديث صفحة البروفايل لحظياً بـ 0ms.
+> **الاستخدام والملاحظة الأمنية:**
+> * عند تمرير `disputeId`: يصل البث حصراً لأطراف هذا النزاع المالي (المدعي والمدعى عليه) أو الأدمن.
+> * عند عدم تمرير `disputeId` (اختياري): يعمل كـ **Global Feed** عام للأدمن لاستقبال تحديثات أي نزاع في المنصة لحظياً، أو للمستخدم لمتابعة كافة النزاعات التي هو طرف فيها.
 
 ---
 
@@ -2111,21 +1916,61 @@ subscription OnReviewAddedToUser($userId: ID!) {
 > كل هذه العمليات تتطلب `role: ADMIN` في الـ JWT Token.
 
 ```graphql
-# الإحصائيات:
+# 1. الإحصائيات العامة للمنصة:
 query { adminGetDashboardStats { totalUsers  verifiedUsers  activeAuctions  todaysRevenue ... } }
 
-# إدارة المستخدمين:
+# 2. إدارة المستخدمين واستعلام الفلترة والبحث:
+query {
+  adminGetUsers(
+    input: { page: 1, limit: 10 }
+    filter: {
+      search: "adham"
+      isBanned: false           # تصفية المحظورين (true) أو النشطين (false)
+      role: USER                 # تصفية الرتبة: USER | ADMIN
+      isEmailVerified: true      # تصفية الموثقين
+      sort: { field: CREATED_AT, order: DESC }
+    }
+  ) {
+    items { _id  email  firstName  lastName  role  isBanned  isEmailVerified  createdAt }
+    total
+    totalPages
+    hasNextPage
+  }
+}
+
+# 3. جلب تفاصيل مستخدم شاملة للأدمن:
+query { adminGetUserDetails(userId: "660abc123456789") { user { _id email } wallet { balance } recentAuctions { total } recentTransactions { total } } }
+
+# 4. حظر / إلغاء حظر مستخدم:
 mutation { adminToggleUserBan(userId: ID!) { _id  isBanned } }
 
-# إلغاء مزاد:
-mutation { adminCancelAuction(auctionId: ID!  reason: String!) }
+# 5. استعراض سجل المعاملات المالية العام مع الفلترة بالمحفظة أو المستخدم:
+query {
+  adminGetTransactions(
+    input: { page: 1, limit: 10 }
+    filter: {
+      search: "TRX-REF-123"
+      userId: "660abc123456789"       # استعراض كشف حساب كامل لمستخدم بعينه
+      walletId: "660def987654321"     # أو الفلترة برقم المحفظة المباشر
+      type: DEPOSIT                   # DEPOSIT | WITHDRAWAL | BID_HOLD | BID_RELEASE | ESCROW_RELEASE | REFUND
+      status: SUCCESS                 # PENDING | SUCCESS | FAILED
+    }
+  ) {
+    items { _id  walletId  type  amount  currency  status  referenceId  createdAt }
+    total
+    totalPages
+  }
+}
 
-# حل نزاع:
+# 6. إلغاء مزاد (يتطلب سبباً توثيقياً لا يقل عن 10 أحرف):
+mutation { adminCancelAuction(auctionId: ID!  reason: "Auction violated seller terms and conditions") }
+
+# 7. حل نزاع مالي:
 mutation {
   resolveDispute(input: {
     disputeId: String!
-    decision: REFUND_BUYER | PAY_SELLER
-    adminNotes: String
+    decision: REFUND_BUYER # REFUND_BUYER | PAY_SELLER
+    adminNotes: "Resolved after item inspection"
   }) { _id  status  adminDecision  resolvedAt }
 }
 ```
@@ -2235,11 +2080,13 @@ subscription {
 > تتطلب صلاحية `role: ADMIN`.
 
 ```graphql
-# 1. استعراض كافة طلبات السحب في النظام مع الفلترة
+# 1. استعراض كافة طلبات السحب في النظام مع الفلترة والبحث
 query {
   adminGetWithdrawals(
     pagination: { page: 1, limit: 20 }
     filter: {
+      search: "01012345678"          # البحث باسم المستلم، رقم الهاتف، الآيبان، رقم الحساب، أو المعرف
+      userId: "660abc123456789"      # أو جلب سحوبات مستخدم بعينه مباشرة
       status: PENDING
       sortOrder: DESC
     }
@@ -2276,12 +2123,12 @@ mutation {
   }
 }
 
-# 3. إتمام السحب وإرفاق بيانات وإيصال التحويل البنكي
+# 3. إتمام السحب وإرفاق بيانات وإيصال التحويل البنكي (صور فقط: JPG, PNG, WEBP)
 mutation {
   adminCompleteWithdrawal(input: {
     withdrawalId: "66123abc456def789"
     adminReference: "CIB-TRX-987654321"
-    receiptUrl: "https://storage.mazadak.com/receipts/rec_98765.pdf"
+    receiptUrl: "https://res.cloudinary.com/mazadak/image/upload/v1234567/receipts/rec_98765.jpg"
   }) {
     _id
     status                  # COMPLETED
@@ -2291,6 +2138,8 @@ mutation {
     completedAt
   }
 }
+
+> ⚠️ **تنبيه:** `receiptUrl` يتطلب حصراً رابط صورة صالح (JPG, PNG, WEBP) مرفوع مسبقاً عبر `uploadImage`. ملفات الـ PDF غير مدعومة.
 
 # 4. رفض طلب السحب مع ذكر السبب وإعادة الرصيد للمحفظة فوراً
 mutation {

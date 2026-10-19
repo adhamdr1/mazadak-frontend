@@ -59,8 +59,10 @@ export function useEscrowDetail(escrowId?: string) {
   const counterpartyId = isBuyer ? escrow?.sellerId : isSeller ? escrow?.buyerId : undefined;
   const counterpartyRole: 'buyer' | 'seller' = isBuyer ? 'seller' : 'buyer';
 
-  // 4. Fetch Counterparty Public Profile
+  // 4. Fetch Counterparty & Both Parties Public Profiles
   const counterpartyQuery = usePublicProfile(counterpartyId);
+  const buyerQuery = usePublicProfile(escrow?.buyerId);
+  const sellerQuery = usePublicProfile(escrow?.sellerId);
 
   // 5. Derived Business Logic
   const now = new Date();
@@ -91,6 +93,12 @@ export function useEscrowDetail(escrowId?: string) {
     counterpartyRole,
     counterpartyProfile: counterpartyQuery.data,
     isCounterpartyLoading: counterpartyQuery.isLoading,
+
+    // Explicit Buyer & Seller Profiles (for Admin supervision & complete auditing)
+    buyerProfile: buyerQuery.data,
+    isBuyerProfileLoading: buyerQuery.isLoading,
+    sellerProfile: sellerQuery.data,
+    isSellerProfileLoading: sellerQuery.isLoading,
 
     // Inspection & Action Flags
     isWithinInspectionPeriod,

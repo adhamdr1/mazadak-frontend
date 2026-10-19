@@ -94,19 +94,26 @@ export interface PaginationInput {
 }
 
 export interface EscrowFilterInput {
+  search?: string;
+  excludeDisputed?: boolean;
   status?: EscrowStatus;
   userId?: string;
   buyerId?: string;
   sellerId?: string;
   auctionId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface DisputeFilterInput {
+  search?: string;
   status?: DisputeStatus;
   userId?: string;
   openedById?: string;
   againstUserId?: string;
   auctionId?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface OpenDisputeInput {

@@ -268,7 +268,14 @@ export function resolveCanonicalErrorCode(raw: string): string | null {
   if (lower.includes('deactivated') || lower.includes('account_deactivated')) {
     return 'ACCOUNT_DEACTIVATED';
   }
-  if (lower.includes('banned') || lower.includes('account_banned')) {
+  if (
+    lower.includes('banned') ||
+    lower.includes('account_banned') ||
+    lower.includes('محظور') ||
+    lower.includes('حظر') ||
+    lower.includes('تعليق') ||
+    lower.includes('متبند')
+  ) {
     return 'ACCOUNT_BANNED';
   }
 

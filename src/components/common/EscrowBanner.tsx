@@ -45,20 +45,34 @@ export const EscrowBanner: React.FC<EscrowBannerProps> = ({
   const isWinner = Boolean(currentUserId && winnerId && currentUserId === winnerId);
   const isEnded = auctionStatus ? auctionStatus === 'ENDED' : true;
 
-  // Escrow transactions only exist for ENDED auctions and are strictly restricted to seller, winner, or admin
+  // Escrow transactions only exist for ENDED auctions that have a WINNER, and are strictly restricted to seller, winner, or admin
   const isEligible = Boolean(
     isAuthenticated &&
     isEnded &&
+    Boolean(winnerId) &&
     (!sellerId || isSeller || isWinner || isAdmin)
   );
 
-  // 1. Fetch Escrow for this Auction
+  // 1. Fetch Escrow for this Auction with smart bounded polling when auction ends
   const { data: escrow, isLoading } = useQuery({
     queryKey: QUERY_KEYS.ESCROW.BY_AUCTION(auctionId),
     queryFn: () => escrowService.getEscrowByAuction(auctionId),
     enabled: Boolean(auctionId && isEligible),
-    staleTime: 1000 * 30, // 30s
-    retry: false,
+    staleTime: 1000 * 30,
+    refetchInterval: (query) => {
+      // 1. Stop immediately the millisecond data is received
+      if (!isEligible || query.state.data) {
+        return false;
+      }
+      // 2. Hard limit: stop completely after 5 attempts (10 seconds total) to prevent infinite loops
+      const totalChecks = query.state.dataUpdateCount + query.state.errorUpdateCount;
+      if (totalChecks >= 5) {
+        return false;
+      }
+      return 2000;
+    },
+    retry: 2,
+    retryDelay: 1000,
   });
 
   // 2. Real-time Live Subscription

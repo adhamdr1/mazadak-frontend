@@ -7,7 +7,7 @@ import { cn } from '@/utils/cn';
 
 export interface BrandLogoProps {
   to?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   showText?: boolean;
   className?: string;
 }
@@ -21,6 +21,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   const { t } = useTranslation('common');
 
   const sizeConfigs = {
+    xs: {
+      box: 'w-6 h-6 rounded-md',
+      icon: 'w-3.5 h-3.5',
+      text: 'text-xs',
+    },
     sm: {
       box: 'w-8 h-8 rounded-lg',
       icon: 'w-4 h-4',

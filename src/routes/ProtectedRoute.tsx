@@ -29,6 +29,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
+  // Strictly block banned users from accessing any protected member route
+  if (user?.isBanned) {
+    return <Navigate to={ROUTES.BANNED} replace />;
+  }
+
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return <Navigate to={ROUTES.UNAUTHORIZED} replace />;
   }

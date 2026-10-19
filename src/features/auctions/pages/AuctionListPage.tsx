@@ -10,11 +10,15 @@ import { AuctionGrid } from '../components/browse/AuctionGrid';
 import { NewAuctionsBanner } from '../components/browse/NewAuctionsBanner';
 import { Alert } from '@/components/common/Alert';
 import { Pagination } from '@/components/common/Pagination';
+import { useAuth } from '@/hooks/useAuth';
 import { toLocalizedDigits } from '@/utils/formatters';
+import { cn } from '@/utils/cn';
 
 export const AuctionListPage: React.FC = () => {
   const { t, i18n } = useTranslation('auctions');
   const isRTL = i18n.language?.startsWith('ar');
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -44,9 +48,9 @@ export const AuctionListPage: React.FC = () => {
   }, [actions]);
 
   return (
-    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+    <div className={cn('w-full mx-auto space-y-6', isAdmin ? 'max-w-7xl pt-0' : 'max-w-7xl px-4 sm:px-6 py-6 sm:py-8')}>
       {/* Minimalist, Elegant Hero Section */}
-      <div className="text-center pt-2 pb-4 space-y-3 max-w-2xl mx-auto">
+      <div className={cn('text-center space-y-3 max-w-2xl mx-auto', isAdmin ? 'pt-0 pb-2' : 'pt-2 pb-4')}>
         <div className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-amber-500" />
           <span>{t('hero.badge')}</span>

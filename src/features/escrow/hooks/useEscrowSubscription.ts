@@ -20,15 +20,26 @@ export function useEscrowSubscription(escrowId?: string) {
     if (!escrowId) return;
 
     const handleStatusChanged = (payload: EscrowStatusChangedPayload) => {
-      // 1. Invalidate caches for this escrow and list
+      // 1. Invalidate caches for this escrow, auction banner, and list
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.ESCROW.DETAIL(payload.escrowId),
       });
+      if (payload.auctionId) {
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.ESCROW.BY_AUCTION(payload.auctionId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.AUCTIONS.DETAIL(payload.auctionId),
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.ESCROW.MY_ESCROWS,
       });
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.WALLET.MY_WALLET,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.WALLET.TRANSACTIONS,
       });
 
       // 2. Localized Toast Announcement

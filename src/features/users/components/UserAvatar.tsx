@@ -13,6 +13,7 @@ export interface UserAvatarProps {
   isVerified?: boolean;
   isAdmin?: boolean;
   showRing?: boolean;
+  variant?: 'default' | 'gold';
   className?: string;
 }
 
@@ -28,21 +29,21 @@ const SIZE_CONFIG: Record<
 > = {
   xs: {
     container: 'w-6 h-6',
-    text: 'text-[10px] font-bold',
+    text: 'text-[10px] font-extrabold',
     iconSize: 'w-3 h-3',
     badgeSize: 'w-2.5 h-2.5 p-0.5',
     badgeOffset: '-bottom-0.5 -end-0.5',
   },
   sm: {
     container: 'w-8 h-8',
-    text: 'text-xs font-bold',
+    text: 'text-xs font-extrabold',
     iconSize: 'w-4 h-4',
     badgeSize: 'w-3 h-3 p-0.5',
     badgeOffset: '-bottom-0.5 -end-0.5',
   },
   md: {
     container: 'w-10 h-10',
-    text: 'text-sm font-bold',
+    text: 'text-sm font-extrabold',
     iconSize: 'w-5 h-5',
     badgeSize: 'w-4 h-4 p-0.5',
     badgeOffset: 'bottom-0 end-0',
@@ -70,13 +71,8 @@ const SIZE_CONFIG: Record<
   },
 };
 
-const GRADIENT_PALETTES = [
-  'bg-linear-to-br from-amber-500 via-amber-600 to-amber-700 text-white shadow-amber-500/20',
-  'bg-linear-to-br from-slate-800 via-slate-900 to-slate-950 text-amber-400 border border-amber-500/30 shadow-slate-900/40',
-  'bg-linear-to-br from-amber-600 via-yellow-600 to-amber-800 text-white shadow-amber-600/20',
-  'bg-linear-to-br from-teal-700 via-emerald-700 to-emerald-900 text-white shadow-emerald-700/20',
-  'bg-linear-to-br from-blue-900 via-slate-900 to-amber-900 text-amber-300 border border-amber-500/20 shadow-blue-900/30',
-];
+const UNIFIED_GOLD_PALETTE =
+  'bg-amber-500/10 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-400/60 dark:border-amber-500/40 ring-1 ring-amber-400/20 dark:ring-amber-500/20 hover:border-amber-500 hover:ring-amber-500/40 group-hover:border-amber-500 group-hover:ring-amber-500/30';
 
 /**
  * Extracts clean, bilingual initials (Arabic and English safe)
@@ -108,23 +104,10 @@ function extractInitials(
   return '';
 }
 
-/**
- * Deterministically picks a gradient based on user string
- */
-function getDeterministicPalette(seed: string): string {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % GRADIENT_PALETTES.length;
-  return GRADIENT_PALETTES[index];
-}
-
 export const UserAvatar: React.FC<UserAvatarProps> = ({
   firstName,
   lastName,
   name,
-  userId,
   size = 'md',
   isVerified = false,
   isAdmin = false,
@@ -136,8 +119,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
     [firstName, lastName, name]
   );
 
-  const seed = userId || firstName || name || 'mazadak';
-  const palette = useMemo(() => getDeterministicPalette(seed), [seed]);
+  const palette = UNIFIED_GOLD_PALETTE;
 
   const config = SIZE_CONFIG[size];
   const displayName = firstName ? `${firstName} ${lastName || ''}`.trim() : name || 'User';
@@ -145,11 +127,11 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   return (
     <div
       className={cn(
-        'relative inline-flex shrink-0 items-center justify-center select-none rounded-full',
+        'relative inline-flex shrink-0 items-center justify-center select-none rounded-full transition-colors duration-150',
         config.container,
         palette,
         showRing && 'ring-2 sm:ring-4 ring-amber-400/40 dark:ring-amber-400/30',
-        'shadow-md transition-transform duration-200 hover:scale-[1.02]',
+        'shadow-xs hover:scale-[1.02]',
         className
       )}
       role="img"
@@ -157,11 +139,11 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
       title={displayName}
     >
       {initials ? (
-        <span className={cn('tracking-wider drop-shadow-xs', config.text)}>
+        <span className={cn('tracking-wider drop-shadow-xs font-extrabold', config.text)}>
           {initials}
         </span>
       ) : (
-        <UserIcon className={cn('text-amber-300 drop-shadow-xs', config.iconSize)} />
+        <UserIcon className={cn('text-amber-500 dark:text-amber-300 drop-shadow-xs', config.iconSize)} />
       )}
 
       {/* Verified Shield Badge Overlay */}

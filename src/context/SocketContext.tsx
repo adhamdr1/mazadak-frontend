@@ -71,6 +71,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         next: (data) => {
           if (data?.walletUpdated) {
             queryClient.setQueryData(QUERY_KEYS.WALLET.MY_WALLET, data.walletUpdated);
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.TRANSACTIONS });
           }
         },
         error: (err) => {

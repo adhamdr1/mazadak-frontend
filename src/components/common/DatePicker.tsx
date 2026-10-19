@@ -7,7 +7,7 @@ import {
   ChevronDown,
   X,
 } from 'lucide-react';
-import { normalizeArabicDigits, toLocalizedDigits } from '@/utils/formatters';
+import { toLocalizedDigits } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 
 export interface DatePickerProps {
@@ -56,42 +56,11 @@ const AR_WEEKDAYS = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خ
 const EN_WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 /**
- * Parses user input (ISO YYYY-MM-DD or DD/MM/YYYY or DD-MM-YYYY) into a valid ISO YYYY-MM-DD string
+ * Mazadak Platform Launch Configuration
+ * Dates and months prior to this date are automatically disabled.
  */
-const parseInputToIso = (text: string): string | null => {
-  const normalized = normalizeArabicDigits(text.trim()).replace(/[^\d\-/.]/g, '');
-  if (!normalized) return null;
-
-  // Pattern 1: YYYY-MM-DD or YYYY/MM/DD
-  const ymdMatch = normalized.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
-  if (ymdMatch) {
-    const y = parseInt(ymdMatch[1], 10);
-    const m = parseInt(ymdMatch[2], 10);
-    const d = parseInt(ymdMatch[3], 10);
-    if (m >= 1 && m <= 12) {
-      const maxDays = new Date(y, m, 0).getDate();
-      if (d >= 1 && d <= maxDays) {
-        return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      }
-    }
-  }
-
-  // Pattern 2: DD/MM/YYYY or DD-MM-YYYY
-  const dmyMatch = normalized.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
-  if (dmyMatch) {
-    const d = parseInt(dmyMatch[1], 10);
-    const m = parseInt(dmyMatch[2], 10);
-    const y = parseInt(dmyMatch[3], 10);
-    if (m >= 1 && m <= 12) {
-      const maxDays = new Date(y, m, 0).getDate();
-      if (d >= 1 && d <= maxDays) {
-        return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      }
-    }
-  }
-
-  return null;
-};
+export const PLATFORM_LAUNCH_DATE = '2026-10-01';
+export const PLATFORM_LAUNCH_YEAR = 2026;
 
 export const DatePicker: React.FC<DatePickerProps> = ({
   label,
@@ -113,12 +82,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     if (!max) return todayStr;
     return max < todayStr ? max : todayStr;
   }, [max, todayStr]);
-  const effectiveMin = min;
+
+  // Lock past dates: effectiveMin is bounded by platform launch date (2026-10-01)
+  const effectiveMin = useMemo(() => {
+    if (!min) return PLATFORM_LAUNCH_DATE;
+    return min < PLATFORM_LAUNCH_DATE ? PLATFORM_LAUNCH_DATE : min;
+  }, [min]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'days' | 'months' | 'years'>('days');
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   // Parse initial view date from value or today
   const initialDate = value ? new Date(value) : new Date();
@@ -140,10 +113,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     [isRTL]
   );
 
-  // Local text input state for typing
-  const [typedText, setTypedText] = useState<string>(() => formatDisplayDate(value));
-  const [isInputFocused, setIsInputFocused] = useState(false);
-
   // Close calendar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -161,11 +130,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     };
   }, [isOpen]);
 
-  // Sync view & typed text when external value or language changes
+  // Sync view when external value changes
   useEffect(() => {
-    if (!isInputFocused) {
-      setTypedText(formatDisplayDate(value));
-    }
     if (value) {
       const d = new Date(value);
       if (!isNaN(d.getTime())) {
@@ -173,15 +139,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         setViewMonth(d.getMonth());
       }
     }
-  }, [value, isInputFocused, formatDisplayDate]);
+  }, [value]);
 
-  // Available years for fast jump (bounded strictly between effectiveMin and effectiveMax)
+  // Available years for fast jump (starts from 2026 launch year up to current year, dynamic automatic year increment)
+  const PLATFORM_LAUNCH_YEAR = 2026;
   const currentYearNum = new Date().getFullYear();
   const availableYears = useMemo(() => {
     const years: number[] = [];
-    const minYear = effectiveMin ? parseInt(effectiveMin.slice(0, 4), 10) : 2020;
+    const minYear = effectiveMin ? parseInt(effectiveMin.slice(0, 4), 10) : PLATFORM_LAUNCH_YEAR;
     const maxYear = effectiveMax ? parseInt(effectiveMax.slice(0, 4), 10) : currentYearNum;
-    for (let y = maxYear; y >= minYear; y--) {
+    const upperLimit = Math.max(maxYear, PLATFORM_LAUNCH_YEAR);
+    const lowerLimit = Math.min(minYear, upperLimit);
+    for (let y = upperLimit; y >= lowerLimit; y--) {
       years.push(y);
     }
     return years;
@@ -267,7 +236,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     const dd = String(day).padStart(2, '0');
     const formatted = `${viewYear}-${mm}-${dd}`;
     onChange(formatted);
-    setTypedText(formatDisplayDate(formatted));
     setIsOpen(false);
     setViewMode('days');
   };
@@ -275,67 +243,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     onChange(undefined);
-    setTypedText('');
   };
 
   const handleSelectToday = (e: React.MouseEvent) => {
     e.stopPropagation();
     onChange(todayStr);
-    setTypedText(formatDisplayDate(todayStr));
     const today = new Date();
     setViewYear(today.getFullYear());
     setViewMonth(today.getMonth());
     setIsOpen(false);
     setViewMode('days');
-  };
-
-  // Typing Handler
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    setTypedText(raw);
-
-    const parsedIso = parseInputToIso(raw);
-    if (parsedIso) {
-      const isOutOfBounds =
-        (effectiveMin && parsedIso < effectiveMin) ||
-        (effectiveMax && parsedIso > effectiveMax);
-
-      if (!isOutOfBounds) {
-        onChange(parsedIso);
-        const d = new Date(parsedIso);
-        if (!isNaN(d.getTime())) {
-          setViewYear(d.getFullYear());
-          setViewMonth(d.getMonth());
-        }
-      }
-    } else if (raw.trim() === '') {
-      onChange(undefined);
-    }
-  };
-
-  const handleInputBlur = () => {
-    setIsInputFocused(false);
-    if (!typedText.trim()) {
-      onChange(undefined);
-      setTypedText('');
-      return;
-    }
-
-    const parsedIso = parseInputToIso(typedText);
-    if (parsedIso) {
-      const isOutOfBounds =
-        (effectiveMin && parsedIso < effectiveMin) ||
-        (effectiveMax && parsedIso > effectiveMax);
-
-      if (!isOutOfBounds) {
-        onChange(parsedIso);
-        setTypedText(formatDisplayDate(parsedIso));
-        return;
-      }
-    }
-
-    // Reset to existing valid value
-    setTypedText(formatDisplayDate(value));
   };
 
   // Calendar Grid Calculations
@@ -359,54 +276,55 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         </label>
       )}
 
-      {/* Input Field with Calendar Trigger & Clear */}
+      {/* Date Trigger Bar with Calendar Trigger & Clear */}
       <div
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        onClick={() => {
+          if (!disabled) {
+            setIsOpen((prev) => !prev);
+            setViewMode('days');
+          }
+        }}
+        onKeyDown={(e) => {
+          if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            setIsOpen((prev) => !prev);
+            setViewMode('days');
+          }
+        }}
         className={cn(
-          'relative w-full flex items-center justify-between rounded-xl border text-xs font-semibold transition-all duration-150 shadow-2xs',
+          'relative w-full flex items-center justify-between rounded-xl border text-xs font-semibold transition-all duration-150 shadow-2xs cursor-pointer select-none outline-none',
           'bg-white dark:bg-slate-900',
           disabled && 'opacity-50 pointer-events-none',
           error
             ? 'border-rose-500 ring-2 ring-rose-500/20'
-            : isOpen || isInputFocused
+            : isOpen
             ? 'border-amber-500 ring-2 ring-amber-500/20 dark:border-amber-500'
             : value
             ? 'border-amber-500/70 dark:border-amber-500/50 text-slate-900 dark:text-slate-100'
             : 'border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:border-amber-500/50'
         )}
       >
-        {/* Calendar Icon Button */}
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => {
-            setIsOpen((prev) => !prev);
-            setViewMode('days');
-          }}
-          className="ps-3 pe-1.5 py-2 text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer shrink-0 transition-colors"
+        {/* Calendar Icon */}
+        <div
+          className="ps-3 pe-1.5 py-2 text-amber-500 shrink-0"
           title={isRTL ? 'فتح التقويم' : 'Open Calendar'}
         >
           <CalendarIcon className="w-3.5 h-3.5" />
-        </button>
+        </div>
 
-        {/* Editable Input */}
-        <input
-          ref={inputRef}
-          type="text"
-          disabled={disabled}
-          value={typedText}
-          onChange={handleInputChange}
-          onFocus={() => {
-            setIsInputFocused(true);
-            setIsOpen(true);
-            setViewMode('days');
-          }}
-          onBlur={handleInputBlur}
-          placeholder={placeholder || defaultPlaceholder}
-          className="w-full py-2 px-1 text-xs font-mono font-semibold bg-transparent text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:outline-none"
-        />
+        {/* Display Text (Clean Non-editable Presentation) */}
+        <div className="w-full py-2 px-1 text-xs font-mono font-semibold truncate text-start">
+          {value ? (
+            <span className="text-slate-900 dark:text-slate-100">{formatDisplayDate(value)}</span>
+          ) : (
+            <span className="text-slate-400 dark:text-slate-500">{placeholder || defaultPlaceholder}</span>
+          )}
+        </div>
 
-        {/* Clear Button (only when value or text exists) */}
-        {(value || typedText) && !disabled && (
+        {/* Clear Button (only when value exists) */}
+        {value && !disabled && (
           <button
             type="button"
             onClick={handleClear}
