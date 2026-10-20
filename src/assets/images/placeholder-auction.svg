@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mazadak-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="mazadak-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#mazadak-bg)" />
+  <circle cx="400" cy="270" r="110" fill="#334155" opacity="0.3" />
+  <!-- Stylized Gavel -->
+  <g transform="translate(400, 260) rotate(-35) translate(-40, -40)">
+    <rect x="10" y="0" width="60" height="30" rx="8" fill="url(#mazadak-gold)" />
+    <rect x="33" y="25" width="14" height="90" rx="6" fill="#94A3B8" />
+    <rect x="25" y="110" width="30" height="10" rx="4" fill="url(#mazadak-gold)" />
+  </g>
+  <rect x="320" y="380" width="160" height="16" rx="8" fill="#475569" opacity="0.6" />
+  <!-- Platform Logo / Text -->
+  <text x="400" y="445" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="bold" fill="#F8FAFC" text-anchor="middle" letter-spacing="1">
+    MAZADAK • مزادك
+  </text>
+  <text x="400" y="480" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" fill="#94A3B8" text-anchor="middle">
+    صورة المزاد غير متوفرة
+  </text>
+</svg>

@@ -8,12 +8,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { bidsService } from '../services/bids.service';
+import { walletService } from '@/features/wallet/services/wallet.service';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/feedback/useToast';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { ROUTES } from '@/constants/routes.constants';
 import { getLocalizedErrorMessage, parseAppError, resolveCanonicalErrorCode } from '@/utils/errorHandler';
-import type { AutoBid, UserWallet } from '../types/bids.types';
+import type { AutoBid } from '../types/bids.types';
+import type { WalletData } from '@/features/wallet/types/wallet.types';
 
 export function useAutoBid(auctionId?: string) {
   const { t } = useTranslation('bids');
@@ -41,9 +43,9 @@ export function useAutoBid(auctionId?: string) {
     data: wallet,
     isLoading: isWalletLoading,
     refetch: refetchWallet,
-  } = useQuery<UserWallet | null>({
+  } = useQuery<WalletData | null>({
     queryKey: QUERY_KEYS.WALLET.MY_WALLET,
-    queryFn: () => (isAuthenticated ? bidsService.getMyWallet() : Promise.resolve(null)),
+    queryFn: () => (isAuthenticated ? walletService.getMyWallet() : Promise.resolve(null)),
     enabled: Boolean(isAuthenticated),
     staleTime: 0,
   });

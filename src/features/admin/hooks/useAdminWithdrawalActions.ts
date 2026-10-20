@@ -20,14 +20,10 @@ export const useAdminWithdrawalActions = () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.WITHDRAWALS_ALL });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.TREASURY });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.STATS });
-      toast.success(
-        t('financials.withdrawals.startProcessingSuccess', {
-          defaultValue: 'تم بدء معالجة طلب السحب بنجاح وقفله للتدقيق المصرفي',
-        })
-      );
+      toast.success(t('financials.withdrawals.startProcessingSuccess'));
     },
     onError: (err: Error) => {
-      toast.error(err.message || t('common.error', { defaultValue: 'حدث خطأ أثناء معالجة الطلب' }));
+      toast.error(err.message || t('common:error'));
     },
   });
 
@@ -38,14 +34,10 @@ export const useAdminWithdrawalActions = () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.WITHDRAWALS_ALL });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.TREASURY });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.STATS });
-      toast.success(
-        t('financials.withdrawals.completeModal.successMessage', {
-          defaultValue: 'تم إتمام عملية السحب وتحديث السجل بنجاح.',
-        })
-      );
+      toast.success(t('financials.withdrawals.completeModal.successMessage'));
     },
     onError: (err: Error) => {
-      toast.error(err.message || t('common.error', { defaultValue: 'فشل إتمام السحب' }));
+      toast.error(err.message || t('common:error'));
     },
   });
 
@@ -56,14 +48,10 @@ export const useAdminWithdrawalActions = () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.WITHDRAWALS_ALL });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.TREASURY });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN.STATS });
-      toast.success(
-        t('financials.withdrawals.rejectModal.successMessage', {
-          defaultValue: 'تم رفض طلب السحب وإعادة المبلغ للمحفظة.',
-        })
-      );
+      toast.success(t('financials.withdrawals.rejectModal.successMessage'));
     },
     onError: (err: Error) => {
-      toast.error(err.message || t('common.error', { defaultValue: 'فشل رفض طلب السحب' }));
+      toast.error(err.message || t('common:error'));
     },
   });
 

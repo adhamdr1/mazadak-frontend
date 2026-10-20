@@ -50,11 +50,7 @@ export const useAdminDisputesSubscription = ({
           }
 
           // 3. User feedback
-          toast.info(
-            t('disputes.realtimeUpdate', {
-              defaultValue: 'تم تحديث حالة نزاع في النظام بشكل لحظي',
-            })
-          );
+          toast.info(t('disputes.realtimeUpdate'));
 
           // 4. Custom callback if provided
           if (onDisputeUpdatedRef.current) {

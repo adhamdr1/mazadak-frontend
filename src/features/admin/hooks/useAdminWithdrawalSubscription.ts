@@ -43,11 +43,7 @@ export const useAdminWithdrawalSubscription = ({
           }
 
           // 3. User feedback toast
-          toast.info(
-            t('financials.withdrawals.realtimeFeedNotice', {
-              defaultValue: 'تم تحديث طلبات السحب في النظام لحظياً عبر البث المباشر',
-            })
-          );
+          toast.info(t('financials.withdrawals.realtimeFeedNotice'));
 
           // 4. Custom callback if provided
           if (onWithdrawalUpdatedRef.current) {

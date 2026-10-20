@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { GuestRoute } from './GuestRoute';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -89,6 +89,7 @@ export const AppRoutes: React.FC = () => {
               <Route path={ROUTES.CREATE_AUCTION} element={<CreateAuctionPage />} />
               <Route path={ROUTES.EDIT_AUCTION()} element={<EditAuctionPage />} />
               <Route path={ROUTES.MY_AUCTIONS} element={<MyAuctionsPage />} />
+              <Route path={ROUTES.MY_WON_AUCTIONS} element={<Navigate to={`${ROUTES.MY_AUCTIONS}?tab=won`} replace />} />
               <Route path={ROUTES.MY_BIDS} element={<MyBidsPage />} />
               <Route path={ROUTES.WALLET} element={<WalletPage />} />
               <Route path={ROUTES.WALLET_DEPOSIT} element={<DepositPage />} />

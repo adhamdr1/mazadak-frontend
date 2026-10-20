@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { usersService } from '../services/users.service';
@@ -17,11 +17,9 @@ export function useUserReputationSubscription({
   enabled = true,
 }: UseUserReputationSubscriptionOptions) {
   const queryClient = useQueryClient();
-  const enabledRef = useRef(enabled);
-  enabledRef.current = enabled;
 
   useEffect(() => {
-    if (!userId || !enabledRef.current) {
+    if (!userId || !enabled) {
       return;
     }
 
@@ -52,5 +50,5 @@ export function useUserReputationSubscription({
     return () => {
       unsubscribe();
     };
-  }, [userId, queryClient]);
+  }, [userId, enabled, queryClient]);
 }

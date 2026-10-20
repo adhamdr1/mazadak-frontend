@@ -44,12 +44,7 @@ export function useEscrowSubscription(escrowId?: string) {
 
       // 2. Localized Toast Announcement
       const statusLabel = t(`status.${payload.status}`, payload.status);
-      toast.info(
-        t('detail.statusUpdatedRealtime', {
-          status: statusLabel,
-          defaultValue: `تم تحديث حالة الضمان المالي لحظياً: ${statusLabel}`,
-        })
-      );
+      toast.info(t('detail.statusUpdatedRealtime', { status: statusLabel }));
     };
 
     // 3. Subscribe with mandatory cleanup
