@@ -62,9 +62,6 @@ VITE_WS_URL=ws://localhost:3000/graphql
 
 # Google OAuth 2.0 Client ID (Public Web Client ID)
 VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-
-# Payment Gateway Public Keys (Test / Sandbox Mode)
-VITE_STRIPE_PUBLIC_KEY=pk_test_sample
 ```
 
 ### 4. Run the Development Server
@@ -97,7 +94,7 @@ npm run preview
 - **⚡ Real-Time Live Bidding Engine:** Sub-millisecond reactive price updates and instant leading bidder indicators powered by `graphql-ws`.
 - **🤖 Proxy Auto-Bidding:** Client interface for automated proxy bidding with budget ceilings and available balance validation.
 - **🛡️ Escrow Protection & Inspection Timer:** Dynamic countdown window for buyers, delivery confirmation modal, and formal dispute center.
-- **💳 Multi-Tier Digital Wallet:** Instant balance tracking, deposit integration (Paymob / Stripe Sandbox), and 3-step withdrawal wizard with Egyptian financial validation (Bank, Mobile Wallets, InstaPay).
+- **💳 Multi-Tier Digital Wallet:** Instant balance tracking, deposit integration (Paymob Payment Gateway), and 3-step withdrawal wizard with Egyptian financial validation (Bank, Mobile Wallets, InstaPay).
 - **💬 Post-Auction Private Chat:** WebSocket communication channel between sellers and winning bidders with unread counters and read receipts.
 - **🔔 Live Notifications Center:** Instant in-app notification dropdown and categorized notifications hub.
 - **⭐ Mutual Blind Reviews:** Rating and review workflow with criteria breakdown and seller reply capability.
@@ -307,7 +304,7 @@ The platform is partitioned into **11 domain-driven feature modules**, all built
 
 ### 5. Digital Wallet & Financial Module (`src/features/wallet/`)
 - **Wallet Overview (`WalletPage.tsx`):** Available balance vs held balance breakdown with dynamic visual cards.
-- **Deposit Engine (`DepositPage.tsx`):** Paymob and Stripe deposit flow with asynchronous webhook status synchronization.
+- **Deposit Engine (`DepositPage.tsx`):** Seamless Paymob deposit gateway with automated webhook status synchronization.
 - **3-Step Withdrawal Wizard (`WithdrawPage.tsx`):** Dynamic amount validation capped at available balance, method selection (Bank Account, Mobile Wallets, InstaPay), and fee previews.
 - **Audit Ledger (`TransactionsPage.tsx` & `WithdrawalsPage.tsx`):** Complete chronological financial transactions ledger with unified date filtering.
 

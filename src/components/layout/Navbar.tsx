@@ -302,7 +302,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
           <div className="flex items-center gap-6">
             <BrandLogo size="md" />
 
-            <nav className="hidden md:flex items-center gap-1 text-xs font-semibold">
+            <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold">
               {desktopTopLinks.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -315,23 +315,23 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                       }
                     }}
                     className={cn(
-                      'px-3 py-2 rounded-xl flex items-center gap-2 transition-all duration-150',
+                      'px-3 py-2 rounded-xl flex items-center gap-2 transition-all duration-150 shrink-0 whitespace-nowrap',
                       item.isActive
                         ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     )}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="whitespace-nowrap">{item.label}</span>
 
                     {/* WhatsApp-style Live Unread Counter Badge */}
                     {item.badge !== undefined && item.badge > 0 && (
                       <span
                         className={cn(
-                          'inline-flex items-center justify-center font-black text-[10px] leading-none',
+                          'inline-flex items-center justify-center font-black text-[10px] leading-none shrink-0',
                           'px-1.5 py-0.5 min-w-[18px] h-[18px] rounded-full',
                           'bg-amber-500 text-slate-950 shadow-xs shadow-amber-500/40',
-                          'animate-in zoom-in-75 duration-200 shrink-0'
+                          'animate-in zoom-in-75 duration-200'
                         )}
                         aria-label={`${item.badge} unread chats`}
                       >
@@ -344,13 +344,38 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
             </nav>
           </div>
 
-          {/* Right: Language/Theme Controls & Menu Trigger */}
+          {/* Right: Messages, Notifications & Menu Trigger */}
           <div className="flex items-center gap-2.5">
-            {/* Language & Theme Controls (Desktop quick access) */}
-            <div className="hidden sm:flex items-center gap-1.5">
-              <LanguageSwitcher />
-              <ThemeToggle />
-            </div>
+            {/* Mobile / Tablet / Half-Screen Messages Quick Link (Visible when desktop nav is hidden) */}
+            {isAuthenticated && (
+              <Link
+                to={ROUTES.MESSAGES}
+                className={cn(
+                  'xl:hidden relative p-2 rounded-xl transition-all duration-150 cursor-pointer select-none',
+                  location.pathname.startsWith('/messages')
+                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-transparent'
+                )}
+                aria-label={t('nav.messages', 'الرسائل')}
+                title={t('nav.messages', 'الرسائل')}
+              >
+                <MessageSquare className="w-4 h-4" />
+
+                {/* WhatsApp-style Live Unread Counter Badge */}
+                {unreadRoomsCount > 0 && (
+                  <span
+                    className={cn(
+                      'absolute -top-1 -end-1 inline-flex items-center justify-center font-black text-[9px] leading-none',
+                      'px-1 min-w-[17px] h-[17px] rounded-full',
+                      'bg-amber-500 text-slate-950 shadow-xs shadow-amber-500/40',
+                      'animate-in zoom-in-75 duration-200'
+                    )}
+                  >
+                    {toLocalizedDigits(unreadRoomsCount > 99 ? '99+' : unreadRoomsCount, isRTL)}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Notifications Dropdown (Bell icon with live pulsing badge) */}
             {isAuthenticated && <NotificationDropdown />}
@@ -370,22 +395,22 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   userId={user?._id}
                   size="xs"
                 />
-                <span className="hidden lg:inline-block text-xs font-bold max-w-[100px] truncate">
+                <span className="hidden xl:inline-block text-xs font-bold max-w-[100px] truncate">
                   {user?.firstName}
                 </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold">
+                <span className="hidden xl:inline-block px-1.5 py-0.2 rounded text-[9px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold">
                   {roleLabel}
                 </span>
                 <Menu className="w-4 h-4 text-slate-500 group-hover:text-amber-500 transition-colors shrink-0" />
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <Link to={ROUTES.LOGIN} className="hidden sm:inline-block">
+                <Link to={ROUTES.LOGIN} className="hidden xl:inline-block">
                   <Button variant="ghost" size="sm" leftIcon={<LogIn className="w-3.5 h-3.5" />}>
                     {t('nav.login', 'دخول')}
                   </Button>
                 </Link>
-                <Link to={ROUTES.REGISTER} className="hidden sm:inline-block">
+                <Link to={ROUTES.REGISTER} className="hidden xl:inline-block">
                   <Button variant="primary" size="sm" leftIcon={<UserPlus className="w-3.5 h-3.5" />}>
                     {t('nav.register', 'تسجيل جديد')}
                   </Button>
@@ -394,7 +419,7 @@ export const Navbar: React.FC<NavbarProps> = ({ className }) => {
                   type="button"
                   onClick={() => setIsMenuOpen(true)}
                   aria-label="Open Menu"
-                  className="sm:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
