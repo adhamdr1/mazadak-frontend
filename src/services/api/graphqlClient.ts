@@ -52,7 +52,10 @@ export async function executeGraphQL<T>(
     });
 
     if (response.data?.errors && response.data.errors.length > 0) {
-      throw new Error(parseGraphQLErrorItem(response.data.errors[0]));
+      const messages = Array.from(
+        new Set(response.data.errors.map(parseGraphQLErrorItem).filter(Boolean))
+      );
+      throw new Error(messages.join('. ') || 'GENERIC_ERROR');
     }
 
     if (!response.data?.data) {
@@ -64,7 +67,10 @@ export async function executeGraphQL<T>(
     if (axios.isAxiosError(err)) {
       const graphqlErrors = err.response?.data?.errors;
       if (Array.isArray(graphqlErrors) && graphqlErrors.length > 0) {
-        throw new Error(parseGraphQLErrorItem(graphqlErrors[0]));
+        const messages = Array.from(
+          new Set(graphqlErrors.map(parseGraphQLErrorItem).filter(Boolean))
+        );
+        throw new Error(messages.join('. ') || 'GENERIC_ERROR');
       }
       if (!err.response) {
         throw new Error('NETWORK_ERROR');

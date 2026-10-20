@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AuthContext, type AuthContextType } from './auth.context';
 import { authService } from '@/features/auth/services/auth.service';
 import { authStorage } from '@/utils/storage.utils';
+import { queryClient } from '@/services/api/queryClient';
 import type { User, AuthResponse } from '@/features/auth/types/auth.types';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -71,6 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Ignore network errors on logout
     } finally {
       authStorage.clearAuth();
+      queryClient.clear();
       setAccessToken(null);
       setUserState(null);
     }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { auctionsService } from '../services/auctions.service';
@@ -116,13 +116,41 @@ export function useAuctionDetail(id?: string) {
     staleTime: 15 * 1000,
   });
 
+  // Dynamic reactive time reference for status transitions
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!query.data) return;
+    const { status, startTime, endTime } = query.data;
+    if (status === 'ENDED' || status === 'CANCELLED') return;
+
+    const startMs = new Date(startTime).getTime();
+    const endMs = new Date(endTime).getTime();
+    const current = Date.now();
+
+    if (current < startMs) {
+      const delay = Math.max(100, startMs - current);
+      const timer = setTimeout(() => {
+        setNowMs(Date.now());
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+
+    if (current < endMs) {
+      const delay = Math.max(100, endMs - current);
+      const timer = setTimeout(() => {
+        setNowMs(Date.now());
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+  }, [query.data, nowMs]);
+
   // Compute dynamic effective status
   const effectiveStatus = useMemo<AuctionStatus | undefined>(() => {
     if (!query.data) return undefined;
     const { status, startTime, endTime } = query.data;
     if (status === 'ENDED' || status === 'CANCELLED') return status;
 
-    const nowMs = Date.now();
     const endMs = new Date(endTime).getTime();
     if (endMs <= nowMs) return 'ENDED';
 
@@ -130,7 +158,7 @@ export function useAuctionDetail(id?: string) {
     if (startMs > nowMs) return 'PENDING';
 
     return 'ACTIVE';
-  }, [query.data]);
+  }, [query.data, nowMs]);
 
   const latestLeadingBidderId =
     query.data?.winnerId ||
