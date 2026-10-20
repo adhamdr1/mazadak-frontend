@@ -21,8 +21,7 @@ export interface AuctionImageGalleryProps {
   className?: string;
 }
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1520031441872-265e4ff70366?auto=format&fit=crop&w=1200&q=80';
+const FALLBACK_IMAGE = '/placeholder-auction.svg';
 
 export const AuctionImageGallery: React.FC<AuctionImageGalleryProps> = ({
   images,

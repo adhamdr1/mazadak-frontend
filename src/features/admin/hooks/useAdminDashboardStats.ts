@@ -3,14 +3,17 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { adminService } from '../services/admin.service';
 import { subscribeToSubscription } from '@/services/websocket/socketClient';
-import { authStorage } from '@/utils/storage.utils';
+import { useAuth } from '@/hooks/useAuth';
 import type { DashboardStats } from '../types/admin.types';
 
 export const useAdminDashboardStats = () => {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuth();
 
   // 1. Real-time updates via WebSocket subscriptions for live platform events
   useEffect(() => {
+    if (!accessToken) return;
+
     // A. Listen to incoming withdrawal requests across the platform
     const unsubscribeWithdrawals = subscribeToSubscription(
       {
@@ -38,7 +41,7 @@ export const useAdminDashboardStats = () => {
         },
         error: () => {},
       },
-      authStorage.getAccessToken()
+      accessToken
     );
 
     // B. Listen to new auctions created across the platform
@@ -58,7 +61,7 @@ export const useAdminDashboardStats = () => {
         },
         error: () => {},
       },
-      authStorage.getAccessToken()
+      accessToken
     );
 
     // C. Listen to wallet balance updates for platform liquidity synchronization
@@ -82,7 +85,7 @@ export const useAdminDashboardStats = () => {
         },
         error: () => {},
       },
-      authStorage.getAccessToken()
+      accessToken
     );
 
     // D. Listen to auction status changes across the platform (ACTIVE / ENDED / CANCELLED)
@@ -106,7 +109,7 @@ export const useAdminDashboardStats = () => {
         },
         error: () => {},
       },
-      authStorage.getAccessToken()
+      accessToken
     );
 
     return () => {
@@ -115,7 +118,7 @@ export const useAdminDashboardStats = () => {
       unsubscribeWallet();
       unsubscribeAuctionStatus();
     };
-  }, [queryClient]);
+  }, [accessToken, queryClient]);
 
   return useQuery<DashboardStats, Error>({
     queryKey: QUERY_KEYS.ADMIN.STATS,

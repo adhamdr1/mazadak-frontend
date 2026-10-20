@@ -44,7 +44,6 @@ export function useDisputeSubscription(disputeId?: string) {
           toast.info(
             t('disputeDetail.statusUpdatedRealtime', {
               status: t(`disputeStatus.${payload.status}`, payload.status),
-              defaultValue: `تم تحديث حالة النزاع: ${payload.status}`,
             })
           );
         },

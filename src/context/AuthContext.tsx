@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AuthContext, type AuthContextType } from './auth.context';
 import { authService } from '@/features/auth/services/auth.service';
 import { authStorage } from '@/utils/storage.utils';
+import { queryClient } from '@/services/api/queryClient';
 import type { User, AuthResponse } from '@/features/auth/types/auth.types';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -71,6 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Ignore network errors on logout
     } finally {
       authStorage.clearAuth();
+      queryClient.clear();
       setAccessToken(null);
       setUserState(null);
     }
@@ -109,6 +111,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       window.removeEventListener('mazadak:auth_expired', handleAuthExpired);
     };
   }, [logout]);
+
+  // Listen for token refresh events from apiClient to synchronize in-tab React state
+  useEffect(() => {
+    const handleTokenRefreshed = (e: Event) => {
+      const custom = e as CustomEvent<{ accessToken: string; user?: User }>;
+      if (custom.detail?.accessToken) {
+        setAccessToken(custom.detail.accessToken);
+        if (custom.detail.user) {
+          setUserState(custom.detail.user);
+        }
+      }
+    };
+
+    window.addEventListener('mazadak:token_refreshed', handleTokenRefreshed);
+    return () => {
+      window.removeEventListener('mazadak:token_refreshed', handleTokenRefreshed);
+    };
+  }, []);
 
   const value: AuthContextType = {
     user,

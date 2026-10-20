@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/feedback/useToast';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { adminService } from '../services/admin.service';
-import { authStorage } from '@/utils/storage.utils';
+import { useAuth } from '@/hooks/useAuth';
 import type { DisputeStatusChangedPayload } from '@/features/escrow/types/escrow.types';
 
 export interface UseAdminDisputesSubscriptionOptions {
@@ -19,6 +19,7 @@ export const useAdminDisputesSubscription = ({
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation(['admin', 'common']);
+  const { accessToken } = useAuth();
   const onDisputeUpdatedRef = useRef(onDisputeUpdated);
 
   useEffect(() => {
@@ -26,9 +27,7 @@ export const useAdminDisputesSubscription = ({
   }, [onDisputeUpdated]);
 
   useEffect(() => {
-    if (!enabled) return;
-
-    const token = authStorage.getAccessToken();
+    if (!enabled || !accessToken) return;
 
     const unsubscribe = adminService.subscribeToDisputeStatusChanged(
       {
@@ -51,11 +50,7 @@ export const useAdminDisputesSubscription = ({
           }
 
           // 3. User feedback
-          toast.info(
-            t('disputes.realtimeUpdate', {
-              defaultValue: 'تم تحديث حالة نزاع في النظام بشكل لحظي',
-            })
-          );
+          toast.info(t('disputes.realtimeUpdate'));
 
           // 4. Custom callback if provided
           if (onDisputeUpdatedRef.current) {
@@ -66,11 +61,11 @@ export const useAdminDisputesSubscription = ({
           console.warn('[useAdminDisputesSubscription] WebSocket subscription error:', err);
         },
       },
-      token
+      accessToken
     );
 
     return () => {
       unsubscribe();
     };
-  }, [enabled, queryClient, toast, t]);
+  }, [enabled, accessToken, queryClient, toast, t]);
 };

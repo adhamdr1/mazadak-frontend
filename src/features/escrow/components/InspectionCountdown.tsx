@@ -8,6 +8,7 @@ export interface InspectionCountdownProps {
   inspectionPeriodEndsAt?: string | null;
   inspectionDurationHours?: number;
   className?: string;
+  onExpired?: () => void;
 }
 
 interface TimeRemaining {
@@ -40,9 +41,15 @@ export const InspectionCountdown: React.FC<InspectionCountdownProps> = ({
   inspectionPeriodEndsAt,
   inspectionDurationHours = 168,
   className,
+  onExpired,
 }) => {
   const { t, i18n } = useTranslation(['escrow', 'common']);
   const isRTL = i18n.language?.startsWith('ar');
+
+  const onExpiredRef = React.useRef(onExpired);
+  useEffect(() => {
+    onExpiredRef.current = onExpired;
+  }, [onExpired]);
 
   const [timeLeft, setTimeLeft] = useState<TimeRemaining>(() => {
     if (!inspectionPeriodEndsAt) {
@@ -63,13 +70,19 @@ export const InspectionCountdown: React.FC<InspectionCountdownProps> = ({
       return;
     }
 
-    setTimeLeft(calculateTimeRemaining(target));
+    const initial = calculateTimeRemaining(target);
+    setTimeLeft(initial);
+    if (initial.isExpired) {
+      onExpiredRef.current?.();
+      return;
+    }
 
     const interval = setInterval(() => {
       const remaining = calculateTimeRemaining(target);
       setTimeLeft(remaining);
       if (remaining.isExpired) {
         clearInterval(interval);
+        onExpiredRef.current?.();
       }
     }, 1000);
 

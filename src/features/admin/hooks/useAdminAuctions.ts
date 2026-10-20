@@ -3,7 +3,7 @@ import { useQuery, keepPreviousData, useQueryClient } from '@tanstack/react-quer
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { adminService } from '../services/admin.service';
 import { subscribeToSubscription } from '@/services/websocket/socketClient';
-import { authStorage } from '@/utils/storage.utils';
+import { useAuth } from '@/hooks/useAuth';
 import type { AdminAuctionsPageData, AuctionsFilterInput } from '../types/admin.types';
 
 export interface UseAdminAuctionsOptions {
@@ -18,8 +18,11 @@ export const useAdminAuctions = ({
   filter,
 }: UseAdminAuctionsOptions = {}) => {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuth();
 
   useEffect(() => {
+    if (!accessToken) return;
+
     // Listen to real-time auction status changes across the platform (ACTIVE / ENDED / CANCELLED)
     const unsubscribeStatus = subscribeToSubscription(
       {
@@ -41,7 +44,7 @@ export const useAdminAuctions = ({
         },
         error: () => {},
       },
-      authStorage.getAccessToken()
+      accessToken
     );
 
     // Listen to new auctions created across the platform
@@ -62,14 +65,14 @@ export const useAdminAuctions = ({
         },
         error: () => {},
       },
-      authStorage.getAccessToken()
+      accessToken
     );
 
     return () => {
       unsubscribeStatus();
       unsubscribeCreated();
     };
-  }, [queryClient]);
+  }, [accessToken, queryClient]);
 
   return useQuery<AdminAuctionsPageData, Error>({
     queryKey: QUERY_KEYS.ADMIN.AUCTIONS(page, limit, filter),

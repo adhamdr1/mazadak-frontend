@@ -5,6 +5,8 @@
 
 import { executeGraphQL } from '@/services/api/graphqlClient';
 import { subscribeToSubscription } from '@/services/websocket/socketClient';
+import { walletService, WALLET_UPDATED_SUBSCRIPTION } from '@/features/wallet/services/wallet.service';
+export { WALLET_UPDATED_SUBSCRIPTION };
 import type {
   Bid,
   AutoBid,
@@ -137,45 +139,16 @@ export const BID_ADDED_SUBSCRIPTION = `
   }
 `;
 
-export const WALLET_UPDATED_SUBSCRIPTION = `
-  subscription OnWalletUpdated {
-    walletUpdated {
-      _id
-      userId
-      balance
-      heldBalance
-      availableBalance
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
 // ----------------------------------------------------
 // Bids Service Implementation
 // ----------------------------------------------------
 
-const MY_WALLET_QUERY = `
-  query MyWallet {
-    myWallet {
-      _id
-      userId
-      balance
-      heldBalance
-      availableBalance
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
 export const bidsService = {
   /**
-   * Fetch current user's wallet balance summary
+   * Fetch current user's wallet balance summary (delegated to walletService)
    */
   async getMyWallet(): Promise<UserWallet> {
-    const data = await executeGraphQL<{ myWallet: UserWallet }>(MY_WALLET_QUERY);
-    return data.myWallet;
+    return walletService.getMyWallet();
   },
 
   /**
@@ -352,7 +325,7 @@ export const bidsService = {
   },
 
   /**
-   * Subscribe to real-time wallet updates for the current authenticated user via WebSocket
+   * Subscribe to real-time wallet updates for the current authenticated user via WebSocket (delegated to walletService)
    */
   subscribeToWalletUpdated(
     handlers: {
@@ -362,12 +335,6 @@ export const bidsService = {
     },
     token?: string | null
   ): () => void {
-    return subscribeToSubscription<{ walletUpdated: UserWallet }>(
-      {
-        query: WALLET_UPDATED_SUBSCRIPTION,
-      },
-      handlers,
-      token
-    );
+    return walletService.subscribeToWalletUpdated(handlers, token);
   },
 };

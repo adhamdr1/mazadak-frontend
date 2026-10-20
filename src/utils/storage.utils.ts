@@ -14,14 +14,7 @@ export const authStorage = {
     if (localToken) return localToken;
 
     const sessionToken = sessionStorage.getItem('access_token');
-    if (sessionToken) {
-      localStorage.setItem('access_token', sessionToken);
-      const sessionRefresh = sessionStorage.getItem('refresh_token');
-      if (sessionRefresh) localStorage.setItem('refresh_token', sessionRefresh);
-      const sessionUser = sessionStorage.getItem('mazadak_user');
-      if (sessionUser) localStorage.setItem('mazadak_user', sessionUser);
-      return sessionToken;
-    }
+    if (sessionToken) return sessionToken;
     return null;
   },
 

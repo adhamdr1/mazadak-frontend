@@ -23,8 +23,7 @@ export interface MyAuctionCardProps {
   className?: string;
 }
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1520031441872-265e4ff70366?auto=format&fit=crop&w=1000&q=80';
+const FALLBACK_IMAGE = '/placeholder-auction.svg';
 
 export const MyAuctionCard: React.FC<MyAuctionCardProps> = ({
   auction,

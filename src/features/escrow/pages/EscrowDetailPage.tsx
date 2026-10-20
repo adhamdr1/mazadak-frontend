@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import {
   ShieldCheck,
   ArrowRight,
@@ -74,6 +76,15 @@ export const EscrowDetailPage: React.FC = () => {
       // Error handled by mutation toast
     }
   };
+
+  const queryClient = useQueryClient();
+
+  const handleInspectionExpired = useCallback(() => {
+    if (!id) return;
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ESCROW.DETAIL(id) });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ESCROW.MY_ESCROWS });
+    refetch();
+  }, [id, queryClient, refetch]);
 
   // Canonical URL auto-correction if accessed via auctionId
   React.useEffect(() => {
@@ -255,6 +266,7 @@ export const EscrowDetailPage: React.FC = () => {
         <InspectionCountdown
           inspectionPeriodEndsAt={escrow.inspectionPeriodEndsAt}
           inspectionDurationHours={escrow.inspectionDurationHours}
+          onExpired={handleInspectionExpired}
         />
       )}
 

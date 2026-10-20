@@ -40,10 +40,10 @@ export const PublicUserPage: React.FC = () => {
     error,
   } = usePublicProfile(id);
 
-  // Subscribe to real-time reputation changes via WebSocket
+  // Subscribe to real-time reputation changes via WebSocket when reviews tab is inactive
   useUserReputationSubscription({
     userId: id,
-    enabled: Boolean(id && profile),
+    enabled: Boolean(id && profile && currentTab !== 'reviews'),
   });
 
   const isOwner = Boolean(currentUser && id && currentUser._id === id);
