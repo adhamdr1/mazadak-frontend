@@ -20,9 +20,55 @@ export function useAuctionDetail(id?: string) {
     staleTime: 15 * 1000,
   });
 
+  // Dynamic reactive time reference for status transitions
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!query.data) return;
+    const { status, startTime, endTime } = query.data;
+    if (status === 'ENDED' || status === 'CANCELLED') return;
+
+    const startMs = new Date(startTime).getTime();
+    const endMs = new Date(endTime).getTime();
+    const current = Date.now();
+
+    if (current < startMs) {
+      const delay = Math.max(100, startMs - current);
+      const timer = setTimeout(() => {
+        setNowMs(Date.now());
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+
+    if (current < endMs) {
+      const delay = Math.max(100, endMs - current);
+      const timer = setTimeout(() => {
+        setNowMs(Date.now());
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+  }, [query.data, nowMs]);
+
+  // Compute dynamic effective status
+  const effectiveStatus = useMemo<AuctionStatus | undefined>(() => {
+    if (!query.data) return undefined;
+    const { status, startTime, endTime } = query.data;
+    if (status === 'ENDED' || status === 'CANCELLED') return status;
+
+    const endMs = new Date(endTime).getTime();
+    if (endMs <= nowMs) return 'ENDED';
+
+    const startMs = new Date(startTime).getTime();
+    if (startMs > nowMs) return 'PENDING';
+
+    return 'ACTIVE';
+  }, [query.data, nowMs]);
+
   // 1. Real-time status update subscription
   useEffect(() => {
     if (!id) return;
+    if (query.data?.status === 'CANCELLED') return;
+
     const unsubscribe = auctionsService.subscribeToStatusChanges(id, (payload) => {
       queryClient.setQueryData<Auction>(QUERY_KEYS.AUCTIONS.DETAIL(id), (old) => {
         if (!old) return payload.auction;
@@ -46,11 +92,13 @@ export function useAuctionDetail(id?: string) {
     return () => {
       unsubscribe();
     };
-  }, [id, queryClient]);
+  }, [id, query.data?.status, queryClient]);
 
-  // 2. Real-time live bid price update subscription (Single Source of Truth for Seller, Bidders, and Visitors)
+  // 2. Real-time live bid price update subscription (Single Source of Truth, active only when auction is ACTIVE)
   useEffect(() => {
-    if (!id) return;
+    // Prevent opening subscriptions on ended, cancelled, or pending auctions
+    if (!id || effectiveStatus !== 'ACTIVE') return;
+
     const unsubscribe = bidsService.subscribeToBidAdded(id, {
       next: (data) => {
         if (!data?.bidAdded) return;
@@ -103,7 +151,7 @@ export function useAuctionDetail(id?: string) {
     return () => {
       unsubscribe();
     };
-  }, [id, queryClient]);
+  }, [id, effectiveStatus, queryClient]);
 
   // 3. Initial bids query to resolve real-time leading/winning bidder
   const bidsQuery = useQuery({
@@ -115,50 +163,6 @@ export function useAuctionDetail(id?: string) {
     enabled: Boolean(id),
     staleTime: 15 * 1000,
   });
-
-  // Dynamic reactive time reference for status transitions
-  const [nowMs, setNowMs] = useState(() => Date.now());
-
-  useEffect(() => {
-    if (!query.data) return;
-    const { status, startTime, endTime } = query.data;
-    if (status === 'ENDED' || status === 'CANCELLED') return;
-
-    const startMs = new Date(startTime).getTime();
-    const endMs = new Date(endTime).getTime();
-    const current = Date.now();
-
-    if (current < startMs) {
-      const delay = Math.max(100, startMs - current);
-      const timer = setTimeout(() => {
-        setNowMs(Date.now());
-      }, delay);
-      return () => clearTimeout(timer);
-    }
-
-    if (current < endMs) {
-      const delay = Math.max(100, endMs - current);
-      const timer = setTimeout(() => {
-        setNowMs(Date.now());
-      }, delay);
-      return () => clearTimeout(timer);
-    }
-  }, [query.data, nowMs]);
-
-  // Compute dynamic effective status
-  const effectiveStatus = useMemo<AuctionStatus | undefined>(() => {
-    if (!query.data) return undefined;
-    const { status, startTime, endTime } = query.data;
-    if (status === 'ENDED' || status === 'CANCELLED') return status;
-
-    const endMs = new Date(endTime).getTime();
-    if (endMs <= nowMs) return 'ENDED';
-
-    const startMs = new Date(startTime).getTime();
-    if (startMs > nowMs) return 'PENDING';
-
-    return 'ACTIVE';
-  }, [query.data, nowMs]);
 
   const latestLeadingBidderId =
     query.data?.winnerId ||
