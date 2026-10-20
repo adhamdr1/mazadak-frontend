@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/feedback/useToast';
 import { QUERY_KEYS } from '@/constants/queryKeys.constants';
 import { adminService } from '../services/admin.service';
-import { authStorage } from '@/utils/storage.utils';
+import { useAuth } from '@/hooks/useAuth';
 import type { WithdrawalResponse } from '../types/admin.types';
 
 export interface UseAdminWithdrawalSubscriptionOptions {
@@ -19,6 +19,7 @@ export const useAdminWithdrawalSubscription = ({
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation(['admin', 'common']);
+  const { accessToken } = useAuth();
   const onWithdrawalUpdatedRef = useRef(onWithdrawalUpdated);
 
   useEffect(() => {
@@ -26,9 +27,7 @@ export const useAdminWithdrawalSubscription = ({
   }, [onWithdrawalUpdated]);
 
   useEffect(() => {
-    if (!enabled) return;
-
-    const token = authStorage.getAccessToken();
+    if (!enabled || !accessToken) return;
 
     const unsubscribe = adminService.subscribeToWithdrawalFeed(
       {
@@ -59,11 +58,11 @@ export const useAdminWithdrawalSubscription = ({
           console.warn('[useAdminWithdrawalSubscription] WebSocket subscription error:', err);
         },
       },
-      token
+      accessToken
     );
 
     return () => {
       unsubscribe();
     };
-  }, [enabled, queryClient, toast, t]);
+  }, [enabled, accessToken, queryClient, toast, t]);
 };

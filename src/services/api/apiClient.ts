@@ -85,6 +85,15 @@ async function attemptTokenRefresh(): Promise<string | null> {
       const authData = refreshRes.data?.data?.refreshToken;
       if (authData?.accessToken) {
         authStorage.setAuthTokens(authData.accessToken, authData.refreshToken, authData.user);
+        window.dispatchEvent(
+          new CustomEvent('mazadak:token_refreshed', {
+            detail: {
+              accessToken: authData.accessToken,
+              refreshToken: authData.refreshToken,
+              user: authData.user,
+            },
+          })
+        );
         return authData.accessToken;
       }
 
